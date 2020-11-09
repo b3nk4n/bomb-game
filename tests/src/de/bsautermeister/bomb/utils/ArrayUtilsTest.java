@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ArrayUtilsTest {
 
@@ -18,7 +18,7 @@ public class ArrayUtilsTest {
 
         for (boolean[] slice : data) {
             for (boolean value : slice) {
-                assertEquals(true, value);
+                assertTrue(value);
             }
         }
     }
@@ -36,7 +36,7 @@ public class ArrayUtilsTest {
 
         int[][] actual = ArrayUtils.copyToInt(data, 1, 0);
 
-        assertEquals(true, Arrays.deepEquals(expected, actual));
+        assertTrue(Arrays.deepEquals(expected, actual));
     }
 
     @Test
@@ -54,6 +54,6 @@ public class ArrayUtilsTest {
 
         ArrayUtils.replace2D(data, 1, 9);
 
-        assertEquals(true, Arrays.deepEquals(expected, data));
+        assertTrue(Arrays.deepEquals(expected, data));
     }
 }

@@ -1,6 +1,7 @@
 package de.bsautermeister.bomb.utils;
 
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import de.bsautermeister.bomb.utils.result.ClusterResult;
@@ -12,8 +13,8 @@ public class ClusterUtils {
 
     private ClusterUtils() {}
 
-    public static ClusterResult computeClusters(boolean[][] data) {
-        int[][] clusterData = ArrayUtils.copyToInt(data, DEFINED, EMPTY);
+    public static ClusterResult computeClusters(boolean[][] gridData) {
+        int[][] clusterData = ArrayUtils.copyToInt(gridData, DEFINED, EMPTY);
         Array<GridPoint2> clusterStartPositions = new Array<>();
 
         int clusterId = 0;
@@ -60,5 +61,44 @@ public class ClusterUtils {
         }
 
         return marked;
+    }
+
+    public static Array<GridPoint2> computeClusterOutline(int[][] clusterData, int clusterIdx, GridPoint2 startPosition) {
+        Array<GridPoint2> result = new Array<>();
+        result.add(new GridPoint2(startPosition));
+        System.out.println("start added " + startPosition.x + " " + startPosition.y);
+
+        int currentI = startPosition.x;
+        int currentJ = startPosition.y;
+        int nextI = startPosition.x;
+        int nextJ = startPosition.y - 1;
+        boolean open = true;
+        while (open) {
+            for (int i = 0; i < 7; ++i) {
+                GridPoint2 next = GridUtils.getNextPosCW(nextI, nextJ, currentI, currentJ);
+                nextI = next.x;
+                nextJ = next.y;
+
+                if (nextI == startPosition.x && nextJ == startPosition.y) {
+                    // outline is closed: stop connecting the dots
+                    open = false;
+                    break;
+                }
+
+                if (GridUtils.isInBounds(clusterData, nextI, nextJ) && clusterData[nextI][nextJ] == clusterIdx) {
+                    System.out.println("added " + nextI + " " + nextJ);
+                    result.add(new GridPoint2(nextI, nextJ));
+                    int tmpI = currentI;
+                    int tmpJ = currentJ;
+                    currentI = nextI;
+                    currentJ = nextJ;
+                    nextI = tmpI;
+                    nextJ = tmpJ;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 }
