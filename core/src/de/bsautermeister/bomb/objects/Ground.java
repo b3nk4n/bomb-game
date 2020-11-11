@@ -1,5 +1,7 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
@@ -20,6 +22,12 @@ public class Ground {
                 float posY = offsetY + y * size;
                 fragments.add(new Fragment(world, posX, posY, size));
             }
+        }
+    }
+
+    public void impact(Circle circle) {
+        for (Fragment fragment : fragments) {
+            fragment.impact(circle);
         }
     }
 

@@ -218,11 +218,11 @@ public class ClusterUtilsTest {
 		startPosition = new GridPoint2(3, 4);
 		result = ClusterUtils.computeClusterOutline(clusterData, clusterIdx, startPosition);
 
-		assertEquals(7, result.size);
+		assertEquals(6, result.size);
 		assertArrayEquals(new GridPoint2[]{
 						new GridPoint2(3,4),
 						new GridPoint2(4,5),
-						new GridPoint2(5, 5),
+						//new GridPoint2(5, 5),
 						new GridPoint2(6, 5),
 						new GridPoint2(5, 4),
 						new GridPoint2(5, 3),

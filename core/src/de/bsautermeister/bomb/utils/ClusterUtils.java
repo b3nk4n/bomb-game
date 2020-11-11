@@ -63,15 +63,16 @@ public class ClusterUtils {
         return marked;
     }
 
-    public static Array<GridPoint2> computeClusterOutline(int[][] clusterData, int clusterIdx, GridPoint2 startPosition) {
+    public static Array<GridPoint2> computeClusterOutline(int[][] clusterData, int clusterIdx, GridPoint2 startPosition) { // TODO: simplify outline: remove unnecessary vertices
         Array<GridPoint2> result = new Array<>();
         result.add(new GridPoint2(startPosition));
-        System.out.println("start added " + startPosition.x + " " + startPosition.y);
 
         int currentI = startPosition.x;
         int currentJ = startPosition.y;
         int nextI = startPosition.x;
         int nextJ = startPosition.y - 1;
+        int lastDiffI = nextI - currentI;
+        int lastDiffJ = nextJ - currentJ;
         boolean open = true;
         while (open) {
             for (int i = 0; i < 7; ++i) {
@@ -82,11 +83,25 @@ public class ClusterUtils {
                 if (nextI == startPosition.x && nextJ == startPosition.y) {
                     // outline is closed: stop connecting the dots
                     open = false;
+
+                    int diffI = nextI - currentI;
+                    int diffJ = nextJ - currentJ;
+                    if (diffI == lastDiffI && diffJ == lastDiffJ) {
+                        result.removeIndex(result.size - 1);
+                    }
+
                     break;
                 }
 
                 if (GridUtils.isInBounds(clusterData, nextI, nextJ) && clusterData[nextI][nextJ] == clusterIdx) {
-                    System.out.println("added " + nextI + " " + nextJ);
+                    int diffI = nextI - currentI;
+                    int diffJ = nextJ - currentJ;
+                    if (diffI == lastDiffI && diffJ == lastDiffJ) {
+                        result.removeIndex(result.size - 1);
+                    }
+                    lastDiffI = diffI;
+                    lastDiffJ = diffJ;
+
                     result.add(new GridPoint2(nextI, nextJ));
                     int tmpI = currentI;
                     int tmpJ = currentJ;

@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
@@ -45,6 +46,12 @@ public class GameController implements Disposable {
         boolean upPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+
+        boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+
+        if (spacePressed) {
+            ground.impact(new Circle(player.getPosition(), player.getRadius() * 2));
+        }
 
         player.control(upPressed, leftPressed, rightPressed);
     }

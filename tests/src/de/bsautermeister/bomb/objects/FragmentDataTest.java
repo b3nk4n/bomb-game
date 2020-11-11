@@ -94,25 +94,51 @@ public class FragmentDataTest {
 		}, polygon0, EPSILON);
 
 		float[] polygon1 = result.get(1);
-		assertEquals(2 * 5, polygon1.length);
+		assertEquals(2 * 4, polygon1.length);
 		assertArrayEquals(new float[] {
 				15f, 24f,
-				15f, 25f,
+				//15f, 25f,
 				15f, 26f,
 				16f, 26f,
 				16f, 25f
 		}, polygon1, EPSILON);
 
 		float[] polygon2 = result.get(2);
-		assertEquals(2 * 6, polygon2.length);
+		assertEquals(2 * 4, polygon2.length);
 		assertArrayEquals(new float[] {
 				16f, 28f,
 				17f, 29f,
 				18f, 29f,
 				19f, 28f,
-				18f, 28f,
-				17f, 28f
+				//18f, 28f,
+				//17f, 28f
 		}, polygon2, EPSILON);
+	}
+
+	@Test
+	public void computeOutlinesDefaultGrid() {
+		FragmentData sut = new FragmentData(4, 0f, 0f, 3f);
+
+		Array<float[]> result = sut.computeOutlines();
+
+		assertEquals(1, result.size);
+
+		float[] polygon = result.get(0);
+		assertEquals(2 * 4, polygon.length);
+		assertArrayEquals(new float[] {
+				0f, 0f,
+				//0f, 1f,
+				//0f, 2f,
+				0f, 3f,
+				//1f, 3f,
+				//2f, 3f,
+				3f, 3f,
+				//3f, 2f,
+				//3f, 1f,
+				3f, 0f,
+				//2f, 0f,
+				//1f, 0f
+		}, polygon, EPSILON);
 	}
 
 }

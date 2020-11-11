@@ -34,7 +34,7 @@ public class FragmentData {
         this.x = x;
         this.y = y;
         this.size = size;
-        this.delta = (gridData.length - 1) / this.size;
+        this.delta = this.size / (gridData.length - 1);
         this.gridData = gridData; // not needed here to copy the array
     }
 
