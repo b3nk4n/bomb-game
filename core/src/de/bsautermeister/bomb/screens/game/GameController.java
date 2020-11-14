@@ -31,8 +31,8 @@ public class GameController implements Disposable {
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
 
-        player = new Player(world, new Vector2(0f, 0f), 1f / Cfg.PPM);
-        ground = new Ground(world, 11, 3);
+        player = new Player(world, new Vector2(0f, 5f), 1f / Cfg.PPM);
+        ground = new Ground(world, 13, 4);
     }
 
     public void update(float delta) {
@@ -47,10 +47,10 @@ public class GameController implements Disposable {
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+        boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
 
         if (spacePressed) {
-            ground.impact(new Circle(player.getPosition(), player.getRadius() * 2));
+            ground.impact(player.getPosition(), player.getRadius() * 2);
         }
 
         player.control(upPressed, leftPressed, rightPressed);

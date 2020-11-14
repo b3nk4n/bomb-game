@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -27,31 +28,35 @@ public class Fragment {
 
     private final FragmentData fragmentData;
 
-    public Fragment(World world, float x, float y, float size) {
+    public Fragment(World world, float leftX, float bottomY, float size) {
         this.world = world;
-        this.fragmentData = new FragmentData(RESOLUTION, x - size / 2f, y - size / 2f, size);
+        this.fragmentData = new FragmentData(RESOLUTION, size);
 
         Array<float[]> polygonOutlines = fragmentData.computeOutlines();
-        this.body = createBody(x, y, polygonOutlines);
+        this.body = createBody(leftX, bottomY, polygonOutlines);
     }
 
-    public void impact(Circle circle) {
-        boolean updated = fragmentData.remove(circle);
+    private static final Circle tmpImpactCircle = new Circle();
+    public void impact(Vector2 position, float radius) {
+        float leftX = getLeftX();
+        float bottomY = getBottomY();
+
+        tmpImpactCircle.set(position.x - leftX, position.y - bottomY, radius);
+        boolean updated = fragmentData.remove(tmpImpactCircle);
         if (updated) {
-            float x = body.getPosition().x;
-            float y = body.getPosition().y;
+
             world.destroyBody(body);
             body = null;
             Array<float[]> polygonOutlines = fragmentData.computeOutlines();
             if (polygonOutlines.notEmpty()) {
-                this.body = createBody(x, y, polygonOutlines);
+                this.body = createBody(leftX, bottomY, polygonOutlines);
             }
         }
     }
 
-    private Body createBody(float x, float y, Array<float[]> polygonOutlines) {
+    private Body createBody(float leftX, float bottomY, Array<float[]> polygonOutlines) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(x, y);
+        bodyDef.position.set(leftX, bottomY);
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
         Body body = world.createBody(bodyDef);
@@ -99,6 +104,14 @@ public class Fragment {
 
     public Body getBody() {
         return body;
+    }
+
+    public float getLeftX() {
+        return body.getPosition().x;
+    }
+
+    public float getBottomY() {
+        return body.getPosition().y;
     }
 
     public boolean isEmpty() {

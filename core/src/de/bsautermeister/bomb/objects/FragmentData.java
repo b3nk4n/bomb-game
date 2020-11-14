@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.utils.Array;
 
 import de.bsautermeister.bomb.utils.ArrayUtils;
@@ -10,14 +11,12 @@ import de.bsautermeister.bomb.utils.result.ClusterResult;
 
 public class FragmentData {
 
-    private final float x;
-    private final float y;
     private final float size;
     private final float delta;
     private final boolean[][] gridData;
 
-    public FragmentData(int resolution, float x, float y, float size) {
-        this(x, y, size, createFilledArray(resolution, true));
+    public FragmentData(int resolution, float size) {
+        this(size, createFilledArray(resolution, true));
     }
 
     private static boolean[][] createFilledArray(int resolution, boolean value) {
@@ -26,24 +25,23 @@ public class FragmentData {
         return data;
     }
 
-    public FragmentData(float x, float y, float size, boolean[][] gridData) {
+    public FragmentData(float size, boolean[][] gridData) {
         if (gridData.length > 0 && gridData[0].length > 0 && gridData.length != gridData[0].length) {
             throw new IllegalArgumentException("Grid data have square shape.");
         }
 
-        this.x = x;
-        this.y = y;
         this.size = size;
         this.delta = this.size / (gridData.length - 1);
         this.gridData = gridData; // not needed here to copy the array
     }
 
     public boolean remove(Circle circle) {
+        // TODO early stop: check if data bounds intersects with circle, before checking each single grid value
         boolean updated = false;
         for (int i = 0; i < gridData.length; ++i) {
             for (int j = 0; j < gridData[i].length; ++j) {
-                float x = getNodeX(i);
-                float y = getNodeY(j);
+                float x = getRelativeX(i);
+                float y = getRelativeY(j);
                 if (gridData[i][j] && circle.contains(x, y)) {
                     gridData[i][j] = false;
                     updated = true;
@@ -75,30 +73,22 @@ public class FragmentData {
         float[] polygonData = new float[gridPoints.size * 2];
         int i = 0;
         for (GridPoint2 gridPoint : gridPoints) {
-            polygonData[i++] = getNodeX(gridPoint.x);
-            polygonData[i++] = getNodeY(gridPoint.y);
+            polygonData[i++] = getRelativeX(gridPoint.x);
+            polygonData[i++] = getRelativeY(gridPoint.y);
         }
         return polygonData;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
     }
 
     public float getSize() {
         return size;
     }
 
-    public float getNodeX(int i) {
-        return x + i * delta;
+    public float getRelativeX(int i) {
+        return i * delta;
     }
 
-    public float getNodeY(int j) {
-        return y + j * delta;
+    public float getRelativeY(int j) {
+        return j * delta;
     }
 
     public boolean[][] getGridData() {

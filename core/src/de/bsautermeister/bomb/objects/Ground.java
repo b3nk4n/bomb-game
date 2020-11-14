@@ -25,9 +25,9 @@ public class Ground {
         }
     }
 
-    public void impact(Circle circle) {
+    public void impact(Vector2 position, float radius) {
         for (Fragment fragment : fragments) {
-            fragment.impact(circle);
+            fragment.impact(position, radius);
             if (fragment.isEmpty()) {
                 fragments.removeValue(fragment, true);
             }
