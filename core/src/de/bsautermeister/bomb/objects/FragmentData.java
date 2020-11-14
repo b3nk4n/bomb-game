@@ -44,7 +44,7 @@ public class FragmentData {
             for (int j = 0; j < gridData[i].length; ++j) {
                 float x = getNodeX(i);
                 float y = getNodeY(j);
-                if (circle.contains(x, y)) {
+                if (gridData[i][j] && circle.contains(x, y)) {
                     gridData[i][j] = false;
                     updated = true;
                 }
@@ -111,5 +111,17 @@ public class FragmentData {
 
     public int getResolution() {
         return gridData.length;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < gridData.length; ++i) {
+            for (int j = 0; j < gridData[0].length; ++j) {
+                sb.append(gridData[i][j] ? 'X' : '-');
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 }

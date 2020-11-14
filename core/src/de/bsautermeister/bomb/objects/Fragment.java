@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -11,12 +12,13 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ShortArray;
 
-import java.util.Arrays;
-
 import de.bsautermeister.bomb.contact.Bits;
 
 public class Fragment {
-    private static final int RESOLUTION = 8;
+
+    private static final float EPSILON = 1e-5f;
+
+    private static final int RESOLUTION = 16;
 
     private final World world;
     private Body body;
@@ -41,7 +43,6 @@ public class Fragment {
             world.destroyBody(body);
             body = null;
             Array<float[]> polygonOutlines = fragmentData.computeOutlines();
-            System.out.println(polygonOutlines);
             if (polygonOutlines.notEmpty()) {
                 this.body = createBody(x, y, polygonOutlines);
             }
@@ -68,22 +69,26 @@ public class Fragment {
                 int p1 = triangles.get(i) * 2;
                 int p2 = triangles.get(i + 1) * 2;
                 int p3 = triangles.get(i + 2) * 2;
-                if (polygonOutline[p1] == polygonOutline[p2] && polygonOutline[p2] == polygonOutline[p3]
-                        || polygonOutline[p1 + 1] == polygonOutline[p2 + 1] && polygonOutline[p2 + 1] == polygonOutline[p3 + 1]) {
-                    System.out.println(Arrays.toString(new float[]{
-                            polygonOutline[p1], polygonOutline[p1 + 1],
-                            polygonOutline[p2], polygonOutline[p2 + 1],
-                            polygonOutline[p3], polygonOutline[p3 + 1]
-                    }));
-                    System.out.println("skip");
-                    // TODO why does the triangulator inlude invalid triangles that are in a straight line?
+
+                float a1 = polygonOutline[p1];
+                float a2 = polygonOutline[p1 + 1];
+                float b1 = polygonOutline[p2];
+                float b2 = polygonOutline[p2 + 1];
+                float c1 = polygonOutline[p3];
+                float c2 = polygonOutline[p3 + 1];
+
+                boolean hasRedundantVertices = a1 == b1 && a2 == b2
+                        || a1 == c1 && a2 == c2
+                        || b1 == c1 && b2 == c2;
+
+                float pointLineDistance = Intersector.distanceLinePoint(a1, a2, b1, b2, c1, c2);
+
+                if (pointLineDistance < EPSILON || hasRedundantVertices) {
+                    // skip because triangulator returns degenerate polygon (at least two vertices on same position),
+                    // which Box2D cannot handle, and that would not be visible anyways
                     continue;
                 }
-                shape.set(new float[]{
-                        polygonOutline[p1], polygonOutline[p1 + 1],
-                        polygonOutline[p2], polygonOutline[p2 + 1],
-                        polygonOutline[p3], polygonOutline[p3 + 1]
-                });
+                shape.set(new float[]{ a1, a2, b1, b2, c1, c2 });
                 Fixture fixture = body.createFixture(fixtureDef);
                 fixture.setUserData(this);
             }
@@ -94,5 +99,9 @@ public class Fragment {
 
     public Body getBody() {
         return body;
+    }
+
+    public boolean isEmpty() {
+        return body == null;
     }
 }

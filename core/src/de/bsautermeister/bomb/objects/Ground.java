@@ -28,6 +28,9 @@ public class Ground {
     public void impact(Circle circle) {
         for (Fragment fragment : fragments) {
             fragment.impact(circle);
+            if (fragment.isEmpty()) {
+                fragments.removeValue(fragment, true);
+            }
         }
     }
 
