@@ -3,7 +3,6 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
@@ -26,19 +25,20 @@ public class GameController implements Disposable {
 
     public GameController() {
         camera = new OrthographicCamera();
-        viewport = new StretchViewport(Cfg.WORLD_WIDTH / Cfg.PPM, Cfg.WORLD_HEIGHT / Cfg.PPM, camera);
+        viewport = new StretchViewport(Cfg.VIEWPORT_WORLD_WIDTH_PPM, Cfg.VIEWPORT_WORLD_HEIGHT_PPM, camera);
 
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
 
-        player = new Player(world, new Vector2(0f, 5f), 1f / Cfg.PPM);
-        ground = new Ground(world, 13, 4);
+        player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
+        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_X, Cfg.GROUND_FRAGMENTS_NUM_Y, Cfg.GROUND_FRAGMENT_SIZE_PPM);
     }
 
     public void update(float delta) {
         handleInput();
         player.update(delta);
-        camera.update();
+        updateCamera();
+
         world.step(delta, 6, 2);
     }
 
@@ -54,6 +54,21 @@ public class GameController implements Disposable {
         }
 
         player.control(upPressed, leftPressed, rightPressed);
+    }
+
+    private void updateCamera() {
+        camera.position.x = camera.position.x - (camera.position.x - player.getPosition().x) * 0.1f;
+        camera.position.y = camera.position.y - (camera.position.y - player.getPosition().y + viewport.getWorldHeight() * 0.075f) * 0.166f;
+
+        // check camera in bounds (X)
+        if (camera.position.x - viewport.getWorldWidth() / 2 < 0) {
+            camera.position.x = viewport.getWorldWidth() / 2;
+        } else if (camera.position.x + viewport.getWorldWidth() / 2 > Cfg.WORLD_WIDTH_PPM) {
+            camera.position.x = Cfg.WORLD_WIDTH_PPM - viewport.getWorldWidth() / 2;
+            camera.position.x = Cfg.WORLD_WIDTH_PPM - viewport.getWorldWidth() / 2;
+        }
+
+        camera.update();
     }
 
     public void save() {
