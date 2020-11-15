@@ -2,20 +2,38 @@ package de.bsautermeister.bomb.screens.game;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.PolygonRegion;
+import com.badlogic.gdx.graphics.g2d.PolygonSprite;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ShortArray;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.objects.Fragment;
+import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.utils.GdxUtils;
+import de.bsautermeister.bomb.utils.TextureUtils;
 
 public class GameRenderer implements Disposable {
+
+    private final EarClippingTriangulator triangulator = new EarClippingTriangulator();
 
     private final SpriteBatch batch;
     private final AssetManager assetManager;
     private final GameController controller;
+    private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch(); // TODO move to other SpriteBatch, or even replace it?
 
     private final Box2DDebugRenderer box2DRenderer;
+
+    private final TextureRegion surfaceRegion;
+    private final TextureRegion groundRegion;
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller) {
         this.batch = batch;
@@ -23,6 +41,9 @@ public class GameRenderer implements Disposable {
         this.controller = controller;
 
         this.box2DRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
+
+        surfaceRegion = TextureUtils.load("block_surface.png");
+        groundRegion = TextureUtils.load("block_ground.png");
     }
 
     public void render(float delta) {
@@ -35,8 +56,50 @@ public class GameRenderer implements Disposable {
 
         batch.end();
 
+        polygonBatch.setProjectionMatrix(camera.combined);
+        polygonBatch.begin();
+
+        renderGround(polygonBatch);
+
+        polygonBatch.end();
+
         if (Cfg.DEBUG_MODE) {
             box2DRenderer.render(controller.getWorld(), camera.combined);
+        }
+    }
+
+    private static Vector2 tmpVertex = new Vector2();
+    private static float[] tmpVerticesArray = new float[6];
+    private void renderGround(PolygonSpriteBatch polygonBatch) {
+        Ground ground = controller.getGround();
+
+        for (Fragment fragment : ground.getFragments()) {
+            if (fragment.isEmpty()) continue;
+
+            TextureRegion textureRegion = fragment.getBottomY() >= -1 ? surfaceRegion : groundRegion;
+            float texWidth = textureRegion.getRegionWidth();
+            float texHeight = textureRegion.getRegionHeight();
+
+            for (Fixture fixture : fragment.getBody().getFixtureList()) {
+                PolygonShape polygon = (PolygonShape) fixture.getShape();
+                polygon.getVertex(0, tmpVertex);
+                tmpVerticesArray[0] = tmpVertex.x * texWidth;
+                tmpVerticesArray[1] = tmpVertex.y * texHeight;
+                polygon.getVertex(1, tmpVertex);
+                tmpVerticesArray[2] = tmpVertex.x * texWidth;
+                tmpVerticesArray[3] = tmpVertex.y * texHeight;
+                polygon.getVertex(2, tmpVertex);
+                tmpVerticesArray[4] = tmpVertex.x * texWidth;
+                tmpVerticesArray[5] = tmpVertex.y * texHeight;
+
+                ShortArray triangleIndices = triangulator.computeTriangles(tmpVerticesArray); // TODO input is already triangulated; how to skip this?
+
+                PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, triangleIndices.toArray());
+                PolygonSprite polySprite = new PolygonSprite(polyReg);
+                polySprite.setPosition(fragment.getLeftX(), fragment.getBottomY());
+                polySprite.setSize(1f, 1f);
+                polySprite.draw(polygonBatch);
+            }
         }
     }
 
@@ -46,6 +109,6 @@ public class GameRenderer implements Disposable {
 
     @Override
     public void dispose() {
-
+        polygonBatch.dispose();
     }
 }

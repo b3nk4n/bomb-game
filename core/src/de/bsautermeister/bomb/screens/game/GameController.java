@@ -47,9 +47,9 @@ public class GameController implements Disposable {
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        boolean spacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+        boolean downPressed = Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
 
-        if (spacePressed) {
+        if (downPressed) {
             ground.impact(player.getPosition(), player.getRadius() * 2);
         }
 
@@ -90,6 +90,10 @@ public class GameController implements Disposable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Ground getGround() {
+        return ground;
     }
 
     public World getWorld() {
