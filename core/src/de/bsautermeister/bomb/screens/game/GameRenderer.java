@@ -7,13 +7,11 @@ import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.ShortArray;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.objects.Fragment;
@@ -23,7 +21,7 @@ import de.bsautermeister.bomb.utils.TextureUtils;
 
 public class GameRenderer implements Disposable {
 
-    private final EarClippingTriangulator triangulator = new EarClippingTriangulator();
+    private final static short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
 
     private final SpriteBatch batch;
     private final AssetManager assetManager;
@@ -92,9 +90,7 @@ public class GameRenderer implements Disposable {
                 tmpVerticesArray[4] = tmpVertex.x * texWidth;
                 tmpVerticesArray[5] = tmpVertex.y * texHeight;
 
-                ShortArray triangleIndices = triangulator.computeTriangles(tmpVerticesArray); // TODO input is already triangulated; how to skip this?
-
-                PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, triangleIndices.toArray());
+                PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, TRIANGULATION_IDENTITY);
                 PolygonSprite polySprite = new PolygonSprite(polyReg);
                 polySprite.setPosition(fragment.getLeftX(), fragment.getBottomY());
                 polySprite.setSize(1f, 1f);
