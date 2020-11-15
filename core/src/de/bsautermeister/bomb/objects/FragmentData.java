@@ -2,7 +2,6 @@ package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.utils.Array;
 
 import de.bsautermeister.bomb.utils.ArrayUtils;
@@ -36,7 +35,6 @@ public class FragmentData {
     }
 
     public boolean remove(Circle circle) {
-        // TODO early stop: check if data bounds intersects with circle, before checking each single grid value
         boolean updated = false;
         for (int i = 0; i < gridData.length; ++i) {
             for (int j = 0; j < gridData[i].length; ++j) {

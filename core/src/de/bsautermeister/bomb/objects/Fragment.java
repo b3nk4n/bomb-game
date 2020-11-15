@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -23,6 +24,7 @@ public class Fragment {
 
     private final World world;
     private Body body;
+    private Rectangle bounds;
 
     private static final EarClippingTriangulator TRIANGULATOR = new EarClippingTriangulator();
 
@@ -30,6 +32,7 @@ public class Fragment {
 
     public Fragment(World world, float leftX, float bottomY, float size) {
         this.world = world;
+        this.bounds = new Rectangle(leftX, bottomY, size, size);
         this.fragmentData = new FragmentData(RESOLUTION, size);
 
         Array<float[]> polygonOutlines = fragmentData.computeOutlines();
@@ -38,10 +41,18 @@ public class Fragment {
 
     private static final Circle tmpImpactCircle = new Circle();
     public void impact(Vector2 position, float radius) {
+        tmpImpactCircle.set(position.x, position.y, radius);
+        if (!Intersector.overlaps(tmpImpactCircle, bounds)) {
+            // early stop: don't check each single fragment grid position when the impact was
+            //             outside of the fragments bounds
+            return;
+        }
+
         float leftX = getLeftX();
         float bottomY = getBottomY();
-
+        // change to relative position used in the fragment data
         tmpImpactCircle.set(position.x - leftX, position.y - bottomY, radius);
+
         boolean updated = fragmentData.remove(tmpImpactCircle);
         if (updated) {
 
@@ -69,7 +80,6 @@ public class Fragment {
         fixtureDef.shape = shape;
         for (float[] polygonOutline : polygonOutlines) {
             ShortArray triangles = TRIANGULATOR.computeTriangles(polygonOutline);
-            System.out.println(triangles.size);
             for (int i = 0; i < triangles.size; i += 3) {
                 int p1 = triangles.get(i) * 2;
                 int p2 = triangles.get(i + 1) * 2;
