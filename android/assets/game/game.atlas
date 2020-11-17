@@ -1,0 +1,27 @@
+
+game.png
+size: 64,32
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ball
+  rotate: false
+  xy: 4, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block_ground
+  rotate: false
+  xy: 24, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+block_surface
+  rotate: false
+  xy: 44, 4
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1

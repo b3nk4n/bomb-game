@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -14,18 +15,18 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Disposable;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.assets.Assets;
+import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.utils.GdxUtils;
-import de.bsautermeister.bomb.utils.TextureUtils;
 
 public class GameRenderer implements Disposable {
 
     private final static short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
 
     private final SpriteBatch batch;
-    private final AssetManager assetManager;
     private final GameController controller;
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch(); // TODO move to other SpriteBatch, or even replace it?
 
@@ -37,14 +38,14 @@ public class GameRenderer implements Disposable {
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller) {
         this.batch = batch;
-        this.assetManager = assetManager;
         this.controller = controller;
 
         this.box2DRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 
-        surfaceRegion = TextureUtils.load("block_surface.png");
-        groundRegion = TextureUtils.load("block_ground.png");
-        ballRegion = TextureUtils.load("ball.png");
+        TextureAtlas atlas =  assetManager.get(Assets.Atlas.GAME);
+        surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
+        groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
+        ballRegion = atlas.findRegion(RegionNames.Game.BALL);
     }
 
     public void render(float delta) {

@@ -11,6 +11,9 @@ public interface Cfg {
     float VIEWPORT_WORLD_WIDTH_PPM = 64f / Cfg.PPM;
     float VIEWPORT_WORLD_HEIGHT_PPM = 41f / Cfg.PPM;
 
+    float UI_WIDTH = 1280;
+    float UI_HEIGHT = 720;
+
     int WINDOW_WIDTH = 1280;
     int WINDOW_HEIGHT = 720;
 

@@ -3,7 +3,7 @@ package de.bsautermeister.bomb;
 import com.badlogic.gdx.Gdx;
 
 import de.bsautermeister.bomb.core.GameApp;
-import de.bsautermeister.bomb.screens.game.GameScreen;
+import de.bsautermeister.bomb.screens.loading.LoadingScreen;
 
 public class BombGame extends GameApp {
 	@Override
@@ -11,6 +11,6 @@ public class BombGame extends GameApp {
 		super.create();
 		Gdx.app.setLogLevel(Cfg.LOG_LEVEL);
 
-		setScreen(new GameScreen(this));
+		setScreen(new LoadingScreen(this));
 	}
 }
