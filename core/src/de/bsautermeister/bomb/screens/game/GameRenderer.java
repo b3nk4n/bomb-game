@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
+import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.bsautermeister.bomb.utils.TextureUtils;
 
@@ -30,6 +31,7 @@ public class GameRenderer implements Disposable {
 
     private final Box2DDebugRenderer box2DRenderer;
 
+    private final TextureRegion ballRegion;
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
@@ -42,6 +44,7 @@ public class GameRenderer implements Disposable {
 
         surfaceRegion = TextureUtils.load("block_surface.png");
         groundRegion = TextureUtils.load("block_ground.png");
+        ballRegion = TextureUtils.load("ball.png");
     }
 
     public void render(float delta) {
@@ -51,6 +54,8 @@ public class GameRenderer implements Disposable {
 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+
+        renderBall(batch);
 
         batch.end();
 
@@ -64,6 +69,16 @@ public class GameRenderer implements Disposable {
         if (Cfg.DEBUG_MODE) {
             box2DRenderer.render(controller.getWorld(), camera.combined);
         }
+    }
+
+    private void renderBall(SpriteBatch batch) {
+        Player player = controller.getPlayer();
+        Vector2 position = player.getPosition();
+        batch.draw(ballRegion,
+                position.x - player.getRadius(), position.y - player.getRadius(),
+                player.getRadius(), player.getRadius(),
+                player.getRadius() * 2f, player.getRadius() * 2f,
+                1f, 1f, player.getRotation());
     }
 
     private static Vector2 tmpVertex = new Vector2();

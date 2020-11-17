@@ -1,5 +1,6 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -26,7 +27,6 @@ public class Player {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(position);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.fixedRotation = false;
 
         Body body = world.createBody(bodyDef);
 
@@ -34,6 +34,8 @@ public class Player {
         shape.setRadius(radius);
 
         FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.friction = 0.8f;
+        fixtureDef.density = 10.0f;
         fixtureDef.filter.categoryBits = Bits.BALL;
         fixtureDef.filter.groupIndex = 1;
         fixtureDef.filter.maskBits = Bits.GROUND;
@@ -58,11 +60,14 @@ public class Player {
     }
 
     public void update(float delta) {
-
     }
 
     public Vector2 getPosition() {
         return body.getPosition();
+    }
+
+    public float getRotation() {
+        return body.getAngle() * MathUtils.radiansToDegrees;
     }
 
     public float getRadius() {

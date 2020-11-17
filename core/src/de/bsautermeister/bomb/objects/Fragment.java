@@ -74,6 +74,7 @@ public class Fragment {
 
         PolygonShape shape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.density = 1f;
         fixtureDef.filter.categoryBits = Bits.GROUND;
         fixtureDef.filter.groupIndex = 1;
         fixtureDef.filter.maskBits = Bits.BALL;
