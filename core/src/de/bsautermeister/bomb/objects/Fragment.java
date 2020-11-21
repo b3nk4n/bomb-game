@@ -40,12 +40,12 @@ public class Fragment {
     }
 
     private static final Circle tmpImpactCircle = new Circle();
-    public void impact(Vector2 position, float radius) {
+    public boolean impact(Vector2 position, float radius) {
         tmpImpactCircle.set(position.x, position.y, radius);
         if (!Intersector.overlaps(tmpImpactCircle, bounds)) {
             // early stop: don't check each single fragment grid position when the impact was
             //             outside of the fragments bounds
-            return;
+            return false;
         }
 
         float leftX = getLeftX();
@@ -63,6 +63,7 @@ public class Fragment {
                 this.body = createBody(leftX, bottomY, polygonOutlines);
             }
         }
+        return updated;
     }
 
     private Body createBody(float leftX, float bottomY, Array<float[]> polygonOutlines) {

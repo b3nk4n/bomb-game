@@ -5,30 +5,68 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 public class Ground {
-    private Array<Fragment> fragments;
 
-    public Ground(World world, int numX, int numY, float size) {
-        this.fragments = new Array<>(4 * numX * numY);
+    private final World world;
 
-        for (int y = 0; y < numY; ++y) {
-            for (int x = 0; x < numX; ++x) {
-                float posX = x * size;
-                float posY = -(y + 1) * size;
-                fragments.add(new Fragment(world, posX, posY, size));
-            }
+    /**
+     * All fragments in shape [row, cols].
+     */
+    private final Array<Array<Fragment>> fragments;
+
+    private int lowestRowImpacted;
+
+    private final float size;
+    private final int numCols;
+    private final int numCompleteRows;
+
+    public Ground(World world, int numCols, int numCompleteRows, float size) {
+        this.world = world;
+        this.fragments = new Array<>(1024);
+        this.size = size;
+        this.numCols = numCols;
+        this.numCompleteRows = numCompleteRows;
+
+        for (int r = 0; r < numCompleteRows; ++r) {
+            addRow();
         }
     }
 
     public void impact(Vector2 position, float radius) {
-        for (Fragment fragment : fragments) {
-            fragment.impact(position, radius);
-            if (fragment.isEmpty()) {
-                fragments.removeValue(fragment, true);
+        for (int row = 0; row < fragments.size; ++row) {
+            Array<Fragment> fragmentRow = fragments.get(row);
+            for (Fragment fragment : fragmentRow) {
+                if (fragment.impact(position, radius)) {
+                    if (fragment.isEmpty()) {
+                        fragmentRow.removeValue(fragment, true);
+                    }
+                    lowestRowImpacted = Math.max(lowestRowImpacted, row);
+                }
             }
         }
     }
 
-    public Array<Fragment> getFragments() {
+    public void update(float delta) {
+        updateRows();
+    }
+
+    private void updateRows() {
+        int missingRows = numCompleteRows - (fragments.size - lowestRowImpacted) + 1;
+        for (int i = 0; i < missingRows; ++i) {
+            addRow();
+        }
+    }
+
+    private void addRow() {
+        Array<Fragment> row = new Array<>(numCols);
+        for (int x = 0; x < numCols; ++x) {
+            float posX = x * size;
+            float posY = -(fragments.size + 1) * size;
+            row.add(new Fragment(world, posX, posY, size));
+        }
+        fragments.add(row);
+    }
+
+    public Array<Array<Fragment>> getFragments() {
         return fragments;
     }
 }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import de.bsautermeister.bomb.Cfg;
@@ -87,30 +88,32 @@ public class GameRenderer implements Disposable {
     private void renderGround(PolygonSpriteBatch polygonBatch) {
         Ground ground = controller.getGround();
 
-        for (Fragment fragment : ground.getFragments()) {
-            if (fragment.isEmpty()) continue;
+        for (Array<Fragment> fragmentRows : ground.getFragments()) {
+            for (Fragment fragment : fragmentRows) {
+                if (fragment.isEmpty()) continue;
 
-            TextureRegion textureRegion = fragment.getBottomY() >= -1 ? surfaceRegion : groundRegion;
-            float texWidth = textureRegion.getRegionWidth();
-            float texHeight = textureRegion.getRegionHeight();
+                TextureRegion textureRegion = fragment.getBottomY() >= -1 ? surfaceRegion : groundRegion;
+                float texWidth = textureRegion.getRegionWidth();
+                float texHeight = textureRegion.getRegionHeight();
 
-            for (Fixture fixture : fragment.getBody().getFixtureList()) {
-                PolygonShape polygon = (PolygonShape) fixture.getShape();
-                polygon.getVertex(0, tmpVertex);
-                tmpVerticesArray[0] = tmpVertex.x * texWidth;
-                tmpVerticesArray[1] = tmpVertex.y * texHeight;
-                polygon.getVertex(1, tmpVertex);
-                tmpVerticesArray[2] = tmpVertex.x * texWidth;
-                tmpVerticesArray[3] = tmpVertex.y * texHeight;
-                polygon.getVertex(2, tmpVertex);
-                tmpVerticesArray[4] = tmpVertex.x * texWidth;
-                tmpVerticesArray[5] = tmpVertex.y * texHeight;
+                for (Fixture fixture : fragment.getBody().getFixtureList()) {
+                    PolygonShape polygon = (PolygonShape) fixture.getShape();
+                    polygon.getVertex(0, tmpVertex);
+                    tmpVerticesArray[0] = tmpVertex.x * texWidth;
+                    tmpVerticesArray[1] = tmpVertex.y * texHeight;
+                    polygon.getVertex(1, tmpVertex);
+                    tmpVerticesArray[2] = tmpVertex.x * texWidth;
+                    tmpVerticesArray[3] = tmpVertex.y * texHeight;
+                    polygon.getVertex(2, tmpVertex);
+                    tmpVerticesArray[4] = tmpVertex.x * texWidth;
+                    tmpVerticesArray[5] = tmpVertex.y * texHeight;
 
-                PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, TRIANGULATION_IDENTITY);
-                PolygonSprite polySprite = new PolygonSprite(polyReg);
-                polySprite.setPosition(fragment.getLeftX(), fragment.getBottomY());
-                polySprite.setSize(1f, 1f);
-                polySprite.draw(polygonBatch);
+                    PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, TRIANGULATION_IDENTITY);
+                    PolygonSprite polySprite = new PolygonSprite(polyReg);
+                    polySprite.setPosition(fragment.getLeftX(), fragment.getBottomY());
+                    polySprite.setSize(1f, 1f);
+                    polySprite.draw(polygonBatch);
+                }
             }
         }
     }

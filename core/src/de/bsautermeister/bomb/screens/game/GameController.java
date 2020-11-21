@@ -31,12 +31,13 @@ public class GameController implements Disposable {
         world.setContactListener(new WorldContactListener());
 
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
-        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_X, Cfg.GROUND_FRAGMENTS_NUM_Y, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
     }
 
     public void update(float delta) {
         handleInput();
         player.update(delta);
+        ground.update(delta);
         updateCamera();
 
         world.step(delta, 6, 2);
