@@ -1,6 +1,6 @@
 
 game.png
-size: 64,32
+size: 128,32
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -23,5 +23,12 @@ block_surface
   xy: 44, 4
   size: 16, 16
   orig: 16, 16
+  offset: 0, 0
+  index: -1
+bomb
+  rotate: false
+  xy: 64, 12
+  size: 8, 8
+  orig: 8, 8
   offset: 0, 0
   index: -1

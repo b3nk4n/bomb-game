@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Logger;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Player;
 
 public class WorldContactListener implements ContactListener {
@@ -20,12 +21,17 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         Player player;
+        Bomb bomb;
 
         int collisionDef = fixtureA.getFilterData().categoryBits | fixtureB.getFilterData().categoryBits;
         switch (collisionDef) {
             case Bits.BALL | Bits.GROUND:
                 player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL);
                 LOG.debug("Player vs. Ground collision");
+                break;
+            case Bits.BOMB | Bits.GROUND:
+                bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);
+                bomb.touchGround();
                 break;
         }
     }

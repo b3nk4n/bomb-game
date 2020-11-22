@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Disposable;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
+import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
@@ -34,6 +35,7 @@ public class GameRenderer implements Disposable {
     private final Box2DDebugRenderer box2DRenderer;
 
     private final TextureRegion ballRegion;
+    private final TextureRegion bombRegion;
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
@@ -47,6 +49,7 @@ public class GameRenderer implements Disposable {
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
         groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
         ballRegion = atlas.findRegion(RegionNames.Game.BALL);
+        bombRegion = atlas.findRegion(RegionNames.Game.BOMB);
     }
 
     public void render(float delta) {
@@ -58,6 +61,7 @@ public class GameRenderer implements Disposable {
         batch.begin();
 
         renderBall(batch);
+        renderBombs(batch);
 
         batch.end();
 
@@ -76,11 +80,24 @@ public class GameRenderer implements Disposable {
     private void renderBall(SpriteBatch batch) {
         Player player = controller.getPlayer();
         Vector2 position = player.getPosition();
+        float radius = player.getRadius();
         batch.draw(ballRegion,
-                position.x - player.getRadius(), position.y - player.getRadius(),
-                player.getRadius(), player.getRadius(),
-                player.getRadius() * 2f, player.getRadius() * 2f,
+                position.x - radius, position.y - radius,
+                radius, radius,
+                radius * 2f, radius * 2f,
                 1f, 1f, player.getRotation());
+    }
+
+    private void renderBombs(SpriteBatch batch) {
+        for (Bomb bomb : controller.getBombs()) {
+            Vector2 position = bomb.getPosition();
+            float radius = bomb.getBodyRadius();
+            batch.draw(bombRegion,
+                    position.x - radius, position.y - radius,
+                    radius, radius,
+                    radius * 2f, radius * 2f,
+                    1f, 1f, bomb.getRotation());
+        }
     }
 
     private static Vector2 tmpVertex = new Vector2();

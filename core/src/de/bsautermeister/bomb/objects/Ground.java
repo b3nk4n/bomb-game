@@ -34,7 +34,8 @@ public class Ground {
     public void impact(Vector2 position, float radius) {
         for (int row = 0; row < fragments.size; ++row) {
             Array<Fragment> fragmentRow = fragments.get(row);
-            for (Fragment fragment : fragmentRow) {
+            for (int col = fragmentRow.size - 1; col >= 0; --col) {
+                Fragment fragment = fragmentRow.get(col);
                 if (fragment.impact(position, radius)) {
                     if (fragment.isEmpty()) {
                         fragmentRow.removeValue(fragment, true);
@@ -58,8 +59,8 @@ public class Ground {
 
     private void addRow() {
         Array<Fragment> row = new Array<>(numCols);
-        for (int x = 0; x < numCols; ++x) {
-            float posX = x * size;
+        for (int col = 0; col < numCols; ++col) {
+            float posX = col * size;
             float posY = -(fragments.size + 1) * size;
             row.add(new Fragment(world, posX, posY, size));
         }

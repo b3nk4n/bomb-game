@@ -80,6 +80,18 @@ public class FragmentDataTest {
 	}
 
 	@Test
+	public void removeCircleFullIntersection() {
+		Circle circle = new Circle(-0f, -0f, 15f);
+		boolean[][] expected = new boolean[sut.getResolution()][sut.getResolution()];
+		ArrayUtils.fill2D(expected, F);
+
+		boolean updated = sut.remove(circle);
+
+		assertEquals(true, updated);
+		assertEquals(true, Arrays.deepEquals(expected, sut.getGridData()));
+	}
+
+	@Test
 	public void computeOutlines() {
 		FragmentData sut = new FragmentData(10f, new boolean[][] {
 				{F, F, F, F, F, F, F, F, F, F, F},

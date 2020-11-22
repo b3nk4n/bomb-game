@@ -47,6 +47,7 @@ public class Fragment {
             //             outside of the fragments bounds
             return false;
         }
+        System.out.println("impact");
 
         float leftX = getLeftX();
         float bottomY = getBottomY();
@@ -55,7 +56,6 @@ public class Fragment {
 
         boolean updated = fragmentData.remove(tmpImpactCircle);
         if (updated) {
-
             world.destroyBody(body);
             body = null;
             Array<float[]> polygonOutlines = fragmentData.computeOutlines();

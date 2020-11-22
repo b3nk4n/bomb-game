@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.assets;
 public interface RegionNames {
     interface Game {
         String BALL = "ball";
+        String BOMB = "bomb";
         String BLOCK_SURFACE = "block_surface";
         String BLOCK_GROUND = "block_ground";
     }

@@ -5,12 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.WorldContactListener;
+import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 
@@ -22,6 +24,7 @@ public class GameController implements Disposable {
     private World world;
     private Player player;
     private Ground ground;
+    private Array<Bomb> bombs;
 
     public GameController() {
         camera = new OrthographicCamera();
@@ -32,15 +35,34 @@ public class GameController implements Disposable {
 
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+
+        bombs = new Array<>();
+        bombs.add(new Bomb(world, viewport.getWorldWidth() / 4, 20f / Cfg.PPM, 3f, 0.75f / Cfg.PPM, 16f / Cfg.PPM));
     }
 
     public void update(float delta) {
         handleInput();
         player.update(delta);
-        ground.update(delta);
         updateCamera();
 
+        updateEnvironment(delta);
+
         world.step(delta, 6, 2);
+    }
+
+    private void updateEnvironment(float delta) {
+        ground.update(delta);
+
+        for (int i = bombs.size - 1; i >= 0; --i) {
+            Bomb bomb = bombs.get(i);
+            bomb.update(delta);
+
+            if (bomb.doExplode()) {
+                ground.impact(bomb.getPosition(), bomb.getDetonationRadius());
+                bomb.dispose();
+                bombs.removeValue(bomb, true);
+            }
+        }
     }
 
     private void handleInput() {
@@ -91,6 +113,10 @@ public class GameController implements Disposable {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Array<Bomb> getBombs() {
+        return bombs;
     }
 
     public Ground getGround() {
