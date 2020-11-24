@@ -1,5 +1,7 @@
 package de.bsautermeister.bomb.screens.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
@@ -12,8 +14,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
@@ -22,12 +28,14 @@ import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
 public class GameRenderer implements Disposable {
 
     private final static short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
 
+    private final Viewport uiViewport;
     private final SpriteBatch batch;
     private final GameController controller;
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch(); // TODO move to other SpriteBatch, or even replace it?
@@ -39,9 +47,14 @@ public class GameRenderer implements Disposable {
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
+    private final Skin skin;
+    private final Stage overlayStage;
+    private final Stage hudStage;
+
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller) {
         this.batch = batch;
         this.controller = controller;
+        uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
         this.box2DRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 
@@ -50,6 +63,14 @@ public class GameRenderer implements Disposable {
         groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
         ballRegion = atlas.findRegion(RegionNames.Game.BALL);
         bombRegion = atlas.findRegion(RegionNames.Game.BOMB);
+
+        skin = assetManager.get(Assets.Skins.UI);
+        overlayStage = new Stage(uiViewport, batch);
+        overlayStage.setDebugAll(Cfg.DEBUG_MODE);
+
+        hudStage = new Stage(uiViewport, batch);
+
+        Gdx.input.setInputProcessor(overlayStage);
     }
 
     public void render(float delta) {
@@ -75,6 +96,11 @@ public class GameRenderer implements Disposable {
         if (Cfg.DEBUG_MODE) {
             box2DRenderer.render(controller.getWorld(), camera.combined);
         }
+
+        uiViewport.apply();
+        batch.setProjectionMatrix(hudStage.getCamera().combined);
+        hudStage.act();
+        renderHud(batch);
     }
 
     private void renderBall(SpriteBatch batch) {
@@ -135,6 +161,42 @@ public class GameRenderer implements Disposable {
         }
     }
 
+    private void renderHud(SpriteBatch batch) {
+        updateOverlay();
+        renderHudOverlay();
+    }
+
+    private void renderHudOverlay() {
+        if (!overlayStage.getActors().isEmpty()) {
+            if (skipNextOverlayAct) {
+                skipNextOverlayAct = false;
+                return;
+            }
+            overlayStage.act();
+            batch.begin();
+            // batch.draw(backgroundOverlayRegion, 0f, 0f, Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+            batch.end();
+            overlayStage.draw();
+        }
+    }
+
+    // workaround: do not act during the first frame, otherwise button event which triggered
+    // this overlay to show are processed in the overlay, which could immediately close it again
+    private boolean skipNextOverlayAct = false;
+
+    private void updateOverlay() {
+        if (overlayStage.getActors().isEmpty()) {
+             if (controller.getState().isPaused()) {
+                overlayStage.addActor(new PauseOverlay(skin, controller.getPauseCallback()));
+                skipNextOverlayAct = true;
+            }
+        } else {
+            if (!controller.getState().isPaused() && !controller.getState().isGameOver()) {
+                overlayStage.clear();
+            }
+        }
+    }
+
     public void resize(int width, int height) {
         controller.getViewport().update(width, height, false);
     }
@@ -142,5 +204,9 @@ public class GameRenderer implements Disposable {
     @Override
     public void dispose() {
         polygonBatch.dispose();
+    }
+
+    public InputProcessor getInputProcessor() {
+        return overlayStage;
     }
 }

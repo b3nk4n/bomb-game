@@ -13,4 +13,13 @@ public class BombGame extends GameApp {
 
 		setScreen(new LoadingScreen(this));
 	}
+
+	public static void deleteSavedData() {
+		// TODO implement
+	}
+
+	public static boolean hasSavedData() {
+		// TODO implement
+		return false;
+	}
 }

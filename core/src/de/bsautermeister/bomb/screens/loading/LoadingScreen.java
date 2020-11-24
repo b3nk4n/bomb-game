@@ -13,12 +13,15 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.awt.Menu;
+
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.screens.game.GameScreen;
+import de.bsautermeister.bomb.screens.menu.MenuScreen;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
 public class LoadingScreen extends ScreenBase {
@@ -146,7 +149,7 @@ public class LoadingScreen extends ScreenBase {
             // logged in
             //BombGame.getGameServiceManager().refresh();
 
-            setScreen(new GameScreen(getGame()));
+            setScreen(new MenuScreen(getGame()));
         }
     }
 

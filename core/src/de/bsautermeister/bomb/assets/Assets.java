@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.assets;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public interface Assets {
     interface Atlas {
@@ -13,7 +14,13 @@ public interface Assets {
                 new AssetDescriptor<>("ui/ui.atlas", TextureAtlas.class);
     }
 
+    interface Skins {
+        AssetDescriptor<Skin> UI =
+                new AssetDescriptor<>("ui/ui.skin", Skin.class);
+    }
+
     AssetDescriptor[] ALL = {
-            Atlas.LOADING, Atlas. GAME
+            Atlas.LOADING, Atlas. GAME, Atlas.UI,
+            Skins.UI
     };
 }

@@ -1,0 +1,13 @@
+
+ui.png
+size: 512,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+life_bar
+  rotate: false
+  xy: 4, 4
+  size: 451, 121
+  orig: 451, 121
+  offset: 0, 0
+  index: -1

@@ -8,12 +8,15 @@ public interface RegionNames {
         String BLOCK_GROUND = "block_ground";
     }
 
-
     interface Loading {
         String LOADING_TEXT = "loading_text";
         String LOADING_ANIMATION = "loading";
         String FRAME = "frame";
         String BAR_HIDDEN = "loading-hidden";
         String FRAME_BACKGROUND = "frame-bg";
+    }
+
+    interface Ui {
+        String LIFE_BAR = "life_bar";
     }
 }

@@ -16,6 +16,7 @@ import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 
 public class GameController implements Disposable {
 
@@ -27,10 +28,30 @@ public class GameController implements Disposable {
     private final Ground ground;
     private final Array<Bomb> bombs = new Array<>();
 
-    private static final float BOMB_EMIT_DELAY = 5f;
+    private GameState state;
+
+    private boolean markBackToMenu;
+
+    private static final float BOMB_EMIT_DELAY = 2f;
     private float bombEmitTimer = BOMB_EMIT_DELAY;
 
-    public GameController() {
+    private final GameScreenCallbacks gameScreenCallbacks;
+
+    private final PauseOverlay.Callback pauseCallback = new PauseOverlay.Callback() {
+        @Override
+        public void quit() {
+            markBackToMenu = true;
+        }
+
+        @Override
+        public void resume() {
+            state = GameState.PLAYING;
+        }
+    };
+
+    public GameController(GameScreenCallbacks gameScreenCallbacks) {
+        this.gameScreenCallbacks = gameScreenCallbacks;
+
         camera = new OrthographicCamera();
         viewport = new StretchViewport(Cfg.VIEWPORT_WORLD_WIDTH_PPM, Cfg.VIEWPORT_WORLD_HEIGHT_PPM, camera);
 
@@ -39,9 +60,21 @@ public class GameController implements Disposable {
 
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+
+        state = GameState.PLAYING;
     }
 
     public void update(float delta) {
+        if (markBackToMenu) {
+            markBackToMenu = false;
+            gameScreenCallbacks.backToMenu();
+            return;
+        }
+
+        if (state.isPaused()) {
+            return;
+        }
+
         handleInput();
         player.update(delta);
         updateCamera();
@@ -92,6 +125,8 @@ public class GameController implements Disposable {
     }
 
     private void handleInput() {
+        handlePauseInput();
+
         boolean upPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
@@ -116,12 +151,25 @@ public class GameController implements Disposable {
     }
 
     public void save() {
+        if (state.isGameOver()) {
+            // TODO delete saved game
+            return;
+        }
 
+        state = GameState.PAUSED;
+
+        // TODO save game
     }
 
     @Override
     public void dispose() {
 
+    }
+
+    private void handlePauseInput() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            state = GameState.PAUSED;
+        }
     }
 
     public OrthographicCamera getCamera() {
@@ -146,5 +194,13 @@ public class GameController implements Disposable {
 
     public World getWorld() {
         return world;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public PauseOverlay.Callback getPauseCallback() {
+        return pauseCallback;
     }
 }
