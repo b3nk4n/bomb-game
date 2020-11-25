@@ -1,5 +1,7 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -9,23 +11,34 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
 
 public class Player {
     private final World world;
     private Body body;
 
-    private float radius;
+    private final Vector2 startPosition;
+    private final float radius;
+
+    private float lifeRatio;
 
     public Player(World world, Vector2 startPosition, float radius) {
         this.world = world;
+        this.startPosition = startPosition;
         this.radius = radius;
-        this.body = createBody(startPosition, radius);
+        this.body = createBody(radius);
+        reset();
     }
 
-    private Body createBody(Vector2 position, float radius) {
+    public void reset() {
+        lifeRatio = 1f;
+        body.setTransform(startPosition, 0);
+        body.setActive(true);
+    }
+
+    private Body createBody(float radius) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(position);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
 
         Body body = world.createBody(bodyDef);
@@ -60,6 +73,26 @@ public class Player {
     }
 
     public void update(float delta) {
+        if (!isDead()) {
+            lifeRatio = Math.min(1f, lifeRatio + Cfg.PLAYER_SELF_HEALING_PER_SECOND * delta);
+        }
+    }
+
+    private static final Circle impactCircle = new Circle();
+    private static final Circle playerCircle = new Circle();
+    public boolean impact(Vector2 position, float radius) {
+        impactCircle.set(position, radius);
+        playerCircle.set(body.getPosition(), getRadius());
+        if (Intersector.overlaps(impactCircle, playerCircle)) {
+            lifeRatio -= 0.66f; // TODO reduce life dependent on distance
+        }
+
+        if (isDead()) {
+            body.setActive(false);
+            return true;
+        }
+
+        return false;
     }
 
     public Vector2 getPosition() {
@@ -72,5 +105,9 @@ public class Player {
 
     public float getRadius() {
         return radius;
+    }
+
+    public boolean isDead() {
+        return lifeRatio <= 0f;
     }
 }

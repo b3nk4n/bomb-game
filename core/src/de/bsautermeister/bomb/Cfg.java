@@ -26,4 +26,5 @@ public interface Cfg {
     float WORLD_WIDTH_PPM = GROUND_FRAGMENT_SIZE_PPM * GROUND_FRAGMENTS_NUM_COLS;
 
     float PLAYER_RADIUS_PPM = 1.25f / Cfg.PPM;
+    float PLAYER_SELF_HEALING_PER_SECOND = 0.01f;
 }

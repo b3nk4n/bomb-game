@@ -28,6 +28,7 @@ import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
@@ -105,13 +106,15 @@ public class GameRenderer implements Disposable {
 
     private void renderBall(SpriteBatch batch) {
         Player player = controller.getPlayer();
-        Vector2 position = player.getPosition();
-        float radius = player.getRadius();
-        batch.draw(ballRegion,
-                position.x - radius, position.y - radius,
-                radius, radius,
-                radius * 2f, radius * 2f,
-                1f, 1f, player.getRotation());
+        if (!player.isDead()) {
+            Vector2 position = player.getPosition();
+            float radius = player.getRadius();
+            batch.draw(ballRegion,
+                    position.x - radius, position.y - radius,
+                    radius, radius,
+                    radius * 2f, radius * 2f,
+                    1f, 1f, player.getRotation());
+        }
     }
 
     private void renderBombs(SpriteBatch batch) {
@@ -186,8 +189,11 @@ public class GameRenderer implements Disposable {
 
     private void updateOverlay() {
         if (overlayStage.getActors().isEmpty()) {
-             if (controller.getState().isPaused()) {
+            if (controller.getState().isPaused()) {
                 overlayStage.addActor(new PauseOverlay(skin, controller.getPauseCallback()));
+                skipNextOverlayAct = true;
+            } else if (controller.getState().isGameOver()) {
+                overlayStage.addActor(new GameOverOverlay(skin, controller.getGameOverCallback()));
                 skipNextOverlayAct = true;
             }
         } else {

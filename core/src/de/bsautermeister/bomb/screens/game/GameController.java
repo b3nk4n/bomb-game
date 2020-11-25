@@ -16,6 +16,7 @@ import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 
 public class GameController implements Disposable {
@@ -49,6 +50,20 @@ public class GameController implements Disposable {
         }
     };
 
+    private final GameOverOverlay.Callback gameOverCallback = new GameOverOverlay.Callback() {
+        @Override
+        public void quit() {
+            markBackToMenu = true;
+        }
+
+        @Override
+        public void restart() {
+            // TODO reset game
+            state = GameState.PLAYING;
+            player.reset();
+        }
+    };
+
     public GameController(GameScreenCallbacks gameScreenCallbacks) {
         this.gameScreenCallbacks = gameScreenCallbacks;
 
@@ -75,9 +90,11 @@ public class GameController implements Disposable {
             return;
         }
 
-        handleInput();
-        player.update(delta);
-        updateCamera();
+        if (!state.isGameOver()) {
+            handleInput();
+            player.update(delta);
+            updateCamera();
+        }
 
         updateBombEmitter(delta);
         updateEnvironment(delta);
@@ -102,9 +119,14 @@ public class GameController implements Disposable {
             bomb.update(delta);
 
             if (bomb.doExplode()) {
-                ground.impact(bomb.getPosition(), bomb.getDetonationRadius());
+                Vector2 bombPosition = bomb.getPosition();
+                ground.impact(bombPosition, bomb.getDetonationRadius());
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
+
+                if (player.impact(bombPosition, bomb.getDetonationRadius())) {
+                    state = GameState.GAME_OVER;
+                }
             }
         }
     }
@@ -202,5 +224,9 @@ public class GameController implements Disposable {
 
     public PauseOverlay.Callback getPauseCallback() {
         return pauseCallback;
+    }
+
+    public GameOverOverlay.Callback getGameOverCallback() {
+        return gameOverCallback;
     }
 }

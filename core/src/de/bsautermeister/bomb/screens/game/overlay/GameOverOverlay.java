@@ -13,23 +13,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import de.bsautermeister.bomb.assets.Styles;
 
-public class PauseOverlay extends Table {
-
+public class GameOverOverlay extends Table {
     public interface Callback {
         void quit();
-        void resume();
+        void restart();
     }
 
     private Callback callback;
 
-    public PauseOverlay(Skin skin, Callback callback) {
+    public GameOverOverlay(Skin skin, Callback callback) {
         super(skin);
         this.callback = callback;
         initialize();
     }
 
     private void initialize() {
-        Label titleLabel = new Label("Paused", getSkin(), Styles.Label.TITLE);
+        Label titleLabel = new Label("Game Over", getSkin(), Styles.Label.TITLE);
         add(titleLabel)
                 .pad(8f)
                 .row();
@@ -44,14 +43,14 @@ public class PauseOverlay extends Table {
                 Actions.show()
         ));
 
-        Button resumeButton = new TextButton("Resume", getSkin());
-        resumeButton.addListener(new ClickListener() {
+        Button restartButton = new TextButton("Restart", getSkin());
+        restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                callback.resume();
+                callback.restart();
             }
         });
-        buttonTable.add(resumeButton).row();
+        buttonTable.add(restartButton).row();
 
         Button quitButton = new TextButton("Quit", getSkin());
         quitButton.addListener(new ClickListener() {
@@ -75,7 +74,7 @@ public class PauseOverlay extends Table {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) ||
                 Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            callback.resume();
+            callback.quit();
         }
     }
 }

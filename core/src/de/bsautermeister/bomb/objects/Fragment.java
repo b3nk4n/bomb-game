@@ -47,7 +47,6 @@ public class Fragment {
             //             outside of the fragments bounds
             return false;
         }
-        System.out.println("impact");
 
         float leftX = getLeftX();
         float bottomY = getBottomY();
