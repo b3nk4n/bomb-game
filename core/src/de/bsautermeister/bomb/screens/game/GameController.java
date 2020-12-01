@@ -36,6 +36,36 @@ public class GameController implements Disposable {
     private static final float BOMB_EMIT_DELAY = 2f;
     private float bombEmitTimer = BOMB_EMIT_DELAY;
 
+    private final Array<BlastInstance> activeBlastEffects = new Array<>();
+
+    public static class BlastInstance {
+        private final Vector2 position;
+        private final float initialTtl;
+        private float ttl;
+
+        public BlastInstance(float x, float y, float ttl) {
+            this.position = new Vector2(x, y);
+            this.initialTtl = ttl;
+            this.ttl = ttl;
+        }
+
+        public void update(float delta) {
+            ttl -= delta;
+        }
+
+        public Vector2 getPosition() {
+            return position;
+        }
+
+        public float getProgress() {
+            return MathUtils.clamp((initialTtl - ttl) / initialTtl, 0f, 1f);
+        }
+
+        public boolean isExpired() {
+            return ttl <= 0;
+        }
+    }
+
     private final GameScreenCallbacks gameScreenCallbacks;
 
     private final PauseOverlay.Callback pauseCallback = new PauseOverlay.Callback() {
@@ -121,12 +151,22 @@ public class GameController implements Disposable {
             if (bomb.doExplode()) {
                 Vector2 bombPosition = bomb.getPosition();
                 ground.impact(bombPosition, bomb.getDetonationRadius());
+                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 3f));
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
 
                 if (player.impact(bombPosition, bomb.getDetonationRadius())) {
                     state = GameState.GAME_OVER;
                 }
+            }
+        }
+
+        for (int i = activeBlastEffects.size - 1; i >= 0; --i) {
+            BlastInstance explosionInstance = activeBlastEffects.get(i);
+            explosionInstance.update(delta);
+
+            if (explosionInstance.isExpired()) {
+                activeBlastEffects.removeIndex(i);
             }
         }
     }
@@ -208,6 +248,10 @@ public class GameController implements Disposable {
 
     public Array<Bomb> getBombs() {
         return bombs;
+    }
+
+    public Array<BlastInstance> getActiveBlastEffects() {
+        return activeBlastEffects;
     }
 
     public Ground getGround() {

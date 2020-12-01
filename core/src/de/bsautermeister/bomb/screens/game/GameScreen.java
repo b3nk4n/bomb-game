@@ -32,7 +32,8 @@ public class GameScreen extends ScreenBase {
         super.show();
 
         controller = new GameController(callbacks);
-        renderer = new GameRenderer(getBatch(), getAssetManager(), controller);
+        renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
+                getGame().getFrameBufferManager());
     }
 
     @Override
