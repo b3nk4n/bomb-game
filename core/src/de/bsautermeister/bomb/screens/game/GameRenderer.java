@@ -46,7 +46,7 @@ public class GameRenderer implements Disposable {
     private final GameController controller;
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch(); // TODO move to other SpriteBatch, or even replace it?
 
-    private final FrameBuffer frameBuffer;
+    private final FrameBuffer[] frameBuffers;
     private final FrameBufferManager frameBufferManager;
 
     private final Box2DDebugRenderer box2DRenderer;
@@ -68,11 +68,14 @@ public class GameRenderer implements Disposable {
         this.controller = controller;
         this.frameBufferManager = frameBufferManager;
 
-        frameBuffer = new FrameBuffer(
-                Pixmap.Format.RGBA8888,
-                Gdx.graphics.getWidth(),
-                Gdx.graphics.getHeight(),
-                false);
+        frameBuffers = new FrameBuffer[2];
+        for (int i = 0; i < frameBuffers.length; ++i) {
+            frameBuffers[i] = new FrameBuffer(
+                    Pixmap.Format.RGBA8888,
+                    Gdx.graphics.getWidth(),
+                    Gdx.graphics.getHeight(),
+                    false);
+        }
 
         uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
@@ -104,7 +107,8 @@ public class GameRenderer implements Disposable {
         GdxUtils.clearScreen();
 
         viewport.apply();
-        frameBufferManager.begin(frameBuffer);
+        int fbIdx = 0;
+        frameBufferManager.begin(frameBuffers[fbIdx++]);
         GdxUtils.clearScreen();
 
         batch.setProjectionMatrix(camera.combined);
@@ -123,11 +127,13 @@ public class GameRenderer implements Disposable {
         polygonBatch.end();
         frameBufferManager.end();
 
-        batch.begin();
-
         Array<GameController.BlastInstance> blasts = controller.getActiveBlastEffects();
-        if (blasts.size > 0) {
-            GameController.BlastInstance blast = blasts.get(0);
+
+        for (GameController.BlastInstance blast : blasts) {
+            frameBufferManager.begin(frameBuffers[fbIdx]);
+            fbIdx = fbIdx == 0 ? 1 : 0;
+            batch.begin();
+
             Vector2 blastPosition = blast.getPosition();
             tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
             camera.project(tmpBlastProjection);
@@ -135,12 +141,20 @@ public class GameRenderer implements Disposable {
             batch.setShader(shaderEffect);
             shaderEffect.setUniformf("u_time", blast.getProgress());
             shaderEffect.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
+
+            batch.draw(frameBuffers[fbIdx].getColorBufferTexture(),
+                    camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
+                    0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
+
+            batch.setShader(null);
+            batch.end();
+            frameBufferManager.end();
         }
 
-        batch.draw(frameBuffer.getColorBufferTexture(),
+        batch.begin();
+        batch.draw(frameBuffers[fbIdx == 0 ? 1 : 0].getColorBufferTexture(),
                 camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
                 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
-        batch.setShader(null);
         batch.end();
 
         if (Cfg.DEBUG_MODE) {
@@ -260,7 +274,9 @@ public class GameRenderer implements Disposable {
     public void dispose() {
         polygonBatch.dispose();
         shaderEffect.dispose();
-        frameBuffer.dispose();
+        for (FrameBuffer frameBuffer : frameBuffers) {
+            frameBuffer.dispose();
+        }
     }
 
     public InputProcessor getInputProcessor() {
