@@ -56,7 +56,7 @@ public class GameRenderer implements Disposable {
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
-    private final ShaderProgram shaderEffect; // TODO try out shader-program-loader via asset loader?
+    private final ShaderProgram blastShader;
 
     private final Skin skin;
     private final Stage overlayStage;
@@ -93,7 +93,7 @@ public class GameRenderer implements Disposable {
 
         hudStage = new Stage(uiViewport, batch);
 
-        shaderEffect = GdxUtils.loadCompiledShader("shader/default.vs", "shader/blast.fs");
+        blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
 
         Gdx.input.setInputProcessor(overlayStage);
     }
@@ -138,9 +138,9 @@ public class GameRenderer implements Disposable {
             tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
             camera.project(tmpBlastProjection);
             tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
-            batch.setShader(shaderEffect);
-            shaderEffect.setUniformf("u_time", blast.getProgress());
-            shaderEffect.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
+            batch.setShader(blastShader);
+            blastShader.setUniformf("u_time", blast.getProgress());
+            blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
 
             batch.draw(frameBuffers[fbIdx].getColorBufferTexture(),
                     camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
@@ -273,7 +273,7 @@ public class GameRenderer implements Disposable {
     @Override
     public void dispose() {
         polygonBatch.dispose();
-        shaderEffect.dispose();
+        blastShader.dispose();
         for (FrameBuffer frameBuffer : frameBuffers) {
             frameBuffer.dispose();
         }
