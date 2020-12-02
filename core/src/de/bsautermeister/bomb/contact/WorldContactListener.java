@@ -27,7 +27,6 @@ public class WorldContactListener implements ContactListener {
         switch (collisionDef) {
             case Bits.BALL | Bits.GROUND:
                 player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL);
-                LOG.debug("Player vs. Ground collision");
                 break;
             case Bits.BOMB | Bits.GROUND:
                 bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);

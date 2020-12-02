@@ -166,6 +166,17 @@ public class GameController implements Disposable {
             if (bomb.doExplode()) {
                 Vector2 bombPosition = bomb.getPosition();
                 ground.impact(bombPosition, bomb.getDetonationRadius());
+
+                if (player.impact(bombPosition, bomb.getDetonationRadius())) {
+                    state = GameState.GAME_OVER;
+                }
+
+                for (Bomb otherBomb : bombs) {
+                    if (otherBomb == bomb) continue;
+
+                    otherBomb.impact(bombPosition, bomb.getDetonationRadius());
+                }
+
                 activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 3f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
@@ -173,10 +184,6 @@ public class GameController implements Disposable {
                         MathUtils.random(0.9f, 1.1f), 0f);
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
-
-                if (player.impact(bombPosition, bomb.getDetonationRadius())) {
-                    state = GameState.GAME_OVER;
-                }
             }
         }
 

@@ -1,5 +1,7 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -57,6 +59,21 @@ public class Bomb implements Disposable {
     public void update(float delta) {
         if (groundTouched) {
             ttl -= delta;
+        }
+    }
+
+    private static final Vector2 blastImpactDirection = new Vector2();
+    public void impact(Vector2 position, float radius) {
+        Vector2 bodyPosition = body.getPosition();
+
+        // blast impact
+        blastImpactDirection.set(bodyPosition).sub(position).scl(1f);
+        float blastDistance = blastImpactDirection.len();
+        final float maxBlast = 3 * radius;
+        if (blastDistance < maxBlast) {
+            blastImpactDirection.nor().scl((maxBlast - blastDistance));
+            System.out.println(blastImpactDirection);
+            body.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
         }
     }
 

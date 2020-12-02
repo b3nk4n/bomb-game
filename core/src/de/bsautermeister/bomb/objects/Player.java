@@ -78,13 +78,25 @@ public class Player {
         }
     }
 
+    private static final Vector2 blastImpactDirection = new Vector2();
     private static final Circle impactCircle = new Circle();
     private static final Circle playerCircle = new Circle();
     public boolean impact(Vector2 position, float radius) {
+        Vector2 bodyPosition = body.getPosition();
         impactCircle.set(position, radius);
-        playerCircle.set(body.getPosition(), getRadius());
+        playerCircle.set(bodyPosition, getRadius());
         if (Intersector.overlaps(impactCircle, playerCircle)) {
-            lifeRatio -= 0.66f; // TODO reduce life dependent on distance
+            lifeRatio -= 0.2f; // TODO reduce life dependent on distance
+        }
+
+        // blast impact
+        blastImpactDirection.set(bodyPosition).sub(position).scl(1f);
+        float blastDistance = blastImpactDirection.len();
+        final float maxBlast = 3 * radius;
+        if (blastDistance < maxBlast) {
+            blastImpactDirection.nor().scl((maxBlast - blastDistance));
+            System.out.println(blastImpactDirection);
+            body.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
         }
 
         if (isDead()) {
