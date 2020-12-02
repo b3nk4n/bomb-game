@@ -1,7 +1,9 @@
 package de.bsautermeister.bomb.assets;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -24,18 +26,30 @@ public interface Assets {
     abstract class ShaderPrograms {
         public static AssetDescriptor<ShaderProgram> BLAST =
                 new AssetDescriptor<>("shader/blast.frag", ShaderProgram.class,
-                        defaultVertexShaderParams());
+                        usingDefaultVertexShader());
 
-        private static ShaderProgramLoader.ShaderProgramParameter defaultVertexShaderParams() {
+        private static ShaderProgramLoader.ShaderProgramParameter usingDefaultVertexShader() {
             ShaderProgramLoader.ShaderProgramParameter params = new ShaderProgramLoader.ShaderProgramParameter();
             params.vertexFile = "shader/default.vert";
             return params;
         }
     }
 
+    abstract class Effects {
+        public static AssetDescriptor<ParticleEffect> EXPLOSION =
+                new AssetDescriptor<>("pfx/explosion.pfx", ParticleEffect.class, usingAtlas(Atlas.GAME.fileName));
+
+        private static ParticleEffectLoader.ParticleEffectParameter usingAtlas(String atlasFile) {
+            ParticleEffectLoader.ParticleEffectParameter params = new ParticleEffectLoader.ParticleEffectParameter();
+            params.atlasFile = atlasFile;
+            return params;
+        }
+    }
+
     AssetDescriptor[] ALL = {
-            Atlas.LOADING, Atlas. GAME, Atlas.UI,
+            Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
-            ShaderPrograms.BLAST
+            ShaderPrograms.BLAST,
+            Effects.EXPLOSION
     };
 }

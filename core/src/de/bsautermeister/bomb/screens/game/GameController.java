@@ -2,7 +2,9 @@ package de.bsautermeister.bomb.screens.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -12,7 +14,9 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.WorldContactListener;
+import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
@@ -37,6 +41,8 @@ public class GameController implements Disposable {
     private float bombEmitTimer = BOMB_EMIT_DELAY;
 
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
+
+    private final ManagedPooledEffect explosionEffect;
 
     public static class BlastInstance {
         private final Vector2 position;
@@ -94,7 +100,7 @@ public class GameController implements Disposable {
         }
     };
 
-    public GameController(GameScreenCallbacks gameScreenCallbacks) {
+    public GameController(GameScreenCallbacks gameScreenCallbacks, AssetManager assetManager) {
         this.gameScreenCallbacks = gameScreenCallbacks;
 
         camera = new OrthographicCamera();
@@ -105,6 +111,9 @@ public class GameController implements Disposable {
 
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+
+        ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
+        explosionEffect = new ManagedPooledEffect(explosion);
 
         state = GameState.PLAYING;
     }
@@ -128,6 +137,7 @@ public class GameController implements Disposable {
 
         updateBombEmitter(delta);
         updateEnvironment(delta);
+        explosionEffect.update(delta);
 
         world.step(delta, 6, 2);
     }
@@ -152,6 +162,7 @@ public class GameController implements Disposable {
                 Vector2 bombPosition = bomb.getPosition();
                 ground.impact(bombPosition, bomb.getDetonationRadius());
                 activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 3f));
+                explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
 
@@ -272,5 +283,9 @@ public class GameController implements Disposable {
 
     public GameOverOverlay.Callback getGameOverCallback() {
         return gameOverCallback;
+    }
+
+    public ManagedPooledEffect getExplosionEffect() {
+        return explosionEffect;
     }
 }

@@ -31,7 +31,7 @@ public class GameScreen extends ScreenBase {
     public void show() {
         super.show();
 
-        controller = new GameController(callbacks);
+        controller = new GameController(callbacks, getAssetManager());
         renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
                 getGame().getFrameBufferManager());
     }

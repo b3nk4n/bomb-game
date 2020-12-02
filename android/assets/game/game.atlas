@@ -1,6 +1,6 @@
 
 game.png
-size: 128,32
+size: 64,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
@@ -13,22 +13,29 @@ ball
   index: -1
 block_ground
   rotate: false
-  xy: 24, 4
+  xy: 40, 40
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block_surface
   rotate: false
-  xy: 44, 4
+  xy: 24, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 bomb
   rotate: false
-  xy: 64, 12
+  xy: 40, 28
   size: 8, 8
   orig: 8, 8
+  offset: 0, 0
+  index: -1
+particle
+  rotate: false
+  xy: 4, 24
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1

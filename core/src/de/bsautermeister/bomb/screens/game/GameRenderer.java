@@ -116,6 +116,7 @@ public class GameRenderer implements Disposable {
 
         renderBall(batch);
         renderBombs(batch);
+        controller.getExplosionEffect().draw(batch);
 
         batch.end();
 
