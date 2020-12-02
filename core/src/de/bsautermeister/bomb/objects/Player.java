@@ -102,7 +102,6 @@ public class Player {
         final float maxBlast = 3 * radius;
         if (blastDistance < maxBlast) {
             blastImpactDirection.nor().scl((maxBlast - blastDistance));
-            System.out.println(blastImpactDirection);
             body.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
         }
 
