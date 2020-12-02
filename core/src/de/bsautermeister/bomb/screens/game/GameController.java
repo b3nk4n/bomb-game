@@ -212,6 +212,8 @@ public class GameController implements Disposable {
         camera.update();
     }
 
+    private Vector2 tmpPosition = new Vector2(0, 0);
+    private Vector2 startSteerPosition = new Vector2(0, 0);
     private void handleInput() {
         handlePauseInput();
 
@@ -219,10 +221,44 @@ public class GameController implements Disposable {
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
-        boolean downPressed = Gdx.input.isKeyJustPressed(Input.Keys.DOWN);
+        boolean jumpAreaTouched = false;
 
-        if (downPressed) {
-            ground.impact(player.getPosition(), player.getRadius() * 2);
+        for (int pointer = 0; pointer < Gdx.input.getMaxPointers(); ++pointer) {
+            if (!Gdx.input.isTouched(pointer)) {
+                continue;
+            }
+            float x = Gdx.input.getX(pointer);
+            float y = Gdx.input.getY(pointer);
+
+            x = x / Gdx.graphics.getWidth();
+            y = y / Gdx.graphics.getHeight();
+
+            if (y < 0.5) {
+                jumpAreaTouched = true;
+                if (startSteerPosition.isZero()) {
+                    startSteerPosition.set(x, y);
+                } else {
+                    tmpPosition.set(x, y);
+                    Vector2 swipeDirection = tmpPosition.sub(startSteerPosition);
+                    float len = swipeDirection.len();
+                    if (len > 0.005f) {
+                        float angle = swipeDirection.angle();
+                        if (len > 0.1f && angle > 230 && angle < 300) {
+                            upPressed = true;
+                        }
+                    }
+                }
+            } else {
+                if (x <= 0.5) {
+                    leftPressed = true;
+                } else {
+                    rightPressed = true;
+                }
+            }
+        }
+
+        if (!jumpAreaTouched) {
+            startSteerPosition.set(0, 0);
         }
 
         player.control(upPressed, leftPressed, rightPressed);

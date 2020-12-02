@@ -23,6 +23,10 @@ public class Player {
 
     private float lifeRatio;
 
+    private static final float BLOCK_JUMP_TIME = 1f;
+    private float blockJumpTimer;
+    private int groundContacts;
+
     public Player(World world, Vector2 startPosition, float radius) {
         this.world = world;
         this.startPosition = startPosition;
@@ -67,14 +71,17 @@ public class Player {
         if (left) {
             body.applyForceToCenter(-25f, 0, true);
         }
-        if (up) {
-            body.applyLinearImpulse(0f, 1f, body.getWorldCenter().x, body.getWorldCenter().y, true);
+        if (up && hasGroundContact() && blockJumpTimer < 0) {
+            blockJumpTimer = BLOCK_JUMP_TIME;
+            body.applyLinearImpulse(0f, 8f, body.getWorldCenter().x, body.getWorldCenter().y, true);
         }
     }
 
     public void update(float delta) {
         if (!isDead()) {
             lifeRatio = Math.min(1f, lifeRatio + Cfg.PLAYER_SELF_HEALING_PER_SECOND * delta);
+
+            blockJumpTimer -= delta;
         }
     }
 
@@ -105,6 +112,18 @@ public class Player {
         }
 
         return false;
+    }
+
+    public void beginGroundContact() {
+        groundContacts++;
+    }
+
+    public void endGroundContact() {
+        groundContacts--;
+    }
+
+    public boolean hasGroundContact() {
+        return groundContacts > 0;
     }
 
     public Vector2 getPosition() {

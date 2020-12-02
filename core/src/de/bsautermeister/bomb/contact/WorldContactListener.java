@@ -27,6 +27,7 @@ public class WorldContactListener implements ContactListener {
         switch (collisionDef) {
             case Bits.BALL | Bits.GROUND:
                 player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL);
+                player.beginGroundContact();
                 break;
             case Bits.BOMB | Bits.GROUND:
                 bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);
@@ -37,7 +38,18 @@ public class WorldContactListener implements ContactListener {
 
     @Override
     public void endContact(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
 
+        Player player;
+
+        int collisionDef = fixtureA.getFilterData().categoryBits | fixtureB.getFilterData().categoryBits;
+        switch (collisionDef) {
+            case Bits.BALL | Bits.GROUND:
+                player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL);
+                player.endGroundContact();
+                break;
+        }
     }
 
     @Override
