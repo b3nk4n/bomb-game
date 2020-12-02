@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.MathUtils;
@@ -43,6 +44,8 @@ public class GameController implements Disposable {
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
 
     private final ManagedPooledEffect explosionEffect;
+
+    private final Sound explosionSound;
 
     public static class BlastInstance {
         private final Vector2 position;
@@ -115,6 +118,8 @@ public class GameController implements Disposable {
         ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
         explosionEffect = new ManagedPooledEffect(explosion);
 
+        explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
+
         state = GameState.PLAYING;
     }
 
@@ -163,6 +168,9 @@ public class GameController implements Disposable {
                 ground.impact(bombPosition, bomb.getDetonationRadius());
                 activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 3f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
+                explosionSound.play(
+                        MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
+                        MathUtils.random(0.9f, 1.1f), 0f);
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
 

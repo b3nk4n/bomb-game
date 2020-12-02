@@ -3,6 +3,8 @@ package de.bsautermeister.bomb.assets;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
+import com.badlogic.gdx.assets.loaders.SoundLoader;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -46,10 +48,16 @@ public interface Assets {
         }
     }
 
+    interface Sounds {
+        AssetDescriptor<Sound> EXPLOSION =
+                new AssetDescriptor<>("sounds/explosion.wav", Sound.class);
+    }
+
     AssetDescriptor[] ALL = {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
             ShaderPrograms.BLAST,
-            Effects.EXPLOSION
+            Effects.EXPLOSION,
+            Sounds.EXPLOSION
     };
 }
