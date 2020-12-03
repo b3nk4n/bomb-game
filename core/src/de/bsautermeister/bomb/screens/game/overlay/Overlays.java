@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -11,8 +12,9 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.utils.TextureUtils;
 
-public class OverlayManager<T extends Enum> {
+public class Overlays<T extends Enum> {
 
     private final ObjectMap<T, Actor> overlays;
     private final Stage overlayStage;
@@ -21,11 +23,15 @@ public class OverlayManager<T extends Enum> {
     // this overlay to show are processed in the overlay, which could immediately close it again
     private boolean skipNextOverlayAct = false;
 
-    public OverlayManager(Viewport uiViewport, Batch batch) {
+    private TextureRegion backgroundRegion;
+
+    public Overlays(Viewport uiViewport, Batch batch, int backgroundRgba8888) {
         overlays = new ObjectMap<>();
 
         overlayStage = new Stage(uiViewport, batch);
         overlayStage.setDebugAll(Cfg.DEBUG_MODE);
+
+        backgroundRegion = TextureUtils.singleColorTexture(backgroundRgba8888);
 
         Gdx.input.setInputProcessor(overlayStage);
     }
@@ -41,10 +47,8 @@ public class OverlayManager<T extends Enum> {
                 overlayStage.addActor(overlay);
                 skipNextOverlayAct = true;
             }
-        } else {
-            if (!overlays.containsKey(state)) {
-                overlayStage.clear();
-            }
+        } else if (!overlays.containsKey(state)) {
+            overlayStage.clear();
         }
     }
 
@@ -56,7 +60,7 @@ public class OverlayManager<T extends Enum> {
             }
             overlayStage.act();
             batch.begin();
-            // batch.draw(backgroundOverlayRegion, 0f, 0f, Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+            batch.draw(backgroundRegion, 0f, 0f, Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
             batch.end();
             overlayStage.draw();
         }

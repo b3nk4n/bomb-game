@@ -33,7 +33,7 @@ import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
-import de.bsautermeister.bomb.screens.game.overlay.OverlayManager;
+import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
@@ -61,7 +61,7 @@ public class GameRenderer implements Disposable {
     private final Skin skin;
 
     private final GameHud hud;
-    private final OverlayManager<GameState> overlayManager;
+    private final Overlays<GameState> overlays;
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
                         FrameBufferManager frameBufferManager) {
@@ -91,10 +91,10 @@ public class GameRenderer implements Disposable {
         skin = assetManager.get(Assets.Skins.UI);
 
         hud = new GameHud(assetManager, uiViewport, batch);
-        overlayManager = new OverlayManager<>(uiViewport, batch);
-        overlayManager.register(GameState.PAUSED,
+        overlays = new Overlays<>(uiViewport, batch, 0x000000BB);
+        overlays.register(GameState.PAUSED,
                 new PauseOverlay(skin, controller.getPauseCallback()));
-        overlayManager.register(GameState.GAME_OVER,
+        overlays.register(GameState.GAME_OVER,
                 new GameOverOverlay(skin, controller.getGameOverCallback()));
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
@@ -162,8 +162,8 @@ public class GameRenderer implements Disposable {
         uiViewport.apply();
         batch.setProjectionMatrix(hud.getCamera().combined);
         renderHud(delta);
-        overlayManager.update(controller.getState());
-        overlayManager.render(batch);
+        overlays.update(controller.getState());
+        overlays.render(batch);
     }
 
     private void renderBall(SpriteBatch batch) {
@@ -248,6 +248,6 @@ public class GameRenderer implements Disposable {
     }
 
     public InputProcessor getInputProcessor() {
-        return overlayManager.getInputProcessor();
+        return overlays.getInputProcessor();
     }
 }
