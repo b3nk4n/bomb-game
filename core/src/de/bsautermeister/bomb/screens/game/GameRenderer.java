@@ -18,7 +18,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -34,6 +33,7 @@ import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
+import de.bsautermeister.bomb.screens.game.overlay.OverlayManager;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
@@ -59,9 +59,9 @@ public class GameRenderer implements Disposable {
     private final ShaderProgram blastShader;
 
     private final Skin skin;
-    private final Stage overlayStage;
 
     private final GameHud hud;
+    private final OverlayManager<GameState> overlayManager;
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
                         FrameBufferManager frameBufferManager) {
@@ -89,14 +89,15 @@ public class GameRenderer implements Disposable {
         uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
         skin = assetManager.get(Assets.Skins.UI);
-        overlayStage = new Stage(uiViewport, batch);
-        overlayStage.setDebugAll(Cfg.DEBUG_MODE);
 
         hud = new GameHud(assetManager, uiViewport, batch);
+        overlayManager = new OverlayManager<>(uiViewport, batch);
+        overlayManager.register(GameState.PAUSED,
+                new PauseOverlay(skin, controller.getPauseCallback()));
+        overlayManager.register(GameState.GAME_OVER,
+                new GameOverOverlay(skin, controller.getGameOverCallback()));
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
-
-        Gdx.input.setInputProcessor(overlayStage);
     }
 
     private final Vector3 tmpBlastProjection = new Vector3();
@@ -161,7 +162,8 @@ public class GameRenderer implements Disposable {
         uiViewport.apply();
         batch.setProjectionMatrix(hud.getCamera().combined);
         renderHud(delta);
-        renderOverlays(batch);
+        overlayManager.update(controller.getState());
+        overlayManager.render(batch);
     }
 
     private void renderBall(SpriteBatch batch) {
@@ -231,44 +233,7 @@ public class GameRenderer implements Disposable {
         hud.render(delta);
     }
 
-    private void renderOverlays(SpriteBatch batch) {
-        updateOverlay();
-        renderHudOverlay();
-    }
 
-    private void renderHudOverlay() {
-        if (!overlayStage.getActors().isEmpty()) {
-            if (skipNextOverlayAct) {
-                skipNextOverlayAct = false;
-                return;
-            }
-            overlayStage.act();
-            batch.begin();
-            // batch.draw(backgroundOverlayRegion, 0f, 0f, Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
-            batch.end();
-            overlayStage.draw();
-        }
-    }
-
-    // workaround: do not act during the first frame, otherwise button event which triggered
-    // this overlay to show are processed in the overlay, which could immediately close it again
-    private boolean skipNextOverlayAct = false;
-
-    private void updateOverlay() {
-        if (overlayStage.getActors().isEmpty()) {
-            if (controller.getState().isPaused()) {
-                overlayStage.addActor(new PauseOverlay(skin, controller.getPauseCallback()));
-                skipNextOverlayAct = true;
-            } else if (controller.getState().isGameOver()) {
-                overlayStage.addActor(new GameOverOverlay(skin, controller.getGameOverCallback()));
-                skipNextOverlayAct = true;
-            }
-        } else {
-            if (!controller.getState().isPaused() && !controller.getState().isGameOver()) {
-                overlayStage.clear();
-            }
-        }
-    }
 
     public void resize(int width, int height) {
         controller.getViewport().update(width, height, false);
@@ -283,6 +248,6 @@ public class GameRenderer implements Disposable {
     }
 
     public InputProcessor getInputProcessor() {
-        return overlayStage;
+        return overlayManager.getInputProcessor();
     }
 }

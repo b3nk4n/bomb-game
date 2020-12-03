@@ -27,9 +27,9 @@ public class GameHud implements Disposable {
     private int lifeRatio = Integer.MAX_VALUE;
     private int score = Integer.MAX_VALUE;
 
-    public GameHud(AssetManager assetManager, Viewport viewport, Batch batch) {
+    public GameHud(AssetManager assetManager, Viewport uiViewport, Batch batch) {
         this.assetManager = assetManager;
-        stage = new Stage(viewport, batch);
+        stage = new Stage(uiViewport, batch);
         stage.setDebugAll(Cfg.DEBUG_MODE);
         initialize();
         updateLifeRatio(1f);

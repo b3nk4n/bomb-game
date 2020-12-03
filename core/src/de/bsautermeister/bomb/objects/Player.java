@@ -97,7 +97,7 @@ public class Player {
         impactCircle.set(position, radius);
         playerCircle.set(bodyPosition, getRadius());
         if (Intersector.overlaps(impactCircle, playerCircle)) {
-            lifeRatio -= 0.2f; // TODO reduce life dependent on distance
+            lifeRatio = Math.max(0f, lifeRatio - .2f); // TODO reduce life dependent on distance
         }
 
         // blast impact
