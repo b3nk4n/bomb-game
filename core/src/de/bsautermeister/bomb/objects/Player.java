@@ -22,6 +22,7 @@ public class Player {
     private final float radius;
 
     private float lifeRatio;
+    private int score;
 
     private static final float BLOCK_JUMP_TIME = 1f;
     private float blockJumpTimer;
@@ -82,6 +83,9 @@ public class Player {
             lifeRatio = Math.min(1f, lifeRatio + Cfg.PLAYER_SELF_HEALING_PER_SECOND * delta);
 
             blockJumpTimer -= delta;
+
+            float lowestPositionY = -body.getPosition().y - radius;
+            score = Math.max(score, (int)(lowestPositionY * 10));
         }
     }
 
@@ -137,7 +141,15 @@ public class Player {
         return radius;
     }
 
+    public float getLifeRatio() {
+        return lifeRatio;
+    }
+
     public boolean isDead() {
         return lifeRatio <= 0f;
+    }
+
+    public int getScore() {
+        return score;
     }
 }

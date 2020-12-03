@@ -60,7 +60,8 @@ public class GameRenderer implements Disposable {
 
     private final Skin skin;
     private final Stage overlayStage;
-    private final Stage hudStage;
+
+    private final GameHud hud;
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
                         FrameBufferManager frameBufferManager) {
@@ -77,8 +78,6 @@ public class GameRenderer implements Disposable {
                     false);
         }
 
-        uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
-
         this.box2DRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 
         TextureAtlas atlas =  assetManager.get(Assets.Atlas.GAME);
@@ -87,11 +86,13 @@ public class GameRenderer implements Disposable {
         ballRegion = atlas.findRegion(RegionNames.Game.BALL);
         bombRegion = atlas.findRegion(RegionNames.Game.BOMB);
 
+        uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+
         skin = assetManager.get(Assets.Skins.UI);
         overlayStage = new Stage(uiViewport, batch);
         overlayStage.setDebugAll(Cfg.DEBUG_MODE);
 
-        hudStage = new Stage(uiViewport, batch);
+        hud = new GameHud(assetManager, uiViewport, batch);
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
 
@@ -158,9 +159,9 @@ public class GameRenderer implements Disposable {
         }
 
         uiViewport.apply();
-        batch.setProjectionMatrix(hudStage.getCamera().combined);
-        hudStage.act();
-        renderHud(batch);
+        batch.setProjectionMatrix(hud.getCamera().combined);
+        renderHud(delta);
+        renderOverlays(batch);
     }
 
     private void renderBall(SpriteBatch batch) {
@@ -223,7 +224,14 @@ public class GameRenderer implements Disposable {
         }
     }
 
-    private void renderHud(SpriteBatch batch) {
+    private void renderHud(float delta) {
+        Player player = controller.getPlayer();
+        hud.updateLifeRatio(player.getLifeRatio());
+        hud.updateScore(player.getScore());
+        hud.render(delta);
+    }
+
+    private void renderOverlays(SpriteBatch batch) {
         updateOverlay();
         renderHudOverlay();
     }
