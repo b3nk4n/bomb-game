@@ -8,6 +8,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
@@ -16,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
+import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.objects.Bomb;
@@ -111,6 +116,7 @@ public class GameController implements Disposable {
 
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
+        createWorldBoundsBodies(world);
 
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
@@ -121,6 +127,30 @@ public class GameController implements Disposable {
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
 
         state = GameState.PLAYING;
+    }
+
+    private void createWorldBoundsBodies(World world) {
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 0.5f;
+        fixtureDef.restitution = 0.1f;
+        fixtureDef.filter.categoryBits = Bits.GROUND;
+        fixtureDef.filter.groupIndex = 1;
+        fixtureDef.filter.maskBits = Bits.BALL;
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1f, 1e10f);
+        fixtureDef.shape = shape;
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+
+        bodyDef.position.set(-1f, 0f);
+        Body leftBounds = world.createBody(bodyDef);
+        leftBounds.createFixture(fixtureDef);
+
+        bodyDef.position.set(Cfg.WORLD_WIDTH_PPM + 1f, 0f);
+        Body rightBounds = world.createBody(bodyDef);
+        rightBounds.createFixture(fixtureDef);
     }
 
     public void update(float delta) {

@@ -20,7 +20,7 @@ public class Fragment {
 
     private static final float EPSILON = 1e-5f;
 
-    private static final int RESOLUTION = 16;
+    private static final int RESOLUTION = 8;
 
     private final World world;
     private Body body;
