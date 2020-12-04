@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
+import de.bsautermeister.bomb.utils.PhysicsUtils;
 
 public class Player {
     private final World world;
@@ -121,6 +122,8 @@ public class Player {
 
             float lowestPositionY = -ballBody.getPosition().y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));
+
+            PhysicsUtils.applyAirResistance(ballBody, 0.1f);
         }
     }
 
@@ -132,7 +135,7 @@ public class Player {
         impactCircle.set(position, radius);
         playerCircle.set(bodyPosition, getRadius());
         if (Intersector.overlaps(impactCircle, playerCircle)) {
-            lifeRatio = Math.max(0f, lifeRatio - .2f); // TODO reduce life dependent on distance
+            lifeRatio = Math.max(0f, lifeRatio - .33f); // TODO reduce life dependent on distance
         }
 
         // blast impact

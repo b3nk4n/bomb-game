@@ -1,7 +1,5 @@
 package de.bsautermeister.bomb.objects;
 
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -13,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import de.bsautermeister.bomb.contact.Bits;
+import de.bsautermeister.bomb.utils.PhysicsUtils;
 
 public class Bomb implements Disposable {
     private final World world;
@@ -60,6 +59,8 @@ public class Bomb implements Disposable {
         if (groundTouched) {
             ttl -= delta;
         }
+
+        PhysicsUtils.applyAirResistance(body, 0.1f);
     }
 
     private static final Vector2 blastImpactDirection = new Vector2();

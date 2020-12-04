@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
     int LOG_LEVEL = Logger.DEBUG;
-    boolean DEBUG_MODE = true;
+    boolean DEBUG_MODE = false;
 
     float PPM = 5f;
 
