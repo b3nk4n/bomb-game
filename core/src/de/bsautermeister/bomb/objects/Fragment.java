@@ -77,7 +77,7 @@ public class Fragment {
         fixtureDef.density = 1f;
         fixtureDef.filter.categoryBits = Bits.GROUND;
         fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.BALL;
+        fixtureDef.filter.maskBits = Bits.BALL | Bits.BALL_SENSOR;
         fixtureDef.shape = shape;
         for (float[] polygonOutline : polygonOutlines) {
             ShortArray triangles = TRIANGULATOR.computeTriangles(polygonOutline);

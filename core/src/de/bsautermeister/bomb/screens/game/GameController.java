@@ -132,7 +132,7 @@ public class GameController implements Disposable {
     private void createWorldBoundsBodies(World world) {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
+        fixtureDef.friction = 0.1f;
         fixtureDef.restitution = 0.1f;
         fixtureDef.filter.categoryBits = Bits.GROUND;
         fixtureDef.filter.groupIndex = 1;
@@ -151,6 +151,7 @@ public class GameController implements Disposable {
         bodyDef.position.set(Cfg.WORLD_WIDTH_PPM + 1f, 0f);
         Body rightBounds = world.createBody(bodyDef);
         rightBounds.createFixture(fixtureDef);
+        shape.dispose();
     }
 
     public void update(float delta) {

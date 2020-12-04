@@ -7,16 +7,20 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
 
 public class Player {
     private final World world;
-    private Body body;
+    private Body ballBody;
+    private Body fixedSensorBody;
 
     private final Vector2 startPosition;
     private final float radius;
@@ -24,22 +28,22 @@ public class Player {
     private float lifeRatio;
     private int score;
 
-    private static final float BLOCK_JUMP_TIME = 1f;
-    private float blockJumpTimer;
+    private boolean blockJumpUntilRelease;
     private int groundContacts;
 
     public Player(World world, Vector2 startPosition, float radius) {
         this.world = world;
         this.startPosition = startPosition;
         this.radius = radius;
-        this.body = createBody(radius);
+        this.ballBody = createBody(radius);
         reset();
     }
 
     public void reset() {
         lifeRatio = 1f;
-        body.setTransform(startPosition, 0);
-        body.setActive(true);
+        ballBody.setTransform(startPosition, 0);
+        ballBody.setActive(true);
+        fixedSensorBody.setTransform(startPosition, 0);
     }
 
     private Body createBody(float radius) {
@@ -62,19 +66,52 @@ public class Player {
         fixture.setUserData(this);
         shape.dispose();
 
+        BodyDef fixedSensorBodyDef = new BodyDef();
+        fixedSensorBodyDef.fixedRotation = true;
+        fixedSensorBodyDef.type = BodyDef.BodyType.DynamicBody;
+        fixedSensorBody = world.createBody(fixedSensorBodyDef);
+
+        FixtureDef groundSensorFixtureDef = new FixtureDef();
+        EdgeShape groundSensorShape = new EdgeShape();
+        groundSensorShape.set(-radius * 0.66f, -radius * 1.1f,
+                radius * 0.66f, -radius * 1.1f);
+        groundSensorFixtureDef.filter.categoryBits = Bits.BALL_SENSOR;
+        groundSensorFixtureDef.filter.maskBits = Bits.GROUND;
+        groundSensorFixtureDef.filter.groupIndex = 1;
+        groundSensorFixtureDef.shape = groundSensorShape;
+        groundSensorFixtureDef.isSensor = true;
+
+        fixedSensorBody.createFixture(groundSensorFixtureDef).setUserData(this);
+        groundSensorShape.dispose();
+
+        JointDef jointDef = new WheelJointDef();
+        jointDef.bodyA = fixedSensorBody;
+        jointDef.bodyB = body;
+
+        world.createJoint(jointDef);
+
         return body;
     }
 
     public void control(boolean up, boolean left, boolean right) {
         if (right) {
-            body.applyForceToCenter(25f, 0, true);
+            if (hasGroundContact()) {
+                ballBody.applyTorque(-1f, true);
+            }
+            ballBody.applyForceToCenter(10f, 0, true);
         }
         if (left) {
-            body.applyForceToCenter(-25f, 0, true);
+            if (hasGroundContact()) {
+                ballBody.applyTorque(1f, true);
+            }
+            ballBody.applyForceToCenter(-10f, 0, true);
         }
-        if (up && hasGroundContact() && blockJumpTimer < 0) {
-            blockJumpTimer = BLOCK_JUMP_TIME;
-            body.applyLinearImpulse(0f, 8f, body.getWorldCenter().x, body.getWorldCenter().y, true);
+        if (up && hasGroundContact() && !blockJumpUntilRelease) {
+            blockJumpUntilRelease = true;
+            ballBody.applyLinearImpulse(0f, 12f, ballBody.getWorldCenter().x, ballBody.getWorldCenter().y, true);
+        }
+        if (!up) {
+            blockJumpUntilRelease = false;
         }
     }
 
@@ -82,9 +119,7 @@ public class Player {
         if (!isDead()) {
             lifeRatio = Math.min(1f, lifeRatio + Cfg.PLAYER_SELF_HEALING_PER_SECOND * delta);
 
-            blockJumpTimer -= delta;
-
-            float lowestPositionY = -body.getPosition().y - radius;
+            float lowestPositionY = -ballBody.getPosition().y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));
         }
     }
@@ -93,7 +128,7 @@ public class Player {
     private static final Circle impactCircle = new Circle();
     private static final Circle playerCircle = new Circle();
     public boolean impact(Vector2 position, float radius) {
-        Vector2 bodyPosition = body.getPosition();
+        Vector2 bodyPosition = ballBody.getPosition();
         impactCircle.set(position, radius);
         playerCircle.set(bodyPosition, getRadius());
         if (Intersector.overlaps(impactCircle, playerCircle)) {
@@ -106,11 +141,11 @@ public class Player {
         final float maxBlast = 3 * radius;
         if (blastDistance < maxBlast) {
             blastImpactDirection.nor().scl((maxBlast - blastDistance));
-            body.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
+            ballBody.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
         }
 
         if (isDead()) {
-            body.setActive(false);
+            ballBody.setActive(false);
             return true;
         }
 
@@ -130,11 +165,11 @@ public class Player {
     }
 
     public Vector2 getPosition() {
-        return body.getPosition();
+        return ballBody.getPosition();
     }
 
     public float getRotation() {
-        return body.getAngle() * MathUtils.radiansToDegrees;
+        return ballBody.getAngle() * MathUtils.radiansToDegrees;
     }
 
     public float getRadius() {
