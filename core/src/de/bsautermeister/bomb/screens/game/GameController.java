@@ -208,7 +208,7 @@ public class GameController implements Disposable {
                     otherBomb.impact(bombPosition, bomb.getDetonationRadius());
                 }
 
-                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 3f));
+                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 2.5f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
                         MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),

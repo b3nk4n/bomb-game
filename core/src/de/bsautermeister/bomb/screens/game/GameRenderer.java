@@ -105,8 +105,6 @@ public class GameRenderer implements Disposable {
         Camera camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
-        GdxUtils.clearScreen();
-
         viewport.apply();
         int fbIdx = 0;
         frameBufferManager.begin(frameBuffers[fbIdx++]);
@@ -129,10 +127,14 @@ public class GameRenderer implements Disposable {
         polygonBatch.end();
         frameBufferManager.end();
 
-        Array<GameController.BlastInstance> blasts = controller.getActiveBlastEffects();
+        // set shader once before the loop, because it causes a fair amount of setup under the hood
+        batch.setShader(blastShader);
 
+        Array<GameController.BlastInstance> blasts = controller.getActiveBlastEffects();
         for (GameController.BlastInstance blast : blasts) {
             frameBufferManager.begin(frameBuffers[fbIdx]);
+            GdxUtils.clearScreen();
+
             batch.begin();
             fbIdx = fbIdx == 0 ? 1 : 0;
             Vector2 blastPosition = blast.getPosition();
@@ -141,13 +143,15 @@ public class GameRenderer implements Disposable {
             tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
             blastShader.setUniformf("u_time", blast.getProgress());
             blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
-            batch.setShader(blastShader);
+
             batch.draw(frameBuffers[fbIdx].getColorBufferTexture(),
                     camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
-                    0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
+                    0, 0, frameBuffers[fbIdx].getWidth(), frameBuffers[fbIdx].getHeight(), false, true);
             batch.end();
             frameBufferManager.end();
         }
+
+        batch.setShader(null);
 
         batch.begin();
         batch.draw(frameBuffers[fbIdx == 0 ? 1 : 0].getColorBufferTexture(),
