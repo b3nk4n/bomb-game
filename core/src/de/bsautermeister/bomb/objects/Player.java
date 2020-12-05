@@ -57,7 +57,7 @@ public class Player {
         shape.setRadius(radius);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0.8f;
+        fixtureDef.friction = 0.9f;
         fixtureDef.density = 10.0f;
         fixtureDef.filter.categoryBits = Bits.BALL;
         fixtureDef.filter.groupIndex = 1;
@@ -97,19 +97,19 @@ public class Player {
     public void control(boolean up, boolean left, boolean right) {
         if (right) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(-1f, true);
+                ballBody.applyTorque(-3f, true);
             }
-            ballBody.applyForceToCenter(10f, 0, true);
+            ballBody.applyForceToCenter(12.5f, 0, true);
         }
         if (left) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(1f, true);
+                ballBody.applyTorque(3f, true);
             }
-            ballBody.applyForceToCenter(-10f, 0, true);
+            ballBody.applyForceToCenter(-12.5f, 0, true);
         }
         if (up && hasGroundContact() && !blockJumpUntilRelease) {
             blockJumpUntilRelease = true;
-            ballBody.applyLinearImpulse(0f, 12f, ballBody.getWorldCenter().x, ballBody.getWorldCenter().y, true);
+            ballBody.applyLinearImpulse(0f, 12.5f, ballBody.getWorldCenter().x, ballBody.getWorldCenter().y, true);
         }
         if (!up) {
             blockJumpUntilRelease = false;
