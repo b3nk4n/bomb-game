@@ -30,8 +30,9 @@ public class WorldContactListener implements ContactListener {
                 player.beginGroundContact();
                 break;
             case Bits.BOMB | Bits.GROUND:
+            case Bits.BOMB | Bits.BALL:
                 bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);
-                bomb.touchGround();
+                bomb.startTicking();
                 break;
         }
     }

@@ -283,11 +283,11 @@ public class GameController implements Disposable {
     private void emitBomb() {
         float bodyRadius = MathUtils.random(0.5f, 1.0f);
         float detonationRadius = bodyRadius * 15;
-        float ttl = MathUtils.random(1f, 5f);
+        float tickingTime = MathUtils.random(2f, 5f);
         float x = MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM);
         float y = 20f / Cfg.PPM;
 
-        bombs.add(new Bomb(world, x, y, ttl, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        bombs.add(new Bomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
     }
 
     public void save() {

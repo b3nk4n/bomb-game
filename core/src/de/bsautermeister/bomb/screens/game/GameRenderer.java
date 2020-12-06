@@ -52,7 +52,7 @@ public class GameRenderer implements Disposable {
     private final Box2DDebugRenderer box2DRenderer;
 
     private final TextureRegion ballRegion;
-    private final TextureRegion bombRegion;
+    private final Array<TextureAtlas.AtlasRegion> bombRegions;
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
@@ -83,7 +83,7 @@ public class GameRenderer implements Disposable {
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
         groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
         ballRegion = atlas.findRegion(RegionNames.Game.BALL);
-        bombRegion = atlas.findRegion(RegionNames.Game.BOMB);
+        bombRegions = atlas.findRegions(RegionNames.Game.BOMB);
 
         uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
@@ -192,7 +192,7 @@ public class GameRenderer implements Disposable {
         for (Bomb bomb : controller.getBombs()) {
             Vector2 position = bomb.getPosition();
             float radius = bomb.getBodyRadius();
-            batch.draw(bombRegion,
+            batch.draw(bombRegions.get(bomb.isFlashing() ? 1 : 0),
                     position.x - radius, position.y - radius,
                     radius, radius,
                     radius * 2f, radius * 2f,

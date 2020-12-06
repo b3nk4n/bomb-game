@@ -17,14 +17,16 @@ public class Bomb implements Disposable {
     private final World world;
 
     private boolean ticking;
-    private float ttl;
+    private final float initialTickingTime;
+    private float tickingTimer;
     private Body body;
     private final float bodyRadius;
     private final float detonationRadius;
 
-    public Bomb(World world, float x, float y, float ttl, float bodyRadius, float detonationRadius) {
+    public Bomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
         this.world = world;
-        this.ttl = ttl;
+        this.initialTickingTime = tickingTime;
+        this.tickingTimer = initialTickingTime;
         this.bodyRadius = bodyRadius;
         this.detonationRadius = detonationRadius;
         this.body = createBody(x, y, bodyRadius);
@@ -57,7 +59,7 @@ public class Bomb implements Disposable {
 
     public void update(float delta) {
         if (isTicking()) {
-            ttl -= delta;
+            tickingTimer = Math.max(0f, tickingTimer - delta);
         }
 
         PhysicsUtils.applyAirResistance(body, 0.1f);
@@ -67,7 +69,7 @@ public class Bomb implements Disposable {
         PhysicsUtils.applyBlastImpact(body, position, radius);
     }
 
-    public void touchGround() {
+    public void startTicking() {
         ticking = true;
     }
 
@@ -75,8 +77,19 @@ public class Bomb implements Disposable {
         return ticking;
     }
 
+    public float getTickingProgress() {
+        return 1f - tickingTimer / initialTickingTime;
+    }
+
+    public boolean isFlashing() {
+        float progress = getTickingProgress();
+        return progress > 0.20f && progress <= 0.30f
+                || progress > 0.5f && progress <= 0.60f
+                || progress > 0.8f && progress <= 1f;
+    }
+
     public boolean doExplode() {
-        return ttl < 0;
+        return tickingTimer <= 0;
     }
 
     @Override
