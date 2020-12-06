@@ -16,7 +16,7 @@ import de.bsautermeister.bomb.utils.PhysicsUtils;
 public class Bomb implements Disposable {
     private final World world;
 
-    private boolean groundTouched;
+    private boolean ticking;
     private float ttl;
     private Body body;
     private final float bodyRadius;
@@ -56,29 +56,23 @@ public class Bomb implements Disposable {
     }
 
     public void update(float delta) {
-        if (groundTouched) {
+        if (isTicking()) {
             ttl -= delta;
         }
 
         PhysicsUtils.applyAirResistance(body, 0.1f);
     }
 
-    private static final Vector2 blastImpactDirection = new Vector2();
     public void impact(Vector2 position, float radius) {
-        Vector2 bodyPosition = body.getPosition();
-
-        // blast impact
-        blastImpactDirection.set(bodyPosition).sub(position).scl(1f);
-        float blastDistance = blastImpactDirection.len();
-        final float maxBlast = 3 * radius;
-        if (blastDistance < maxBlast) {
-            blastImpactDirection.nor().scl((maxBlast - blastDistance));
-            body.applyLinearImpulse(blastImpactDirection, bodyPosition, true);
-        }
+        PhysicsUtils.applyBlastImpact(body, position, radius);
     }
 
     public void touchGround() {
-        groundTouched = true;
+        ticking = true;
+    }
+
+    public boolean isTicking() {
+        return ticking;
     }
 
     public boolean doExplode() {
