@@ -13,19 +13,16 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import java.awt.Menu;
-
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
-import de.bsautermeister.bomb.screens.game.GameScreen;
 import de.bsautermeister.bomb.screens.menu.MenuScreen;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
 public class LoadingScreen extends ScreenBase {
-    private static final Logger LOGGER = new Logger(LoadingScreen.class.getSimpleName(), Cfg.LOG_LEVEL);
+    private static final Logger LOG = new Logger(LoadingScreen.class.getSimpleName(), Cfg.LOG_LEVEL);
 
     private Viewport viewport;
     private Stage stage;
@@ -165,13 +162,13 @@ public class LoadingScreen extends ScreenBase {
     public void pause() {
         super.pause();
 
-        LOGGER.debug("PAUSE");
+        LOG.debug("PAUSE");
     }
 
     @Override
     public void resume() {
         super.resume();
 
-        LOGGER.debug("RESUME");
+        LOG.debug("RESUME");
     }
 }

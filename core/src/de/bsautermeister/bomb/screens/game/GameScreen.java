@@ -13,11 +13,6 @@ public class GameScreen extends ScreenBase {
 
     private final GameScreenCallbacks callbacks = new GameScreenCallbacks() {
         @Override
-        public void gameOver(long score) {
-            setScreen(new MenuScreen(getGame())); // TODO navigate to game over screen
-        }
-
-        @Override
         public void backToMenu() {
             setScreen(new MenuScreen(getGame()));
         }

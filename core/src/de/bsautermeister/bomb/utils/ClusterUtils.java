@@ -63,7 +63,7 @@ public class ClusterUtils {
         return marked;
     }
 
-    public static Array<GridPoint2> computeClusterOutline(int[][] clusterData, int clusterIdx, GridPoint2 startPosition) { // TODO: simplify outline: remove unnecessary vertices
+    public static Array<GridPoint2> computeClusterOutline(int[][] clusterData, int clusterIdx, GridPoint2 startPosition) {
         Array<GridPoint2> result = new Array<>();
         result.add(new GridPoint2(startPosition));
 

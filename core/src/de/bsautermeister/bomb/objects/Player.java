@@ -13,12 +13,15 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
+import com.badlogic.gdx.utils.Logger;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.utils.PhysicsUtils;
 
 public class Player {
+    private final static Logger LOG = new Logger(Player.class.getSimpleName(), Cfg.LOG_LEVEL);
+
     private final World world;
     private Body ballBody;
     private Body fixedSensorBody;
@@ -132,15 +135,18 @@ public class Player {
     private static final Circle playerCircle = new Circle();
     public boolean impact(Vector2 position, float radius) {
         Vector2 bodyPosition = ballBody.getPosition();
+        blastImpactDirection.set(bodyPosition).sub(position);
+        float blastDistance = blastImpactDirection.len();
+
         impactCircle.set(position, radius);
         playerCircle.set(bodyPosition, getRadius());
         if (Intersector.overlaps(impactCircle, playerCircle)) {
-            lifeRatio = Math.max(0f, lifeRatio - .33f); // TODO reduce life dependent on distance
+            float damage = -1f / radius * blastDistance + 1.5f;
+            lifeRatio = Math.max(0f, lifeRatio - damage);
+            LOG.debug("Applied damage: " + damage);
         }
 
         // blast impact
-        blastImpactDirection.set(bodyPosition).sub(position).scl(1f);
-        float blastDistance = blastImpactDirection.len();
         final float maxBlast = 3 * radius;
         if (blastDistance < maxBlast) {
             blastImpactDirection.nor().scl((maxBlast - blastDistance));
