@@ -60,6 +60,7 @@ public class TimedBomb extends Bomb {
         return tickingTimer <= 0;
     }
 
+    @Override
     public void beginContact(Fixture otherFixture) {
         ticking = true;
     }

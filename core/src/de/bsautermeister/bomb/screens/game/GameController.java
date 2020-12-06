@@ -24,6 +24,7 @@ import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.objects.Bomb;
+import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
@@ -291,14 +292,18 @@ public class GameController implements Disposable {
         float tickingTime = MathUtils.random(2f, 5f);
         float x = MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM);
         float y = 20f / Cfg.PPM;
+        float angleRad = MathUtils.random(0, MathUtils.PI2);
 
         float randomBombType = MathUtils.random();
-        if (randomBombType < 0.33f) {
+        randomBombType = 0.9f;
+        if (randomBombType < 0.25f) {
             bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else if (randomBombType < 0.66f) {
+        } else if (randomBombType < 0.5f) {
             bombs.add(new ClusterBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else {
+        } else if (randomBombType < 0.75) {
             bombs.add(new StickyBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        } else {
+            bombs.add(new BounceStickyBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM, angleRad));
         }
     }
 

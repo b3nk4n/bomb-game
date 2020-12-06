@@ -1,6 +1,5 @@
 package de.bsautermeister.bomb.contact;
 
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.utils.Logger;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Player;
-import de.bsautermeister.bomb.objects.StickyBomb;
 
 public class WorldContactListener implements ContactListener {
 
@@ -36,11 +34,6 @@ public class WorldContactListener implements ContactListener {
                 bomb = (Bomb) resolve(fixtureA, fixtureB, Bits.BOMB).getUserData();
                 Fixture otherFixture = resolve(fixtureA, fixtureB, ~Bits.BOMB);
                 bomb.beginContact(otherFixture);
-
-                if (bomb instanceof StickyBomb) {
-                    Body otherBody = resolve(fixtureA, fixtureB, ~Bits.BOMB).getBody();
-                    ((StickyBomb) bomb).stick(otherBody);
-                }
                 break;
         }
     }

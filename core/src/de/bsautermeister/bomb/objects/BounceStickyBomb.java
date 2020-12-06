@@ -1,33 +1,40 @@
 package de.bsautermeister.bomb.objects;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
 import de.bsautermeister.bomb.contact.Bits;
 
-public class StickyBomb extends Bomb {
+public class BounceStickyBomb extends Bomb {
+    private static final float[] POLYGON_VERTICES = new float[] {
+        0, .15f, .15f, .05f, .1f, -.15f, -.1f, -.15f, -.15f, .05f
+    };
+
     private boolean ticking;
     private final float initialTickingTime;
     private float tickingTimer;
 
+    private final float initialStickyDelay;
+    private float stickyTimer;
+
+
     private JointDef stickyJointDef;
     private Joint stickyJoint;
 
-    public StickyBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
+    public BounceStickyBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius, float angleRad) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-        getBody().setTransform(x, y, 0f);
+        initialStickyDelay = 0.5f;
+        stickyTimer = initialStickyDelay;
+        getBody().setTransform(x, y, angleRad);
     }
 
     @Override
@@ -37,13 +44,13 @@ public class StickyBomb extends Bomb {
 
         Body body = getWorld().createBody(bodyDef);
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(getBodyRadius());
+        PolygonShape shape = new PolygonShape();
+        shape.set(POLYGON_VERTICES);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.8f;
         fixtureDef.density = 10.0f;
-        fixtureDef.restitution = 0.25f;
+        fixtureDef.restitution = 0.8f;
         fixtureDef.filter.categoryBits = Bits.BOMB;
         fixtureDef.filter.groupIndex = 1;
         fixtureDef.filter.maskBits = Bits.GROUND;
@@ -61,6 +68,7 @@ public class StickyBomb extends Bomb {
 
         if (isTicking()) {
             tickingTimer = Math.max(0f, tickingTimer - delta);
+            stickyTimer = Math.max(0f, stickyTimer - delta);
         }
 
         if (stickyJointDef != null) {
@@ -78,7 +86,7 @@ public class StickyBomb extends Bomb {
     public void beginContact(Fixture otherFixture) {
         ticking = true;
 
-        if (stickyJoint == null) {
+        if (stickyJoint == null && stickyTimer <= 0f) {
             Body otherBody = otherFixture.getBody();
             WeldJointDef jointDef = new WeldJointDef();
             jointDef.initialize(getBody(), otherBody, otherBody.getPosition());

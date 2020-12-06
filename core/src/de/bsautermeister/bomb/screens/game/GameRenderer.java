@@ -31,6 +31,7 @@ import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.FrameBufferManager;
 import de.bsautermeister.bomb.objects.Bomb;
+import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
 import de.bsautermeister.bomb.objects.ClusterFragmentBomb;
 import de.bsautermeister.bomb.objects.Fragment;
@@ -213,6 +214,8 @@ public class GameRenderer implements Disposable {
             return bombRegions.get(bomb.isFlashing() ? 1 : 0);
         } else if (bomb instanceof StickyBomb) {
             return bombRegions.get(bomb.isFlashing() ? 5 : 4);
+        } else if (bomb instanceof BounceStickyBomb) {
+            return bombRegions.get(bomb.isFlashing() ? 7 : 6);
         }
 
         throw new IllegalArgumentException("The given type is not supported yet.");
