@@ -2,6 +2,8 @@ package de.bsautermeister.bomb;
 
 import com.badlogic.gdx.Gdx;
 
+import java.io.File;
+
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.screens.loading.LoadingScreen;
 
@@ -19,7 +21,11 @@ public class BombGame extends GameApp {
 	}
 
 	public static boolean hasSavedData() {
-		// TODO implement
-		return false;
+		// TODO improve implementation
+
+		String fileName = "save.bin";
+		// use file in dedicated local storage
+		File file = new File(Gdx.files.getLocalStoragePath () + "/" + fileName);
+		return file.exists();
 	}
 }

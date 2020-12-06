@@ -73,12 +73,12 @@ public class MenuScreen extends ScreenBase {
         return new MenuContent(getAssetManager(), new MenuContent.Callbacks() {
             @Override
             public void playClicked() {
-                setScreen(new GameScreen(getGame()));
+                setScreen(new GameScreen(getGame(), false));
             }
 
             @Override
             public void continueClicked() {
-                setScreen(new GameScreen(getGame()));
+                setScreen(new GameScreen(getGame(), true));
             }
 
             @Override

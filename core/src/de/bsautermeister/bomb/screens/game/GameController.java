@@ -17,6 +17,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
@@ -26,12 +33,20 @@ import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
+import de.bsautermeister.bomb.objects.Fragment;
+import de.bsautermeister.bomb.objects.FragmentData;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.objects.StickyBomb;
 import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
+import de.bsautermeister.bomb.serializers.ArraySerializer;
+import de.bsautermeister.bomb.serializers.FragmentDataSerializer;
+import de.bsautermeister.bomb.serializers.FragmentSerializer;
+import de.bsautermeister.bomb.serializers.GroundSerializer;
+import de.bsautermeister.bomb.serializers.PlayerSerializer;
+import de.bsautermeister.bomb.serializers.Vector2Serializer;
 
 public class GameController implements Disposable {
 
@@ -39,8 +54,8 @@ public class GameController implements Disposable {
     private final Viewport viewport;
 
     private final World world;
-    private final Player player;
-    private final Ground ground;
+    private Player player;
+    private Ground ground;
     private final Array<Bomb> bombs = new Array<>();
 
     private GameState state;
@@ -118,6 +133,8 @@ public class GameController implements Disposable {
         }
     };
 
+    private final Kryo kryo;
+
     public GameController(GameScreenCallbacks gameScreenCallbacks, AssetManager assetManager) {
         this.gameScreenCallbacks = gameScreenCallbacks;
 
@@ -128,13 +145,24 @@ public class GameController implements Disposable {
         world.setContactListener(new WorldContactListener());
         createWorldBoundsBodies(world);
 
-        player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
-        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
-
         ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
         explosionEffect = new ManagedPooledEffect(explosion);
-
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
+
+        kryo = new Kryo();
+        kryo.setRegistrationRequired(false);
+        kryo.register(Player.class, new PlayerSerializer(world));
+        kryo.register(Vector2.class, new Vector2Serializer());
+        kryo.register(Ground.class, new GroundSerializer(world));
+        kryo.register(Array.class, new ArraySerializer());
+        kryo.register(Fragment.class, new FragmentSerializer(world));
+        kryo.register(FragmentData.class, new FragmentDataSerializer());
+    }
+
+    public void initialize() {
+        player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
+        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+        ground.initialize();
 
         state = GameState.PLAYING;
     }
@@ -295,7 +323,6 @@ public class GameController implements Disposable {
         float angleRad = MathUtils.random(0, MathUtils.PI2);
 
         float randomBombType = MathUtils.random();
-        randomBombType = 0.9f;
         if (randomBombType < 0.25f) {
             bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
         } else if (randomBombType < 0.5f) {
@@ -313,9 +340,35 @@ public class GameController implements Disposable {
             return;
         }
 
+        // set state to paused before saving
         state = GameState.PAUSED;
 
-        // TODO save game
+        String fileName = "save.bin";
+        File file = new File(Gdx.files.getLocalStoragePath() + "/" + fileName);
+        try {
+            Output output = new Output(new FileOutputStream(file));
+            output.writeString(state.name());
+            kryo.writeObject(output, player);
+            kryo.writeObject(output, ground);
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace(); // TODO write log
+        }
+    }
+
+    public void load() {
+        String fileName = "save.bin";
+        File file = new File(Gdx.files.getLocalStoragePath () + "/" + fileName);
+        try {
+            com.esotericsoftware.kryo.io.Input input = new com.esotericsoftware.kryo.io.Input(
+                    new FileInputStream(file));
+            state = GameState.valueOf(input.readString());
+            player = kryo.readObject(input, Player.class);
+            ground = kryo.readObject(input, Ground.class);
+            input.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

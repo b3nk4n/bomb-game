@@ -1,15 +1,19 @@
 package de.bsautermeister.bomb.screens.game;
 
 import com.badlogic.gdx.InputProcessor;
+import com.esotericsoftware.kryo.Kryo;
 
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
+import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.menu.MenuScreen;
 
 public class GameScreen extends ScreenBase {
 
     private GameController controller;
     private GameRenderer renderer;
+
+    private final boolean resume;
 
     private final GameScreenCallbacks callbacks = new GameScreenCallbacks() {
         @Override
@@ -18,8 +22,9 @@ public class GameScreen extends ScreenBase {
         }
     };
 
-    public GameScreen(GameApp game) {
+    public GameScreen(GameApp game, boolean resume) {
         super(game);
+        this.resume = resume;
     }
 
     @Override
@@ -27,6 +32,11 @@ public class GameScreen extends ScreenBase {
         super.show();
 
         controller = new GameController(callbacks, getAssetManager());
+        if (resume) {
+            controller.load();
+        } else {
+            controller.initialize();
+        }
         renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
                 getGame().getFrameBufferManager());
     }

@@ -28,15 +28,16 @@ public class Fragment {
 
     private static final EarClippingTriangulator TRIANGULATOR = new EarClippingTriangulator();
 
-    private final FragmentData fragmentData;
+    private FragmentData fragmentData;
 
     public Fragment(World world, float leftX, float bottomY, float size) {
         this.world = world;
         this.bounds = new Rectangle(leftX, bottomY, size, size);
-        this.fragmentData = new FragmentData(RESOLUTION, size);
+    }
 
-        Array<float[]> polygonOutlines = fragmentData.computeOutlines();
-        this.body = createBody(leftX, bottomY, polygonOutlines);
+    public void initialize() {
+        this.fragmentData = new FragmentData(RESOLUTION, getSize());
+        updateBody();
     }
 
     private static final Circle tmpImpactCircle = new Circle();
@@ -57,12 +58,16 @@ public class Fragment {
         if (updated) {
             world.destroyBody(body);
             body = null;
-            Array<float[]> polygonOutlines = fragmentData.computeOutlines();
-            if (polygonOutlines.notEmpty()) {
-                this.body = createBody(leftX, bottomY, polygonOutlines);
-            }
+            updateBody();
         }
         return updated;
+    }
+
+    private void updateBody() {
+        Array<float[]> polygonOutlines = fragmentData.computeOutlines();
+        if (polygonOutlines.notEmpty()) {
+            this.body = createBody(getLeftX(), getBottomY(), polygonOutlines);
+        }
     }
 
     private Body createBody(float leftX, float bottomY, Array<float[]> polygonOutlines) {
@@ -119,14 +124,27 @@ public class Fragment {
     }
 
     public float getLeftX() {
-        return body.getPosition().x;
+        return bounds.x;
     }
 
     public float getBottomY() {
-        return body.getPosition().y;
+        return bounds.y;
+    }
+
+    public float getSize() {
+        return bounds.width;
     }
 
     public boolean isEmpty() {
         return body == null;
+    }
+
+    public FragmentData getFragmentData() {
+        return fragmentData;
+    }
+
+    public void setFragmentData(FragmentData fragmentData) {
+        this.fragmentData = fragmentData;
+        updateBody();
     }
 }

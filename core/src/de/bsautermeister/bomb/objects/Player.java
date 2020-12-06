@@ -22,12 +22,12 @@ import de.bsautermeister.bomb.utils.PhysicsUtils;
 public class Player {
     private final static Logger LOG = new Logger(Player.class.getSimpleName(), Cfg.LOG_LEVEL);
 
-    private final World world;
+    private World world;
     private Body ballBody;
     private Body fixedSensorBody;
 
-    private final Vector2 startPosition;
-    private final float radius;
+    private Vector2 startPosition;
+    private float radius;
 
     private float lifeRatio;
     private int score;

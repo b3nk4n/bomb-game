@@ -25,7 +25,9 @@ public class Ground {
         this.size = size;
         this.numCols = numCols;
         this.numCompleteRows = numCompleteRows;
+    }
 
+    public void initialize() {
         for (int r = 0; r < numCompleteRows; ++r) {
             addRow();
         }
@@ -62,12 +64,31 @@ public class Ground {
         for (int col = 0; col < numCols; ++col) {
             float posX = col * size;
             float posY = -(fragments.size + 1) * size;
-            row.add(new Fragment(world, posX, posY, size));
+            Fragment fragment = new Fragment(world, posX, posY, size);
+            fragment.initialize();
+            row.add(fragment);
         }
         fragments.add(row);
     }
 
     public Array<Array<Fragment>> getFragments() {
         return fragments;
+    }
+
+    public void setFragments(Array<Array<Fragment>> fragments) {
+        this.fragments.clear();
+        this.fragments.addAll(fragments);
+    }
+
+    public float getSize() {
+        return size;
+    }
+
+    public int getNumCols() {
+        return numCols;
+    }
+
+    public int getNumCompleteRows() {
+        return numCompleteRows;
     }
 }
