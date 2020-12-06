@@ -1,5 +1,6 @@
 package de.bsautermeister.bomb.contact;
 
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.utils.Logger;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.objects.StickyBomb;
 
 public class WorldContactListener implements ContactListener {
 
@@ -26,13 +28,19 @@ public class WorldContactListener implements ContactListener {
         int collisionDef = fixtureA.getFilterData().categoryBits | fixtureB.getFilterData().categoryBits;
         switch (collisionDef) {
             case Bits.BALL_SENSOR | Bits.GROUND:
-                player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL_SENSOR);
+                player = (Player) resolve(fixtureA, fixtureB, Bits.BALL_SENSOR).getUserData();
                 player.beginGroundContact();
                 break;
             case Bits.BOMB | Bits.GROUND:
             case Bits.BOMB | Bits.BALL:
-                bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);
-                bomb.contact();
+                bomb = (Bomb) resolve(fixtureA, fixtureB, Bits.BOMB).getUserData();
+                Fixture otherFixture = resolve(fixtureA, fixtureB, ~Bits.BOMB);
+                bomb.beginContact(otherFixture);
+
+                if (bomb instanceof StickyBomb) {
+                    Body otherBody = resolve(fixtureA, fixtureB, ~Bits.BOMB).getBody();
+                    ((StickyBomb) bomb).stick(otherBody);
+                }
                 break;
         }
     }
@@ -43,12 +51,18 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         Player player;
-
+        Bomb bomb;
         int collisionDef = fixtureA.getFilterData().categoryBits | fixtureB.getFilterData().categoryBits;
         switch (collisionDef) {
             case Bits.BALL_SENSOR | Bits.GROUND:
-                player = (Player) resolveUserData(fixtureA, fixtureB, Bits.BALL_SENSOR);
+                player = (Player) resolve(fixtureA, fixtureB, Bits.BALL_SENSOR).getUserData();
                 player.endGroundContact();
+                break;
+            case Bits.BOMB | Bits.GROUND:
+            case Bits.BOMB | Bits.BALL:
+                bomb = (Bomb) resolve(fixtureA, fixtureB, Bits.BOMB).getUserData();
+                Fixture otherFixture = resolve(fixtureA, fixtureB, ~Bits.BOMB);
+                bomb.endContact(otherFixture);
                 break;
         }
     }
@@ -63,8 +77,8 @@ public class WorldContactListener implements ContactListener {
 
     }
 
-    private Object resolveUserData(Fixture fixtureA, Fixture fixtureB, int categoryBits) {
+    private Fixture resolve(Fixture fixtureA, Fixture fixtureB, int categoryBits) {
         return ((fixtureA.getFilterData().categoryBits & categoryBits) != 0)
-                ? fixtureA.getUserData() : fixtureB.getUserData();
+                ? fixtureA : fixtureB;
     }
 }

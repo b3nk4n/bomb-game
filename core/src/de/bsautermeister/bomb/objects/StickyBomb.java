@@ -1,20 +1,29 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
+import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
+import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
 import de.bsautermeister.bomb.contact.Bits;
 
-public class TimedBomb extends Bomb {
+public class StickyBomb extends Bomb {
     private boolean ticking;
     private final float initialTickingTime;
     private float tickingTimer;
 
-    public TimedBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
+    private JointDef stickyJointDef;
+    private Joint stickyJoint;
+
+    public StickyBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
@@ -53,6 +62,19 @@ public class TimedBomb extends Bomb {
         if (isTicking()) {
             tickingTimer = Math.max(0f, tickingTimer - delta);
         }
+
+        if (stickyJointDef != null) {
+            getWorld().createJoint(stickyJointDef);
+            stickyJointDef = null;
+        }
+    }
+
+    public void stick(Body otherBody) {
+        if (stickyJoint != null) return;
+
+        WeldJointDef jointDef = new WeldJointDef();
+        jointDef.initialize(getBody(), otherBody, otherBody.getPosition());
+        stickyJointDef = jointDef;
     }
 
     @Override
@@ -66,7 +88,14 @@ public class TimedBomb extends Bomb {
 
     @Override
     public void endContact(Fixture otherFixture) {
+        if (stickyJoint == null) return;
 
+        Body otherBody = otherFixture.getBody();
+        if (stickyJoint.getBodyA() == otherBody || stickyJoint.getBodyB() == otherBody) {
+            // AFAIK Box2D internally takes care of destroying the joint. Here we just want to get
+            // get rid of the dead reference.
+            stickyJoint = null;
+        }
     }
 
     public boolean isTicking() {

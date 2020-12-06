@@ -27,6 +27,7 @@ import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.objects.StickyBomb;
 import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
@@ -291,10 +292,13 @@ public class GameController implements Disposable {
         float x = MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM);
         float y = 20f / Cfg.PPM;
 
-        if (MathUtils.random() < 0.5) {
+        float randomBombType = MathUtils.random();
+        if (randomBombType < 0.33f) {
             bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else {
+        } else if (randomBombType < 0.66f) {
             bombs.add(new ClusterBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        } else {
+            bombs.add(new StickyBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
         }
     }
 

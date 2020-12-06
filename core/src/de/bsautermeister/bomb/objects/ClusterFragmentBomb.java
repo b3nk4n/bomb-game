@@ -62,9 +62,14 @@ public class ClusterFragmentBomb extends Bomb {
         return groundContact;
     }
 
-    public void contact() {
+    public void beginContact(Fixture otherFixture) {
         if (delayToFirstContact > 0) return;
         groundContact = true;
+    }
+
+    @Override
+    public void endContact(Fixture otherFixture) {
+
     }
 
     @Override

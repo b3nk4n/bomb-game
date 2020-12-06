@@ -81,8 +81,13 @@ public class ClusterBomb extends Bomb {
         return bombs;
     }
 
-    public void contact() {
+    public void beginContact(Fixture otherFixture) {
         ticking = true;
+    }
+
+    @Override
+    public void endContact(Fixture otherFixture) {
+
     }
 
     public boolean isTicking() {
