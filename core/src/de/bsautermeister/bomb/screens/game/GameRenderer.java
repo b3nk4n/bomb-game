@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -143,10 +144,12 @@ public class GameRenderer implements Disposable {
             tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
             blastShader.setUniformf("u_time", blast.getProgress());
             blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
+            blastShader.setUniformf("u_dist_range", blast.getRadius() / 6f);
 
-            batch.draw(frameBuffers[fbIdx].getColorBufferTexture(),
+            Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
+            batch.draw(sourceTexture,
                     camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
-                    0, 0, frameBuffers[fbIdx].getWidth(), frameBuffers[fbIdx].getHeight(), false, true);
+                    0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
             batch.end();
             frameBufferManager.end();
         }
@@ -154,9 +157,11 @@ public class GameRenderer implements Disposable {
         batch.setShader(null);
 
         batch.begin();
-        batch.draw(frameBuffers[fbIdx == 0 ? 1 : 0].getColorBufferTexture(),
+        Texture sourceTexture = frameBuffers[fbIdx == 0 ? 1 : 0].getColorBufferTexture();
+        GdxUtils.clearScreen();
+        batch.draw(sourceTexture,
                 camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
-                0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
+                0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
         batch.end();
 
         if (Cfg.DEBUG_MODE) {

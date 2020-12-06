@@ -54,11 +54,13 @@ public class GameController implements Disposable {
 
     public static class BlastInstance {
         private final Vector2 position;
+        private final float radius;
         private final float initialTtl;
         private float ttl;
 
-        public BlastInstance(float x, float y, float ttl) {
+        public BlastInstance(float x, float y, float radius, float ttl) {
             this.position = new Vector2(x, y);
+            this.radius = radius;
             this.initialTtl = ttl;
             this.ttl = ttl;
         }
@@ -73,6 +75,10 @@ public class GameController implements Disposable {
 
         public float getProgress() {
             return MathUtils.clamp((initialTtl - ttl) / initialTtl, 0f, 1f);
+        }
+
+        public float getRadius() {
+            return radius;
         }
 
         public boolean isExpired() {
@@ -208,7 +214,7 @@ public class GameController implements Disposable {
                     otherBomb.impact(bombPosition, bomb.getDetonationRadius());
                 }
 
-                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, 2.5f));
+                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, bomb.getDetonationRadius(), 2.5f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
                         MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
