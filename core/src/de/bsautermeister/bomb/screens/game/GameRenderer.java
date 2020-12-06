@@ -31,9 +31,12 @@ import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.FrameBufferManager;
 import de.bsautermeister.bomb.objects.Bomb;
+import de.bsautermeister.bomb.objects.ClusterBomb;
+import de.bsautermeister.bomb.objects.ClusterFragmentBomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
@@ -192,12 +195,24 @@ public class GameRenderer implements Disposable {
         for (Bomb bomb : controller.getBombs()) {
             Vector2 position = bomb.getPosition();
             float radius = bomb.getBodyRadius();
-            batch.draw(bombRegions.get(bomb.isFlashing() ? 1 : 0),
+            batch.draw(getTexture(bomb),
                     position.x - radius, position.y - radius,
                     radius, radius,
                     radius * 2f, radius * 2f,
                     1f, 1f, bomb.getRotation());
         }
+    }
+
+    private TextureRegion getTexture(Bomb bomb) {
+        if (bomb instanceof ClusterBomb) {
+            return bombRegions.get(bomb.isFlashing() ? 3 : 2);
+        } else if (bomb instanceof ClusterFragmentBomb) {
+            return bombRegions.get(2);
+        } else if (bomb instanceof TimedBomb) {
+            return bombRegions.get(bomb.isFlashing() ? 1 : 0);
+        }
+
+        throw new IllegalArgumentException("The given type is not supported yet.");
     }
 
     private static Vector2 tmpVertex = new Vector2();

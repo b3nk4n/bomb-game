@@ -39,6 +39,20 @@ bomb
   orig: 8, 8
   offset: 0, 0
   index: 1
+bomb
+  rotate: false
+  xy: 44, 16
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: 2
+bomb
+  rotate: false
+  xy: 44, 4
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: 3
 particle
   rotate: false
   xy: 4, 24

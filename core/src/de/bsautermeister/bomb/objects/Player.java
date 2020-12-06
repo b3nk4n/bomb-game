@@ -126,14 +126,14 @@ public class Player {
             float lowestPositionY = -ballBody.getPosition().y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));
 
-            PhysicsUtils.applyAirResistance(ballBody, 0.1f);
+            PhysicsUtils.applyAirResistance(ballBody, 0.066f);
         }
     }
 
     private static final Circle impactCircle = new Circle();
     private static final Circle playerCircle = new Circle();
     public boolean impact(Vector2 position, float radius) {
-        float blastDistance = PhysicsUtils.applyBlastImpact(ballBody, position, radius);
+        float blastDistance = PhysicsUtils.applyBlastImpact(ballBody, position, radius, 1f);
 
         Vector2 bodyPosition = ballBody.getPosition();
         impactCircle.set(position, radius);

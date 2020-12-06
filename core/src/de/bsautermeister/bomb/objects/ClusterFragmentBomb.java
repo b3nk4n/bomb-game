@@ -1,5 +1,6 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -9,16 +10,19 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import de.bsautermeister.bomb.contact.Bits;
 
-public class TimedBomb extends Bomb {
-    private boolean ticking;
-    private final float initialTickingTime;
-    private float tickingTimer;
+public class ClusterFragmentBomb extends Bomb {
+    /**
+     * Grant initial delay, because otherwise the the fragments are already touching the ground,
+     * because the world is updated after the bombs are emitted.
+     */
+    private float delayToFirstContact = 0.1f;
 
-    public TimedBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, detonationRadius, 1f);
-        this.initialTickingTime = tickingTime;
-        this.tickingTimer = initialTickingTime;
+    private boolean groundContact;
+
+    public ClusterFragmentBomb(World world, float x, float y, float bodyRadius, float detonationRadius, Vector2 velocity) {
+        super(world, bodyRadius, detonationRadius, 0.05f);
         getBody().setTransform(x, y, 0f);
+        getBody().setLinearVelocity(velocity);
     }
 
     @Override
@@ -50,33 +54,21 @@ public class TimedBomb extends Bomb {
     public void update(float delta) {
         super.update(delta);
 
-        if (isTicking()) {
-            tickingTimer = Math.max(0f, tickingTimer - delta);
-        }
+        delayToFirstContact -= delta;
     }
 
     @Override
     public boolean doExplode() {
-        return tickingTimer <= 0;
+        return groundContact;
     }
 
     public void contact() {
-        ticking = true;
-    }
-
-    public boolean isTicking() {
-        return ticking;
-    }
-
-    public float getTickingProgress() {
-        return 1f - tickingTimer / initialTickingTime;
+        if (delayToFirstContact > 0) return;
+        groundContact = true;
     }
 
     @Override
     public boolean isFlashing() {
-        float progress = getTickingProgress();
-        return progress > 0.20f && progress <= 0.30f
-                || progress > 0.5f && progress <= 0.60f
-                || progress > 0.8f && progress <= 1f;
+        return false;
     }
 }

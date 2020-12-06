@@ -9,26 +9,30 @@ import com.badlogic.gdx.utils.Disposable;
 import de.bsautermeister.bomb.utils.PhysicsUtils;
 
 public abstract class Bomb implements Disposable {
+    private static final Bomb[] EMPTY_BOMB_RELEASE = new Bomb[0];
+
     private final World world;
     private final Body body;
     private final float bodyRadius;
     private final float detonationRadius;
+    private final float blastImpactStrengthFactor;
 
-    public Bomb(World world, float bodyRadius, float detonationRadius) {
+    public Bomb(World world, float bodyRadius, float detonationRadius, float blastImpactStrengthFactor) {
         this.world = world;
         this.bodyRadius = bodyRadius;
         this.detonationRadius = detonationRadius;
+        this.blastImpactStrengthFactor = blastImpactStrengthFactor;
         this.body = createBody();
     }
 
     protected abstract Body createBody();
 
     public void update(float delta) {
-        PhysicsUtils.applyAirResistance(getBody(), 0.1f);
+        PhysicsUtils.applyAirResistance(getBody(), 0.066f);
     }
 
     public void impact(Vector2 position, float radius) {
-        PhysicsUtils.applyBlastImpact(getBody(), position, radius);
+        PhysicsUtils.applyBlastImpact(getBody(), position, radius, blastImpactStrengthFactor);
     }
 
     public abstract void contact();
@@ -36,6 +40,10 @@ public abstract class Bomb implements Disposable {
     public abstract boolean doExplode();
 
     public abstract boolean isFlashing();
+
+    public Bomb[] releaseBombs() {
+        return EMPTY_BOMB_RELEASE;
+    }
 
     @Override
     public void dispose() {

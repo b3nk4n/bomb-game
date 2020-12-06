@@ -24,6 +24,7 @@ import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.objects.Bomb;
+import de.bsautermeister.bomb.objects.ClusterBomb;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.objects.TimedBomb;
@@ -215,6 +216,8 @@ public class GameController implements Disposable {
                     otherBomb.impact(bombPosition, bomb.getDetonationRadius());
                 }
 
+                bombs.addAll(bomb.releaseBombs());
+
                 activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, bomb.getDetonationRadius(), 2.5f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
@@ -288,7 +291,11 @@ public class GameController implements Disposable {
         float x = MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM);
         float y = 20f / Cfg.PPM;
 
-        bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        if (MathUtils.random() < 0.5) {
+            bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        } else {
+            bombs.add(new ClusterBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+        }
     }
 
     public void save() {
