@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -43,13 +44,11 @@ public class GameRenderer implements Disposable {
     private final static short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
 
     private final Viewport uiViewport;
+    private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch();
     private final SpriteBatch batch;
-    private final GameController controller;
-    private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch(); // TODO move to other SpriteBatch, or even replace it?
-
-    private final FrameBuffer[] frameBuffers;
     private final FrameBufferManager frameBufferManager;
-
+    private final FrameBuffer[] frameBuffers;
+    private final GameController controller;
     private final Box2DDebugRenderer box2DRenderer;
 
     private final TextureRegion ballRegion;
@@ -60,7 +59,6 @@ public class GameRenderer implements Disposable {
     private final ShaderProgram blastShader;
 
     private final Skin skin;
-
     private final GameHud hud;
     private final Overlays<GameState> overlays;
 
@@ -108,7 +106,8 @@ public class GameRenderer implements Disposable {
 
         viewport.apply();
         int fbIdx = 0;
-        frameBufferManager.begin(frameBuffers[fbIdx++]);
+        frameBufferManager.begin(frameBuffers[fbIdx]);
+        fbIdx = ++fbIdx % frameBuffers.length;
         GdxUtils.clearScreen();
 
         batch.setProjectionMatrix(camera.combined);
@@ -134,10 +133,10 @@ public class GameRenderer implements Disposable {
         Array<GameController.BlastInstance> blasts = controller.getActiveBlastEffects();
         for (GameController.BlastInstance blast : blasts) {
             frameBufferManager.begin(frameBuffers[fbIdx]);
+            fbIdx = ++fbIdx % frameBuffers.length;
             GdxUtils.clearScreen();
 
             batch.begin();
-            fbIdx = fbIdx == 0 ? 1 : 0;
             Vector2 blastPosition = blast.getPosition();
             tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
             camera.project(tmpBlastProjection);
@@ -157,7 +156,8 @@ public class GameRenderer implements Disposable {
         batch.setShader(null);
 
         batch.begin();
-        Texture sourceTexture = frameBuffers[fbIdx == 0 ? 1 : 0].getColorBufferTexture();
+        fbIdx = ++fbIdx % frameBuffers.length;
+        Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
         GdxUtils.clearScreen();
         batch.draw(sourceTexture,
                 camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
@@ -175,7 +175,7 @@ public class GameRenderer implements Disposable {
         overlays.render(batch);
     }
 
-    private void renderBall(SpriteBatch batch) {
+    private void renderBall(Batch batch) {
         Player player = controller.getPlayer();
         if (!player.isDead()) {
             Vector2 position = player.getPosition();
@@ -188,7 +188,7 @@ public class GameRenderer implements Disposable {
         }
     }
 
-    private void renderBombs(SpriteBatch batch) {
+    private void renderBombs(Batch batch) {
         for (Bomb bomb : controller.getBombs()) {
             Vector2 position = bomb.getPosition();
             float radius = bomb.getBodyRadius();
