@@ -32,7 +32,7 @@ public class WorldContactListener implements ContactListener {
             case Bits.BOMB | Bits.GROUND:
             case Bits.BOMB | Bits.BALL:
                 bomb = (Bomb) resolveUserData(fixtureA, fixtureB, Bits.BOMB);
-                bomb.startTicking();
+                bomb.contact();
                 break;
         }
     }
