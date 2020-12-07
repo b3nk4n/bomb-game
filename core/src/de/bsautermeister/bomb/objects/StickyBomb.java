@@ -9,9 +9,11 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.contact.Bits;
 
@@ -23,11 +25,11 @@ public class StickyBomb extends Bomb {
     private JointDef stickyJointDef;
     private Joint stickyJoint;
 
-    public StickyBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
+    public StickyBomb(World world, Vector2 position, float tickingTime, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-        getBody().setTransform(x, y, 0f);
+        getBody().setTransform(position, 0f);
     }
 
     @Override
@@ -112,5 +114,48 @@ public class StickyBomb extends Bomb {
         return progress > 0.20f && progress <= 0.30f
                 || progress > 0.5f && progress <= 0.60f
                 || progress > 0.8f && progress <= 1f;
+    }
+
+    public static class KryoSerializer extends Serializer<StickyBomb> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, StickyBomb object) {
+            kryo.writeObject(output, object.getBody().getPosition());
+            output.writeFloat(object.initialTickingTime);
+            output.writeFloat(object.getBodyRadius());
+            output.writeFloat(object.getDetonationRadius());
+            output.writeFloat(object.tickingTimer);
+            output.writeBoolean(object.ticking);
+            kryo.writeObject(output, object.getBody().getAngle());
+            kryo.writeObject(output, object.getBody().getLinearVelocity());
+            kryo.writeObject(output, object.getBody().getAngularVelocity());
+
+            // TODO how to persist the joint? Or will it be automatically re-created after load
+            //      because bodies are in contact at the next world.step() call?
+        }
+
+        @Override
+        public StickyBomb read(Kryo kryo, Input input, Class<? extends StickyBomb> type) {
+            Vector2 position = kryo.readObject(input, Vector2.class);
+            StickyBomb bomb = new StickyBomb(
+                    world,
+                    position,
+                    input.readFloat(),
+                    input.readFloat(),
+                    input.readFloat()
+            );
+            bomb.tickingTimer = input.readFloat();
+            bomb.ticking = input.readBoolean();
+            bomb.getBody().setTransform(position, input.readFloat());
+            bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
+            bomb.getBody().setAngularVelocity(input.readFloat());
+            return bomb;
+        }
     }
 }

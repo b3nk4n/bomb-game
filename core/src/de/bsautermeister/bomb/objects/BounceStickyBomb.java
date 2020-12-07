@@ -1,5 +1,6 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -9,6 +10,10 @@ import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.contact.Bits;
 
@@ -28,13 +33,13 @@ public class BounceStickyBomb extends Bomb {
     private JointDef stickyJointDef;
     private Joint stickyJoint;
 
-    public BounceStickyBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius, float angleRad) {
+    public BounceStickyBomb(World world, Vector2 position, float tickingTime, float bodyRadius, float detonationRadius, float angleRad) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
         initialStickyDelay = 0.5f;
         stickyTimer = initialStickyDelay;
-        getBody().setTransform(x, y, angleRad);
+        getBody().setTransform(position, angleRad);
     }
 
     @Override
@@ -120,5 +125,49 @@ public class BounceStickyBomb extends Bomb {
         return progress > 0.20f && progress <= 0.30f
                 || progress > 0.5f && progress <= 0.60f
                 || progress > 0.8f && progress <= 1f;
+    }
+
+    public static class KryoSerializer extends Serializer<BounceStickyBomb> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, BounceStickyBomb object) {
+            kryo.writeObject(output, object.getBody().getPosition());
+            kryo.writeObject(output, object.getBody().getAngle());
+            output.writeFloat(object.initialTickingTime);
+            output.writeFloat(object.getBodyRadius());
+            output.writeFloat(object.getDetonationRadius());
+            output.writeFloat(object.tickingTimer);
+            output.writeBoolean(object.ticking);
+            output.writeFloat(object.stickyTimer);
+            kryo.writeObject(output, object.getBody().getLinearVelocity());
+            kryo.writeObject(output, object.getBody().getAngularVelocity());
+        }
+
+        @Override
+        public BounceStickyBomb read(Kryo kryo, Input input, Class<? extends BounceStickyBomb> type) {
+            Vector2 position = kryo.readObject(input, Vector2.class);
+            float angle = input.readFloat();
+            BounceStickyBomb bomb = new BounceStickyBomb(
+                    world,
+                    position,
+                    input.readFloat(),
+                    input.readFloat(),
+                    input.readFloat(),
+                    angle
+            );
+            bomb.tickingTimer = input.readFloat();
+            bomb.ticking = input.readBoolean();
+            bomb.stickyTimer = input.readFloat();
+            bomb.getBody().setTransform(position, angle);
+            bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
+            bomb.getBody().setAngularVelocity(input.readFloat());
+            return bomb;
+        }
     }
 }

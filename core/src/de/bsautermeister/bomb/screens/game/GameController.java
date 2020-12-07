@@ -35,6 +35,7 @@ import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
+import de.bsautermeister.bomb.objects.ClusterFragmentBomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.FragmentData;
 import de.bsautermeister.bomb.objects.Ground;
@@ -94,7 +95,7 @@ public class GameController implements Disposable {
         public void restart() {
             // TODO reset game
             state = GameState.PLAYING;
-            player.reset();
+            player.reset(); // TODO consider dispose and create new Player, instead of implementing a reset() function?
         }
     };
 
@@ -124,6 +125,11 @@ public class GameController implements Disposable {
         kryo.register(Fragment.class, new Fragment.KryoSerializer(world));
         kryo.register(FragmentData.class, new FragmentData.KryoSerializer());
         kryo.register(BlastInstance.class, new BlastInstance.KryoSerializer());
+        kryo.register(TimedBomb.class, new TimedBomb.KryoSerializer(world));
+        kryo.register(StickyBomb.class, new StickyBomb.KryoSerializer(world));
+        kryo.register(ClusterBomb.class, new ClusterBomb.KryoSerializer(world));
+        kryo.register(ClusterFragmentBomb.class, new ClusterFragmentBomb.KryoSerializer(world));
+        kryo.register(BounceStickyBomb.class, new BounceStickyBomb.KryoSerializer(world));
     }
 
     public void initialize() {
@@ -284,19 +290,21 @@ public class GameController implements Disposable {
         float bodyRadius = MathUtils.random(0.5f, 1.0f);
         float detonationRadius = bodyRadius * 15;
         float tickingTime = MathUtils.random(2f, 5f);
-        float x = MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM);
-        float y = 20f / Cfg.PPM;
+        Vector2 position = new Vector2(
+                MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM),
+                20f / Cfg.PPM
+        );
         float angleRad = MathUtils.random(0, MathUtils.PI2);
 
         float randomBombType = MathUtils.random();
         if (randomBombType < 0.25f) {
-            bombs.add(new TimedBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+            bombs.add(new TimedBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
         } else if (randomBombType < 0.5f) {
-            bombs.add(new ClusterBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+            bombs.add(new ClusterBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
         } else if (randomBombType < 0.75) {
-            bombs.add(new StickyBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
+            bombs.add(new StickyBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
         } else {
-            bombs.add(new BounceStickyBomb(world, x, y, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM, angleRad));
+            bombs.add(new BounceStickyBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM, angleRad));
         }
     }
 
@@ -317,6 +325,7 @@ public class GameController implements Disposable {
             kryo.writeObject(output, player);
             kryo.writeObject(output, ground);
             kryo.writeObject(output, activeBlastEffects);
+            kryo.writeObject(output, bombs);
             output.close();
         } catch (Exception e) {
             e.printStackTrace(); // TODO write log
@@ -334,6 +343,8 @@ public class GameController implements Disposable {
             ground = kryo.readObject(input, Ground.class);
             activeBlastEffects.clear();
             activeBlastEffects.addAll(kryo.readObject(input, Array.class));
+            bombs.clear();
+            bombs.addAll(kryo.readObject(input, Array.class));
             input.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

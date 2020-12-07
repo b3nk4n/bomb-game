@@ -1,11 +1,16 @@
 package de.bsautermeister.bomb.objects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.contact.Bits;
 
@@ -14,11 +19,11 @@ public class TimedBomb extends Bomb {
     private final float initialTickingTime;
     private float tickingTimer;
 
-    public TimedBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
+    public TimedBomb(World world, Vector2 position, float tickingTime, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-        getBody().setTransform(x, y, 0f);
+        getBody().setTransform(position, 0f);
     }
 
     @Override
@@ -84,5 +89,45 @@ public class TimedBomb extends Bomb {
         return progress > 0.20f && progress <= 0.30f
                 || progress > 0.5f && progress <= 0.60f
                 || progress > 0.8f && progress <= 1f;
+    }
+
+    public static class KryoSerializer extends Serializer<TimedBomb> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, TimedBomb object) {
+            kryo.writeObject(output, object.getBody().getPosition());
+            output.writeFloat(object.initialTickingTime);
+            output.writeFloat(object.getBodyRadius());
+            output.writeFloat(object.getDetonationRadius());
+            output.writeFloat(object.tickingTimer);
+            output.writeBoolean(object.ticking);
+            kryo.writeObject(output, object.getBody().getAngle());
+            kryo.writeObject(output, object.getBody().getLinearVelocity());
+            kryo.writeObject(output, object.getBody().getAngularVelocity());
+        }
+
+        @Override
+        public TimedBomb read(Kryo kryo, Input input, Class<? extends TimedBomb> type) {
+            Vector2 position = kryo.readObject(input, Vector2.class);
+            TimedBomb bomb = new TimedBomb(
+                    world,
+                    position,
+                    input.readFloat(),
+                    input.readFloat(),
+                    input.readFloat()
+            );
+            bomb.tickingTimer = input.readFloat();
+            bomb.ticking = input.readBoolean();
+            bomb.getBody().setTransform(position, input.readFloat());
+            bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
+            bomb.getBody().setAngularVelocity(input.readFloat());
+            return bomb;
+        }
     }
 }

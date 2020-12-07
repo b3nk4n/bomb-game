@@ -8,6 +8,10 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.contact.Bits;
 
@@ -22,11 +26,11 @@ public class ClusterBomb extends Bomb {
     private final float initialTickingTime;
     private float tickingTimer;
 
-    public ClusterBomb(World world, float x, float y, float tickingTime, float bodyRadius, float detonationRadius) {
+    public ClusterBomb(World world, Vector2 position, float tickingTime, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-        getBody().setTransform(x, y, 0f);
+        getBody().setTransform(position, 0f);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class ClusterBomb extends Bomb {
             position.add(RELEASE_CLUSTER_OFFSETS[i]);
             float theta = MathUtils.random(0.5f, MathUtils.PI - 0.5f);
             Vector2 velocity = new Vector2(MathUtils.cos(theta), MathUtils.sin(theta)).scl(MathUtils.random(7.5f, 12f));
-            bombs[i] = new ClusterFragmentBomb(getWorld(), position.x, position.y, getBodyRadius() / 2f, getDetonationRadius() / 2, velocity);
+            bombs[i] = new ClusterFragmentBomb(getWorld(), position, getBodyRadius() / 2f, getDetonationRadius() / 2, velocity);
         }
         return bombs;
     }
@@ -105,5 +109,45 @@ public class ClusterBomb extends Bomb {
         return progress > 0.20f && progress <= 0.30f
                 || progress > 0.5f && progress <= 0.60f
                 || progress > 0.8f && progress <= 1f;
+    }
+
+    public static class KryoSerializer extends Serializer<ClusterBomb> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, ClusterBomb object) {
+            kryo.writeObject(output, object.getBody().getPosition());
+            output.writeFloat(object.initialTickingTime);
+            output.writeFloat(object.getBodyRadius());
+            output.writeFloat(object.getDetonationRadius());
+            output.writeFloat(object.tickingTimer);
+            output.writeBoolean(object.ticking);
+            kryo.writeObject(output, object.getBody().getAngle());
+            kryo.writeObject(output, object.getBody().getLinearVelocity());
+            kryo.writeObject(output, object.getBody().getAngularVelocity());
+        }
+
+        @Override
+        public ClusterBomb read(Kryo kryo, Input input, Class<? extends ClusterBomb> type) {
+            Vector2 position = kryo.readObject(input, Vector2.class);
+            ClusterBomb bomb = new ClusterBomb(
+                    world,
+                    position,
+                    input.readFloat(),
+                    input.readFloat(),
+                    input.readFloat()
+            );
+            bomb.tickingTimer = input.readFloat();
+            bomb.ticking = input.readBoolean();
+            bomb.getBody().setTransform(position, input.readFloat());
+            bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
+            bomb.getBody().setAngularVelocity(input.readFloat());
+            return bomb;
+        }
     }
 }
