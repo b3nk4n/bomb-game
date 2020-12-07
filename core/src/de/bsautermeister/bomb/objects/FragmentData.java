@@ -3,6 +3,10 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.utils.ArrayUtils;
 import de.bsautermeister.bomb.utils.ClusterUtils;
@@ -111,5 +115,20 @@ public class FragmentData {
             sb.append('\n');
         }
         return sb.toString();
+    }
+
+    public static class KryoSerializer extends Serializer<FragmentData> {
+        @Override
+        public void write(Kryo kryo, Output output, FragmentData object) {
+            output.writeFloat(object.getSize());
+            kryo.writeObject(output, object.getGridData());
+        }
+
+        @Override
+        public FragmentData read(Kryo kryo, Input input, Class<? extends FragmentData> type) {
+            return new FragmentData(
+                    input.readFloat(),
+                    kryo.readObject(input, boolean[][].class));
+        }
     }
 }

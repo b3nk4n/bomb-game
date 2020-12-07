@@ -13,30 +13,33 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ShortArray;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.contact.Bits;
 
 public class Fragment {
 
     private static final float EPSILON = 1e-5f;
-
     private static final int RESOLUTION = 8;
-
-    private final World world;
-    private Body body;
-    private Rectangle bounds;
-
     private static final EarClippingTriangulator TRIANGULATOR = new EarClippingTriangulator();
 
-    private FragmentData fragmentData;
+    private final World world;
+    private final Rectangle bounds;
+    private final FragmentData fragmentData;
+
+    private Body body;
 
     public Fragment(World world, float leftX, float bottomY, float size) {
-        this.world = world;
-        this.bounds = new Rectangle(leftX, bottomY, size, size);
+        this(world, leftX, bottomY, size, new FragmentData(RESOLUTION, size));
     }
 
-    public void initialize() {
-        this.fragmentData = new FragmentData(RESOLUTION, getSize());
+    public Fragment(World world, float leftX, float bottomY, float size, FragmentData fragmentData) {
+        this.world = world;
+        this.bounds = new Rectangle(leftX, bottomY, size, size);
+        this.fragmentData = fragmentData;
         updateBody();
     }
 
@@ -57,7 +60,6 @@ public class Fragment {
         boolean updated = fragmentData.remove(tmpImpactCircle);
         if (updated) {
             world.destroyBody(body);
-            body = null;
             updateBody();
         }
         return updated;
@@ -66,7 +68,10 @@ public class Fragment {
     private void updateBody() {
         Array<float[]> polygonOutlines = fragmentData.computeOutlines();
         if (polygonOutlines.notEmpty()) {
-            this.body = createBody(getLeftX(), getBottomY(), polygonOutlines);
+            body = createBody(getLeftX(), getBottomY(), polygonOutlines);
+        } else  {
+            // mark empty
+            body = null;
         }
     }
 
@@ -143,8 +148,30 @@ public class Fragment {
         return fragmentData;
     }
 
-    public void setFragmentData(FragmentData fragmentData) {
-        this.fragmentData = fragmentData;
-        updateBody();
+    public static class KryoSerializer extends Serializer<Fragment> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, Fragment object) {
+            output.writeFloat(object.getLeftX());
+            output.writeFloat(object.getBottomY());
+            output.writeFloat(object.getSize());
+            kryo.writeObject(output, object.getFragmentData());
+        }
+
+        @Override
+        public Fragment read(Kryo kryo, Input input, Class<? extends Fragment> type) {
+            return new Fragment(
+                    world,
+                    input.readFloat(),
+                    input.readFloat(),
+                    input.readFloat(),
+                    kryo.readObject(input, FragmentData.class));
+        }
     }
 }

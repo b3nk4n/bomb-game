@@ -42,10 +42,6 @@ import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
-import de.bsautermeister.bomb.serializers.FragmentDataSerializer;
-import de.bsautermeister.bomb.serializers.FragmentSerializer;
-import de.bsautermeister.bomb.serializers.GroundSerializer;
-import de.bsautermeister.bomb.serializers.PlayerSerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 
 public class GameController implements Disposable {
@@ -151,18 +147,17 @@ public class GameController implements Disposable {
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
-        kryo.register(Player.class, new PlayerSerializer(world));
+        kryo.register(Player.class, new Player.KryoSerializer(world));
         kryo.register(Vector2.class, new Vector2Serializer());
-        kryo.register(Ground.class, new GroundSerializer(world));
+        kryo.register(Ground.class, new Ground.KryoSerializer(world));
         kryo.register(Array.class, new ArraySerializer());
-        kryo.register(Fragment.class, new FragmentSerializer(world));
-        kryo.register(FragmentData.class, new FragmentDataSerializer());
+        kryo.register(Fragment.class, new Fragment.KryoSerializer(world));
+        kryo.register(FragmentData.class, new FragmentData.KryoSerializer());
     }
 
     public void initialize() {
         player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
-        ground.initialize();
 
         state = GameState.PLAYING;
     }

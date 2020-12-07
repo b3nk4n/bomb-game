@@ -14,6 +14,10 @@ import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 import com.badlogic.gdx.utils.Logger;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
@@ -164,6 +168,10 @@ public class Player {
         return groundContacts > 0;
     }
 
+    public Body getBallBody() {
+        return ballBody;
+    }
+
     public Vector2 getPosition() {
         return ballBody.getPosition();
     }
@@ -186,5 +194,40 @@ public class Player {
 
     public int getScore() {
         return score;
+    }
+
+    public static class KryoSerializer extends Serializer<Player> {
+
+        private final World world;
+
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
+
+        @Override
+        public void write(Kryo kryo, Output output, Player object) {
+            kryo.writeObject(output, object.startPosition);
+            output.writeFloat(object.getRadius());
+            kryo.writeObject(output, object.ballBody.getPosition());
+            kryo.writeObject(output, object.ballBody.getAngle());
+            kryo.writeObject(output, object.ballBody.getLinearVelocity());
+            kryo.writeObject(output, object.ballBody.getAngularVelocity());
+            output.writeFloat(object.lifeRatio);
+            output.writeInt(object.score);
+            output.writeBoolean(object.blockJumpUntilRelease);
+        }
+
+        @Override
+        public Player read(Kryo kryo, Input input, Class<? extends Player> type) {
+            Player player = new Player(world, kryo.readObject(input, Vector2.class),
+                    input.readFloat());
+            player.ballBody.setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
+            player.ballBody.setLinearVelocity(kryo.readObject(input, Vector2.class));
+            player.ballBody.setAngularVelocity(input.readFloat());
+            player.lifeRatio = input.readFloat();
+            player.score = input.readInt();
+            player.blockJumpUntilRelease = input.readBoolean();
+            return player;
+        }
     }
 }

@@ -3,6 +3,10 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 public class Ground {
 
@@ -21,16 +25,22 @@ public class Ground {
 
     public Ground(World world, int numCols, int numCompleteRows, float size) {
         this.world = world;
-        this.fragments = new Array<>(1024);
         this.size = size;
         this.numCols = numCols;
         this.numCompleteRows = numCompleteRows;
+        this.fragments = new Array<>(1024);
+        for (int r = 0; r < numCompleteRows; ++r) {
+            fragments.add(createRow(world, numCols, r, size));
+        }
     }
 
-    public void initialize() {
-        for (int r = 0; r < numCompleteRows; ++r) {
-            addRow();
-        }
+    public Ground(World world, int numCols, int numCompleteRows, float size,
+                  Array<Array<Fragment>> fragments) {
+        this.world = world;
+        this.size = size;
+        this.numCols = numCols;
+        this.numCompleteRows = numCompleteRows;
+        this.fragments = fragments;
     }
 
     public void impact(Vector2 position, float radius) {
@@ -55,40 +65,48 @@ public class Ground {
     private void updateRows() {
         int missingRows = numCompleteRows - (fragments.size - lowestRowImpacted) + 1;
         for (int i = 0; i < missingRows; ++i) {
-            addRow();
+            fragments.add(createRow(world, numCols, fragments.size, size));
         }
     }
 
-    private void addRow() {
+    private static Array<Fragment> createRow(World world, int numCols, int rowIdx, float size) {
         Array<Fragment> row = new Array<>(numCols);
         for (int col = 0; col < numCols; ++col) {
             float posX = col * size;
-            float posY = -(fragments.size + 1) * size;
-            Fragment fragment = new Fragment(world, posX, posY, size);
-            fragment.initialize();
-            row.add(fragment);
+            float posY = -(rowIdx + 1) * size;
+            row.add(new Fragment(world, posX, posY, size));
         }
-        fragments.add(row);
+        return row;
     }
 
     public Array<Array<Fragment>> getFragments() {
         return fragments;
     }
 
-    public void setFragments(Array<Array<Fragment>> fragments) {
-        this.fragments.clear();
-        this.fragments.addAll(fragments);
-    }
+    public static class KryoSerializer extends Serializer<Ground> {
 
-    public float getSize() {
-        return size;
-    }
+        private final World world;
 
-    public int getNumCols() {
-        return numCols;
-    }
+        public KryoSerializer(World world) {
+            this.world = world;
+        }
 
-    public int getNumCompleteRows() {
-        return numCompleteRows;
+        @Override
+        public void write(Kryo kryo, Output output, Ground object) {
+            output.writeInt(object.numCols);
+            output.writeInt(object.numCompleteRows);
+            output.writeFloat(object.size);
+            kryo.writeObject(output, object.getFragments());
+        }
+
+        @Override
+        public Ground read(Kryo kryo, Input input, Class<? extends Ground> type) {
+            return new Ground(
+                    world,
+                    input.readInt(),
+                    input.readInt(),
+                    input.readFloat(),
+                    kryo.readObject(input, Array.class));
+        }
     }
 }
