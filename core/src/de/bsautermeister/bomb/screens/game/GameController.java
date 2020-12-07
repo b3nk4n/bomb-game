@@ -30,6 +30,7 @@ import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
+import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
@@ -66,40 +67,6 @@ public class GameController implements Disposable {
     private final ManagedPooledEffect explosionEffect;
 
     private final Sound explosionSound;
-
-    public static class BlastInstance {
-        private final Vector2 position;
-        private final float radius;
-        private final float initialTtl;
-        private float ttl;
-
-        public BlastInstance(float x, float y, float radius, float ttl) {
-            this.position = new Vector2(x, y);
-            this.radius = radius;
-            this.initialTtl = ttl;
-            this.ttl = ttl;
-        }
-
-        public void update(float delta) {
-            ttl -= delta;
-        }
-
-        public Vector2 getPosition() {
-            return position;
-        }
-
-        public float getProgress() {
-            return MathUtils.clamp((initialTtl - ttl) / initialTtl, 0f, 1f);
-        }
-
-        public float getRadius() {
-            return radius;
-        }
-
-        public boolean isExpired() {
-            return ttl <= 0;
-        }
-    }
 
     private final GameScreenCallbacks gameScreenCallbacks;
 
@@ -147,12 +114,13 @@ public class GameController implements Disposable {
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
-        kryo.register(Player.class, new Player.KryoSerializer(world));
         kryo.register(Vector2.class, new Vector2Serializer());
-        kryo.register(Ground.class, new Ground.KryoSerializer(world));
         kryo.register(Array.class, new ArraySerializer());
+        kryo.register(Player.class, new Player.KryoSerializer(world));
+        kryo.register(Ground.class, new Ground.KryoSerializer(world));
         kryo.register(Fragment.class, new Fragment.KryoSerializer(world));
         kryo.register(FragmentData.class, new FragmentData.KryoSerializer());
+        kryo.register(BlastInstance.class, new BlastInstance.KryoSerializer());
     }
 
     public void initialize() {
@@ -243,7 +211,7 @@ public class GameController implements Disposable {
 
                 bombs.addAll(bomb.releaseBombs());
 
-                activeBlastEffects.add(new BlastInstance(bombPosition.x, bombPosition.y, bomb.getDetonationRadius(), 2.5f));
+                activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 2.5f));
                 explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
                         MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
@@ -345,6 +313,7 @@ public class GameController implements Disposable {
             output.writeString(state.name());
             kryo.writeObject(output, player);
             kryo.writeObject(output, ground);
+            kryo.writeObject(output, activeBlastEffects);
             output.close();
         } catch (Exception e) {
             e.printStackTrace(); // TODO write log
@@ -360,6 +329,8 @@ public class GameController implements Disposable {
             state = GameState.valueOf(input.readString());
             player = kryo.readObject(input, Player.class);
             ground = kryo.readObject(input, Ground.class);
+            activeBlastEffects.clear();
+            activeBlastEffects.addAll(kryo.readObject(input, Array.class));
             input.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();

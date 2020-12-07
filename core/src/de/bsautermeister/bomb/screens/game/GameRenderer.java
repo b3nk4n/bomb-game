@@ -30,6 +30,7 @@ import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.FrameBufferManager;
+import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
@@ -135,8 +136,8 @@ public class GameRenderer implements Disposable {
         // set shader once before the loop, because it causes a fair amount of setup under the hood
         batch.setShader(blastShader);
 
-        Array<GameController.BlastInstance> blasts = controller.getActiveBlastEffects();
-        for (GameController.BlastInstance blast : blasts) {
+        Array<BlastInstance> blasts = controller.getActiveBlastEffects();
+        for (BlastInstance blast : blasts) {
             frameBufferManager.begin(frameBuffers[fbIdx]);
             fbIdx = ++fbIdx % frameBuffers.length;
             GdxUtils.clearScreen();
