@@ -212,6 +212,7 @@ public class Player {
             kryo.writeObject(output, object.ballBody.getAngle());
             kryo.writeObject(output, object.ballBody.getLinearVelocity());
             kryo.writeObject(output, object.ballBody.getAngularVelocity());
+            kryo.writeObject(output, object.fixedSensorBody.getPosition());
             output.writeFloat(object.lifeRatio);
             output.writeInt(object.score);
             output.writeBoolean(object.blockJumpUntilRelease);
@@ -224,6 +225,7 @@ public class Player {
             player.ballBody.setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
             player.ballBody.setLinearVelocity(kryo.readObject(input, Vector2.class));
             player.ballBody.setAngularVelocity(input.readFloat());
+            player.fixedSensorBody.setTransform(kryo.readObject(input, Vector2.class), 0f);
             player.lifeRatio = input.readFloat();
             player.score = input.readInt();
             player.blockJumpUntilRelease = input.readBoolean();

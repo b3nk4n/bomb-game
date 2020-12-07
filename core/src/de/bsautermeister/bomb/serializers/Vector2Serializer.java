@@ -17,4 +17,9 @@ public class Vector2Serializer extends Serializer<Vector2> {
     public Vector2 read(Kryo kryo, Input input, Class<? extends Vector2> type) {
         return new Vector2(input.readFloat(), input.readFloat());
     }
+
+    @Override
+    public Vector2 copy (Kryo kryo, Vector2 original) {
+        return new Vector2(original);
+    }
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -44,10 +45,11 @@ import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
+import de.bsautermeister.bomb.serializers.Vector3Serializer;
 
 public class GameController implements Disposable {
 
-    private final OrthographicCamera camera;
+    private OrthographicCamera camera;
     private final Viewport viewport;
 
     private final World world;
@@ -115,6 +117,7 @@ public class GameController implements Disposable {
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
         kryo.register(Vector2.class, new Vector2Serializer());
+        kryo.register(Vector3.class, new Vector3Serializer());
         kryo.register(Array.class, new ArraySerializer());
         kryo.register(Player.class, new Player.KryoSerializer(world));
         kryo.register(Ground.class, new Ground.KryoSerializer(world));
@@ -306,11 +309,11 @@ public class GameController implements Disposable {
         // set state to paused before saving
         state = GameState.PAUSED;
 
-        String fileName = "save.bin";
-        File file = new File(Gdx.files.getLocalStoragePath() + "/" + fileName);
+        File file = new File(Gdx.files.getLocalStoragePath() + "/" + Cfg.SAVE_GAME_FILE);
         try {
             Output output = new Output(new FileOutputStream(file));
             output.writeString(state.name());
+            kryo.writeObject(output, camera.position);
             kryo.writeObject(output, player);
             kryo.writeObject(output, ground);
             kryo.writeObject(output, activeBlastEffects);
@@ -321,12 +324,12 @@ public class GameController implements Disposable {
     }
 
     public void load() {
-        String fileName = "save.bin";
-        File file = new File(Gdx.files.getLocalStoragePath () + "/" + fileName);
+        File file = new File(Gdx.files.getLocalStoragePath () + "/" + Cfg.SAVE_GAME_FILE);
         try {
             com.esotericsoftware.kryo.io.Input input = new com.esotericsoftware.kryo.io.Input(
                     new FileInputStream(file));
             state = GameState.valueOf(input.readString());
+            camera.position.set(kryo.readObject(input, Vector3.class));
             player = kryo.readObject(input, Player.class);
             ground = kryo.readObject(input, Ground.class);
             activeBlastEffects.clear();

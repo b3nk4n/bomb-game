@@ -6,6 +6,8 @@ public interface Cfg {
     int LOG_LEVEL = Logger.DEBUG;
     boolean DEBUG_MODE = true;
 
+    String SAVE_GAME_FILE = "save.bin";
+
     float PPM = 5f;
 
     float VIEWPORT_WORLD_WIDTH_PPM = 64f / Cfg.PPM;
