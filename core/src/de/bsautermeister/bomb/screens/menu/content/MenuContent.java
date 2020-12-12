@@ -20,9 +20,11 @@ public class MenuContent extends Table {
 
     private static float DELAY_OFFSET = 0.25f;
 
+    private final BombGame game;
     private final Callbacks callbacks;
 
-    public MenuContent(AssetManager assetManager, Callbacks callbacks) {
+    public MenuContent(BombGame game, AssetManager assetManager, Callbacks callbacks) {
+        this.game = game;
         this.callbacks = callbacks;
         initialize(assetManager);
     }
@@ -58,7 +60,7 @@ public class MenuContent extends Table {
         add(playButton)
                 .row();
 
-        if (BombGame.hasSavedData()) {
+        if (game.getGameFile().exists()) {
             Button continueButton = new TextButton("Resume", skin);
             continueButton.addListener(new ClickListener() {
                 @Override

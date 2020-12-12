@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.core.GameApp;
@@ -70,7 +71,7 @@ public class MenuScreen extends ScreenBase {
     }
 
     private Table createMainContent() {
-        return new MenuContent(getAssetManager(), new MenuContent.Callbacks() {
+        return new MenuContent((BombGame) getGame(), getAssetManager(), new MenuContent.Callbacks() {
             @Override
             public void playClicked() {
                 setScreen(new GameScreen(getGame(), false));

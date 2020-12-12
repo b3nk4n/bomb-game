@@ -16,16 +16,7 @@ public class BombGame extends GameApp {
 		setScreen(new LoadingScreen(this));
 	}
 
-	public static void deleteSavedData() {
-		// TODO implement
-	}
-
-	public static boolean hasSavedData() {
-		// TODO improve implementation
-
-		String fileName = "save.bin";
-		// use file in dedicated local storage
-		File file = new File(Gdx.files.getLocalStoragePath () + "/" + fileName);
-		return file.exists();
+	public File getGameFile() {
+		return new File(Gdx.files.getLocalStoragePath() + "/" + Cfg.SAVE_GAME_FILE);
 	}
 }

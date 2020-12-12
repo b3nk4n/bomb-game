@@ -16,6 +16,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryo.Kryo;
@@ -26,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.Bits;
@@ -50,6 +52,9 @@ import de.bsautermeister.bomb.serializers.Vector3Serializer;
 
 public class GameController implements Disposable {
 
+    private static final Logger LOG = new Logger(GameController.class.getSimpleName(), Cfg.LOG_LEVEL);
+
+    private final BombGame game;
     private OrthographicCamera camera;
     private final Viewport viewport;
 
@@ -101,7 +106,8 @@ public class GameController implements Disposable {
 
     private final Kryo kryo;
 
-    public GameController(GameScreenCallbacks gameScreenCallbacks, AssetManager assetManager) {
+    public GameController(BombGame game, GameScreenCallbacks gameScreenCallbacks, AssetManager assetManager) {
+        this.game = game;
         this.gameScreenCallbacks = gameScreenCallbacks;
 
         camera = new OrthographicCamera();
@@ -310,15 +316,14 @@ public class GameController implements Disposable {
 
     public void save() {
         if (state.isGameOver()) {
-            // TODO delete saved game
             return;
         }
 
         // set state to paused before saving
         state = GameState.PAUSED;
 
-        File file = new File(Gdx.files.getLocalStoragePath() + "/" + Cfg.SAVE_GAME_FILE);
         try {
+            File file = game.getGameFile();
             Output output = new Output(new FileOutputStream(file));
             output.writeString(state.name());
             kryo.writeObject(output, camera.position);
@@ -328,12 +333,16 @@ public class GameController implements Disposable {
             kryo.writeObject(output, bombs);
             output.close();
         } catch (Exception e) {
-            e.printStackTrace(); // TODO write log
+            LOG.error("Failed to save game.", e);
         }
     }
 
     public void load() {
-        File file = new File(Gdx.files.getLocalStoragePath () + "/" + Cfg.SAVE_GAME_FILE);
+        File file = game.getGameFile();
+        if (!file.exists()) {
+            return;
+        }
+
         try {
             com.esotericsoftware.kryo.io.Input input = new com.esotericsoftware.kryo.io.Input(
                     new FileInputStream(file));
@@ -347,7 +356,12 @@ public class GameController implements Disposable {
             bombs.addAll(kryo.readObject(input, Array.class));
             input.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOG.error("Failed to load game.", e);
+        }
+
+        // save the file after the game was restored:
+        if (!file.delete()) {
+            LOG.error("Failed to delete saved game.");
         }
     }
 

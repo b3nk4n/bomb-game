@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.InputProcessor;
 import com.esotericsoftware.kryo.Kryo;
 
+import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.objects.Player;
@@ -31,7 +32,7 @@ public class GameScreen extends ScreenBase {
     public void show() {
         super.show();
 
-        controller = new GameController(callbacks, getAssetManager());
+        controller = new GameController((BombGame) getGame(), callbacks, getAssetManager());
         if (resume) {
             controller.load();
         } else {
