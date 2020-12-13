@@ -30,7 +30,6 @@ public class Player {
     private Body ballBody;
     private Body fixedSensorBody;
 
-    private Vector2 startPosition;
     private float radius;
 
     private float lifeRatio;
@@ -39,9 +38,8 @@ public class Player {
     private boolean blockJumpUntilRelease;
     private int groundContacts;
 
-    public Player(World world, Vector2 startPosition, float radius) {
+    public Player(World world, float radius) {
         this.world = world;
-        this.startPosition = startPosition;
         this.radius = radius;
         this.ballBody = createBody(radius);
         reset();
@@ -49,9 +47,7 @@ public class Player {
 
     public void reset() {
         lifeRatio = 1f;
-        ballBody.setTransform(startPosition, 0);
         ballBody.setActive(true);
-        fixedSensorBody.setTransform(startPosition, 0);
     }
 
     private Body createBody(float radius) {
@@ -156,6 +152,11 @@ public class Player {
         return false;
     }
 
+    public void setTransform(Vector2 position, float angle) {
+        ballBody.setTransform(position, angle);
+        fixedSensorBody.setTransform(position, angle);
+    }
+
     public void beginGroundContact() {
         groundContacts++;
     }
@@ -166,10 +167,6 @@ public class Player {
 
     public boolean hasGroundContact() {
         return groundContacts > 0;
-    }
-
-    public Body getBallBody() {
-        return ballBody;
     }
 
     public Vector2 getPosition() {
@@ -206,7 +203,6 @@ public class Player {
 
         @Override
         public void write(Kryo kryo, Output output, Player object) {
-            kryo.writeObject(output, object.startPosition);
             output.writeFloat(object.getRadius());
             kryo.writeObject(output, object.ballBody.getPosition());
             kryo.writeObject(output, object.ballBody.getAngle());
@@ -220,8 +216,7 @@ public class Player {
 
         @Override
         public Player read(Kryo kryo, Input input, Class<? extends Player> type) {
-            Player player = new Player(world, kryo.readObject(input, Vector2.class),
-                    input.readFloat());
+            Player player = new Player(world, input.readFloat());
             player.ballBody.setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
             player.ballBody.setLinearVelocity(kryo.readObject(input, Vector2.class));
             player.ballBody.setAngularVelocity(input.readFloat());

@@ -26,20 +26,18 @@ public class BounceStickyBomb extends Bomb {
     private final float initialTickingTime;
     private float tickingTimer;
 
-    private final float initialStickyDelay;
+    private static final float INITIAL_STICKY_DELAY = 0.5f;
     private float stickyTimer;
 
 
     private JointDef stickyJointDef;
     private Joint stickyJoint;
 
-    public BounceStickyBomb(World world, Vector2 position, float tickingTime, float bodyRadius, float detonationRadius, float angleRad) {
+    public BounceStickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-        initialStickyDelay = 0.5f;
-        stickyTimer = initialStickyDelay;
-        getBody().setTransform(position, angleRad);
+        stickyTimer = INITIAL_STICKY_DELAY;
     }
 
     @Override
@@ -137,34 +135,30 @@ public class BounceStickyBomb extends Bomb {
 
         @Override
         public void write(Kryo kryo, Output output, BounceStickyBomb object) {
-            kryo.writeObject(output, object.getBody().getPosition());
-            kryo.writeObject(output, object.getBody().getAngle());
             output.writeFloat(object.initialTickingTime);
             output.writeFloat(object.getBodyRadius());
             output.writeFloat(object.getDetonationRadius());
             output.writeFloat(object.tickingTimer);
             output.writeBoolean(object.ticking);
             output.writeFloat(object.stickyTimer);
+            kryo.writeObject(output, object.getBody().getPosition());
+            kryo.writeObject(output, object.getBody().getAngle());
             kryo.writeObject(output, object.getBody().getLinearVelocity());
             kryo.writeObject(output, object.getBody().getAngularVelocity());
         }
 
         @Override
         public BounceStickyBomb read(Kryo kryo, Input input, Class<? extends BounceStickyBomb> type) {
-            Vector2 position = kryo.readObject(input, Vector2.class);
-            float angle = input.readFloat();
             BounceStickyBomb bomb = new BounceStickyBomb(
                     world,
-                    position,
                     input.readFloat(),
                     input.readFloat(),
-                    input.readFloat(),
-                    angle
+                    input.readFloat()
             );
             bomb.tickingTimer = input.readFloat();
             bomb.ticking = input.readBoolean();
             bomb.stickyTimer = input.readFloat();
-            bomb.getBody().setTransform(position, angle);
+            bomb.getBody().setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
             bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
             bomb.getBody().setAngularVelocity(input.readFloat());
             return bomb;

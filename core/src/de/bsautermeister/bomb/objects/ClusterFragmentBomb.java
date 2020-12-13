@@ -23,10 +23,8 @@ public class ClusterFragmentBomb extends Bomb {
 
     private boolean groundContact;
 
-    public ClusterFragmentBomb(World world, Vector2 position, float bodyRadius, float detonationRadius, Vector2 velocity) {
+    public ClusterFragmentBomb(World world, float bodyRadius, float detonationRadius) {
         super(world, bodyRadius, detonationRadius, 0.05f);
-        getBody().setTransform(position, 0f);
-        getBody().setLinearVelocity(velocity);
     }
 
     @Override
@@ -92,28 +90,25 @@ public class ClusterFragmentBomb extends Bomb {
 
         @Override
         public void write(Kryo kryo, Output output, ClusterFragmentBomb object) {
-            kryo.writeObject(output, object.getBody().getPosition());
-            kryo.writeObject(output, object.getBody().getLinearVelocity());
             output.writeFloat(object.getBodyRadius());
             output.writeFloat(object.getDetonationRadius());
             output.writeBoolean(object.groundContact);
+            kryo.writeObject(output, object.getBody().getPosition());
             kryo.writeObject(output, object.getBody().getAngle());
+            kryo.writeObject(output, object.getBody().getLinearVelocity());
             kryo.writeObject(output, object.getBody().getAngularVelocity());
         }
 
         @Override
         public ClusterFragmentBomb read(Kryo kryo, Input input, Class<? extends ClusterFragmentBomb> type) {
-            Vector2 position = kryo.readObject(input, Vector2.class);
-            Vector2 velocity = kryo.readObject(input, Vector2.class); // TODO move setting position / velocity out of all constructors?
             ClusterFragmentBomb bomb = new ClusterFragmentBomb(
                     world,
-                    position,
                     input.readFloat(),
-                    input.readFloat(),
-                    velocity
+                    input.readFloat()
             );
             bomb.groundContact = input.readBoolean();
-            bomb.getBody().setTransform(position, input.readFloat());
+            bomb.getBody().setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
+            bomb.getBody().setLinearVelocity(kryo.readObject(input, Vector2.class));
             bomb.getBody().setAngularVelocity(input.readFloat());
             return bomb;
         }

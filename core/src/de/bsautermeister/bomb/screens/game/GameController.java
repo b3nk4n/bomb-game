@@ -33,6 +33,8 @@ import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
+import de.bsautermeister.bomb.factories.BombFactory;
+import de.bsautermeister.bomb.factories.BombFactoryImpl;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
@@ -61,6 +63,7 @@ public class GameController implements Disposable {
     private final World world;
     private Player player;
     private Ground ground;
+    private final BombFactory bombFactory;
     private final Array<Bomb> bombs = new Array<>();
 
     private GameState state;
@@ -101,6 +104,7 @@ public class GameController implements Disposable {
             // TODO reset game
             state = GameState.PLAYING;
             player.reset(); // TODO consider dispose and create new Player, instead of implementing a reset() function?
+            player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
         }
     };
 
@@ -116,6 +120,8 @@ public class GameController implements Disposable {
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
         createWorldBoundsBodies(world);
+
+        bombFactory = new BombFactoryImpl(world);
 
         ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
         explosionEffect = new ManagedPooledEffect(explosion);
@@ -139,7 +145,8 @@ public class GameController implements Disposable {
     }
 
     public void initialize() {
-        player = new Player(world, new Vector2(viewport.getWorldWidth() / 2, 5f / Cfg.PPM), Cfg.PLAYER_RADIUS_PPM);
+        player = new Player(world, Cfg.PLAYER_RADIUS_PPM);
+        player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
 
         state = GameState.PLAYING;
@@ -201,6 +208,17 @@ public class GameController implements Disposable {
             bombEmitTimer = BOMB_EMIT_DELAY;
             emitBomb();
         }
+    }
+
+    private void emitBomb() {
+        Bomb bomb = bombFactory.createRandomBomb();
+        Vector2 position = new Vector2(
+                MathUtils.random(bomb.getBodyRadius() / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bomb.getBodyRadius() / Cfg.PPM),
+                20f / Cfg.PPM
+        );
+        float angleRad = MathUtils.random(0, MathUtils.PI2);
+        bomb.setTransform(position, angleRad);
+        bombs.add(bomb);
     }
 
     private void updateEnvironment(float delta) {
@@ -290,28 +308,6 @@ public class GameController implements Disposable {
         }
 
         player.control(upPressed, leftPressed, rightPressed);
-    }
-
-    private void emitBomb() {
-        float bodyRadius = MathUtils.random(0.5f, 1.0f);
-        float detonationRadius = bodyRadius * 15;
-        float tickingTime = MathUtils.random(2f, 5f);
-        Vector2 position = new Vector2(
-                MathUtils.random(bodyRadius / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bodyRadius / Cfg.PPM),
-                20f / Cfg.PPM
-        );
-        float angleRad = MathUtils.random(0, MathUtils.PI2);
-
-        float randomBombType = MathUtils.random();
-        if (randomBombType < 0.25f) {
-            bombs.add(new TimedBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else if (randomBombType < 0.5f) {
-            bombs.add(new ClusterBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else if (randomBombType < 0.75) {
-            bombs.add(new StickyBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM));
-        } else {
-            bombs.add(new BounceStickyBomb(world, position, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM, angleRad));
-        }
     }
 
     public void save() {

@@ -36,6 +36,14 @@ public abstract class Bomb implements Disposable {
         PhysicsUtils.applyBlastImpact(getBody(), position, radius, blastImpactStrengthFactor);
     }
 
+    public void setTransform(Vector2 position, float angle) {
+        body.setTransform(position, angle);
+    }
+
+    public void setLinearVelocity(Vector2 velocity) {
+        body.setLinearVelocity(velocity);
+    }
+
     public abstract void beginContact(Fixture otherFixture);
 
     public abstract void endContact(Fixture otherFixture);
@@ -57,7 +65,7 @@ public abstract class Bomb implements Disposable {
         return world;
     }
 
-    public Body getBody() {
+    protected Body getBody() {
         return body;
     }
 

@@ -1,5 +1,6 @@
 package de.bsautermeister.bomb;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
@@ -29,4 +30,5 @@ public interface Cfg {
 
     float PLAYER_RADIUS_PPM = 1.25f / Cfg.PPM;
     float PLAYER_SELF_HEALING_PER_SECOND = 0.01f;
+    Vector2 PLAYER_START_POSITION = new Vector2(VIEWPORT_WORLD_WIDTH_PPM, 5f / Cfg.PPM);
 }
