@@ -1,12 +1,10 @@
 package de.bsautermeister.bomb.screens.game;
 
 import com.badlogic.gdx.InputProcessor;
-import com.esotericsoftware.kryo.Kryo;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
-import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.menu.MenuScreen;
 
 public class GameScreen extends ScreenBase {
@@ -20,6 +18,11 @@ public class GameScreen extends ScreenBase {
         @Override
         public void backToMenu() {
             setScreen(new MenuScreen(getGame()));
+        }
+
+        @Override
+        public void restartGame() {
+            setScreen(new GameScreen(getGame(), false));
         }
     };
 

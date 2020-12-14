@@ -69,6 +69,7 @@ public class GameController implements Disposable {
     private GameState state;
 
     private boolean markBackToMenu;
+    private boolean markRestartGame;
 
     private static final float BOMB_EMIT_DELAY = 2f;
     private float bombEmitTimer = BOMB_EMIT_DELAY;
@@ -101,10 +102,7 @@ public class GameController implements Disposable {
 
         @Override
         public void restart() {
-            // TODO reset game
-            state = GameState.PLAYING;
-            player.reset(); // TODO consider dispose and create new Player, instead of implementing a reset() function?
-            player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
+            markRestartGame = true;
         }
     };
 
@@ -184,6 +182,12 @@ public class GameController implements Disposable {
             return;
         }
 
+        if (markRestartGame) {
+            markRestartGame = false;
+            gameScreenCallbacks.restartGame();
+            return;
+        }
+
         if (state.isPaused()) {
             return;
         }
@@ -192,9 +196,9 @@ public class GameController implements Disposable {
             handleInput();
             player.update(delta);
             updateCamera();
+            updateBombEmitter(delta);
         }
 
-        updateBombEmitter(delta);
         updateEnvironment(delta);
         explosionEffect.update(delta);
 

@@ -134,9 +134,6 @@ public class StickyBomb extends Bomb {
             kryo.writeObject(output, object.getBody().getAngle());
             kryo.writeObject(output, object.getBody().getLinearVelocity());
             kryo.writeObject(output, object.getBody().getAngularVelocity());
-
-            // TODO how to persist the joint? Or will it be automatically re-created after load
-            //      because bodies are in contact at the next world.step() call?
         }
 
         @Override
