@@ -32,6 +32,7 @@ import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
+import de.bsautermeister.bomb.core.GameObjectState;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.factories.BombFactory;
 import de.bsautermeister.bomb.factories.BombFactoryImpl;
@@ -66,13 +67,15 @@ public class GameController implements Disposable {
     private final BombFactory bombFactory;
     private final Array<Bomb> bombs = new Array<>();
 
-    private GameState state;
+    private GameObjectState<GameState> state;
 
     private boolean markBackToMenu;
     private boolean markRestartGame;
 
-    private static final float BOMB_EMIT_DELAY = 2f;
-    private float bombEmitTimer = BOMB_EMIT_DELAY;
+    private static final float INITIAL_BOMB_EMIT_DELAY = 3f;
+    private static final float MIN_BOMB_EMIT_DELAY = 1f;
+    private float bombEmitTimer = INITIAL_BOMB_EMIT_DELAY;
+    private float gameTime = 0f;
 
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
 
@@ -90,7 +93,7 @@ public class GameController implements Disposable {
 
         @Override
         public void resume() {
-            state = GameState.PLAYING;
+            state.set(GameState.PLAYING);
         }
     };
 
@@ -147,7 +150,7 @@ public class GameController implements Disposable {
         player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
 
-        state = GameState.PLAYING;
+        state = new GameObjectState<>(GameState.PLAYING);
     }
 
     private void createWorldBoundsBodies(World world) {
@@ -188,11 +191,12 @@ public class GameController implements Disposable {
             return;
         }
 
-        if (state.isPaused()) {
+        if (state.is(GameState.PAUSED)) {
             return;
         }
 
-        if (!state.isGameOver()) {
+        if (!state.is(GameState.GAME_OVER)) {
+            gameTime += delta;
             handleInput();
             player.update(delta);
             updateCamera();
@@ -209,7 +213,8 @@ public class GameController implements Disposable {
         bombEmitTimer -= delta;
 
         if (bombEmitTimer < 0) {
-            bombEmitTimer = BOMB_EMIT_DELAY;
+            float delay = INITIAL_BOMB_EMIT_DELAY - gameTime * 0.005f - 0.5f + MathUtils.random();
+            bombEmitTimer = Math.max(MIN_BOMB_EMIT_DELAY, delay);
             emitBomb();
         }
     }
@@ -237,7 +242,7 @@ public class GameController implements Disposable {
                 ground.impact(bombPosition, bomb.getDetonationRadius());
 
                 if (player.impact(bombPosition, bomb.getDetonationRadius())) {
-                    state = GameState.GAME_OVER;
+                    state.set(GameState.GAME_OVER);
                 }
 
                 for (Bomb otherBomb : bombs) {
@@ -315,17 +320,18 @@ public class GameController implements Disposable {
     }
 
     public void save() {
-        if (state.isGameOver()) {
+        if (state.is(GameState.GAME_OVER)) {
             return;
         }
 
         // set state to paused before saving
-        state = GameState.PAUSED;
+        state.set(GameState.PAUSED);
 
         try {
             File file = game.getGameFile();
             Output output = new Output(new FileOutputStream(file));
-            output.writeString(state.name());
+            output.writeFloat(gameTime);
+            kryo.writeObject(output, state);
             kryo.writeObject(output, camera.position);
             kryo.writeObject(output, player);
             kryo.writeObject(output, ground);
@@ -346,7 +352,8 @@ public class GameController implements Disposable {
         try {
             com.esotericsoftware.kryo.io.Input input = new com.esotericsoftware.kryo.io.Input(
                     new FileInputStream(file));
-            state = GameState.valueOf(input.readString());
+            gameTime = input.readFloat();
+            state = kryo.readObject(input, GameObjectState.class);
             camera.position.set(kryo.readObject(input, Vector3.class));
             player = kryo.readObject(input, Player.class);
             ground = kryo.readObject(input, Ground.class);
@@ -372,7 +379,7 @@ public class GameController implements Disposable {
 
     private void handlePauseInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            state = GameState.PAUSED;
+            state.set(GameState.PAUSED);
         }
     }
 
@@ -405,7 +412,7 @@ public class GameController implements Disposable {
     }
 
     public GameState getState() {
-        return state;
+        return state.current();
     }
 
     public PauseOverlay.Callback getPauseCallback() {
