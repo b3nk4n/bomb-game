@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
 
@@ -20,13 +19,16 @@ public class MenuContent extends Table {
 
     private static float DELAY_OFFSET = 0.25f;
 
-    private final BombGame game;
+    private final boolean canShowAchievements;
+    private final boolean canResume;
     private final Callbacks callbacks;
 
-    public MenuContent(BombGame game, AssetManager assetManager, Callbacks callbacks) {
-        this.game = game;
-        this.callbacks = callbacks;
+    public MenuContent(AssetManager assetManager, Callbacks callbacks,
+                       boolean canResume, boolean canShowAchievements) {
         initialize(assetManager);
+        this.canResume = canResume;
+        this.canShowAchievements = canShowAchievements;
+        this.callbacks = callbacks;
     }
 
     private void initialize(AssetManager assetManager) {
@@ -60,7 +62,7 @@ public class MenuContent extends Table {
         add(playButton)
                 .row();
 
-        if (game.getGameFile().exists()) {
+        if (canResume) {
             Button continueButton = new TextButton("Resume", skin);
             continueButton.addListener(new ClickListener() {
                 @Override
@@ -78,7 +80,7 @@ public class MenuContent extends Table {
                     .row();
         }
 
-        /*if (BombGame.getGameServiceManager().isSupported()) {
+        if (canShowAchievements) {
             Button aboutButton = new TextButton("Achievements", skin);
             aboutButton.addListener(new ClickListener() {
                 @Override
@@ -94,7 +96,7 @@ public class MenuContent extends Table {
             delay += DELAY_OFFSET;
             add(aboutButton)
                     .row();
-        }*/
+        }
 
         Button aboutButton = new TextButton("About", skin);
         aboutButton.addListener(new ClickListener() {

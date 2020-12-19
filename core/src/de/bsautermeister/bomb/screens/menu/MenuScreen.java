@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -20,8 +21,12 @@ import de.bsautermeister.bomb.screens.game.GameScreen;
 import de.bsautermeister.bomb.screens.menu.content.AboutContent;
 import de.bsautermeister.bomb.screens.menu.content.MenuContent;
 import de.bsautermeister.bomb.utils.GdxUtils;
+import de.golfgl.gdxgamesvcs.GameServiceException;
+import de.golfgl.gdxgamesvcs.IGameServiceClient;
 
 public class MenuScreen extends ScreenBase {
+    private final static Logger LOG = new Logger(MenuScreen.class.getSimpleName(), Cfg.LOG_LEVEL);
+
     private final Viewport uiViewport;
     private Stage stage;
 
@@ -71,27 +76,36 @@ public class MenuScreen extends ScreenBase {
     }
 
     private Table createMainContent() {
-        return new MenuContent((BombGame) getGame(), getAssetManager(), new MenuContent.Callbacks() {
-            @Override
-            public void playClicked() {
-                setScreen(new GameScreen(getGame(), false));
-            }
+        return new MenuContent(
+                getAssetManager(),
+                new MenuContent.Callbacks() {
+                    @Override
+                    public void playClicked() {
+                        setScreen(new GameScreen(getGame(), false));
+                    }
 
-            @Override
-            public void continueClicked() {
-                setScreen(new GameScreen(getGame(), true));
-            }
+                    @Override
+                    public void continueClicked() {
+                        setScreen(new GameScreen(getGame(), true));
+                    }
 
-            @Override
-            public void achievementsClicked() {
-                // BombGame.getGameServiceManager().showAchievements();
-            }
+                    @Override
+                    public void achievementsClicked() {
+                        try {
+                            getGame().getGameServiceClient().showAchievements();
+                        } catch (GameServiceException e) {
+                            LOG.error("Showing achievements failed", e);
+                        }
+                    }
 
-            @Override
-            public void aboutClicked() {
-                setContent(createAboutContent());
-            }
-        });
+                    @Override
+                    public void aboutClicked() {
+                        setContent(createAboutContent());
+                    }
+                },
+                ((BombGame) getGame()).getGameFile().exists(),
+                getGame().getGameServiceClient().isFeatureSupported(
+                        IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
     }
 
     private Table createAboutContent() {
