@@ -25,5 +25,5 @@ void main() {
     }
 
     color /= BLUR_QUALITY * BLUR_DIRECTIONS;
-    gl_FragColor = color;
+    gl_FragColor = v_color * color;
 }

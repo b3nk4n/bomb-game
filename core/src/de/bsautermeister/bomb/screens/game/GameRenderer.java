@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -167,6 +168,8 @@ public class GameRenderer implements Disposable {
         if (criticalHealthRatio > 0f) {
             batch.setShader(blurShader);
             blurShader.setUniformf("u_radius", Interpolation.smooth.apply(0f, 0.01f, criticalHealthRatio));
+            float otherColorRatio = 1f - criticalHealthRatio / 2f;
+            batch.setColor(1f, otherColorRatio, otherColorRatio, 1f);
         } else {
             batch.setShader(null);
         }
@@ -177,6 +180,7 @@ public class GameRenderer implements Disposable {
                 camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
                 0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
         batch.end();
+        batch.setColor(Color.WHITE);
         batch.setShader(null);
 
         if (Cfg.DEBUG_MODE) {
