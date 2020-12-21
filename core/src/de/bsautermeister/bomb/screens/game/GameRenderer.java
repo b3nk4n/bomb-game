@@ -3,7 +3,6 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -32,7 +30,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
-import de.bsautermeister.bomb.core.FrameBufferManager;
+import de.bsautermeister.bomb.core.graphics.Camera2D;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
@@ -111,7 +110,7 @@ public class GameRenderer implements Disposable {
 
     private final Vector3 tmpBlastProjection = new Vector3();
     public void render(float delta) {
-        Camera camera = controller.getCamera();
+        Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
         viewport.apply();
@@ -120,7 +119,7 @@ public class GameRenderer implements Disposable {
         fbIdx = ++fbIdx % frameBuffers.length;
         GdxUtils.clearScreen();
 
-        batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(camera.getGdxCamera().combined);
         batch.begin();
 
         renderBall(batch);
@@ -129,7 +128,7 @@ public class GameRenderer implements Disposable {
 
         batch.end();
 
-        polygonBatch.setProjectionMatrix(camera.combined);
+        polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);
         polygonBatch.begin();
 
         renderGround(polygonBatch);
@@ -149,7 +148,7 @@ public class GameRenderer implements Disposable {
             batch.begin();
             Vector2 blastPosition = blast.getPosition();
             tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
-            camera.project(tmpBlastProjection);
+            camera.getGdxCamera().project(tmpBlastProjection);
             tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
             blastShader.setUniformf("u_time", blast.getProgress());
             blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
@@ -157,7 +156,9 @@ public class GameRenderer implements Disposable {
 
             Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
             batch.draw(sourceTexture,
-                    camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
+                    camera.getPosition().x - camera.getGdxCamera().viewportWidth / 2,
+                    camera.getPosition().y - camera.getGdxCamera().viewportHeight / 2,
+                    camera.getGdxCamera().viewportWidth, camera.getGdxCamera().viewportHeight,
                     0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
             batch.end();
             frameBufferManager.end();
@@ -177,14 +178,16 @@ public class GameRenderer implements Disposable {
         Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
         GdxUtils.clearScreen();
         batch.draw(sourceTexture,
-                camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
+                camera.getPosition().x - camera.getGdxCamera().viewportWidth / 2,
+                camera.getPosition().y - camera.getGdxCamera().viewportHeight / 2,
+                camera.getGdxCamera().viewportWidth, camera.getGdxCamera().viewportHeight,
                 0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
         batch.end();
         batch.setColor(Color.WHITE);
         batch.setShader(null);
 
         if (Cfg.DEBUG_MODE) {
-            box2DRenderer.render(controller.getWorld(), camera.combined);
+            box2DRenderer.render(controller.getWorld(), camera.getGdxCamera().combined);
         }
 
         uiViewport.apply();

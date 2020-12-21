@@ -1,4 +1,4 @@
-package de.bsautermeister.bomb.core;
+package de.bsautermeister.bomb.core.graphics;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 

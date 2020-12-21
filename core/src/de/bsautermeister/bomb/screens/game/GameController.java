@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
@@ -34,6 +33,10 @@ import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.core.GameObjectState;
+import de.bsautermeister.bomb.core.graphics.BoundedCamera2D;
+import de.bsautermeister.bomb.core.graphics.Camera2D;
+import de.bsautermeister.bomb.core.graphics.OrthographicCamera2D;
+import de.bsautermeister.bomb.core.graphics.ShakableCamera2D;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.factories.BombFactory;
 import de.bsautermeister.bomb.factories.BombFactoryImpl;
@@ -59,7 +62,7 @@ public class GameController implements Disposable {
     private static final Logger LOG = new Logger(GameController.class.getSimpleName(), Cfg.LOG_LEVEL);
 
     private final BombGame game;
-    private OrthographicCamera camera;
+    private ShakableCamera2D camera;
     private final Viewport viewport;
 
     private final World world;
@@ -119,8 +122,14 @@ public class GameController implements Disposable {
         this.game = game;
         this.gameScreenCallbacks = gameScreenCallbacks;
 
-        camera = new OrthographicCamera();
-        viewport = new StretchViewport(Cfg.VIEWPORT_WORLD_WIDTH_PPM, Cfg.VIEWPORT_WORLD_HEIGHT_PPM, camera);
+        camera = new ShakableCamera2D(
+                new BoundedCamera2D(
+                        new OrthographicCamera2D(),
+                        Cfg.VIEWPORT_WORLD_WIDTH_PPM / 2f,
+                        Cfg.WORLD_WIDTH_PPM - Cfg.VIEWPORT_WORLD_WIDTH_PPM / 2f,
+                        Float.MAX_VALUE, -Float.MAX_VALUE)
+        );
+        viewport = new StretchViewport(Cfg.VIEWPORT_WORLD_WIDTH_PPM, Cfg.VIEWPORT_WORLD_HEIGHT_PPM, camera.getGdxCamera());
 
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
@@ -205,7 +214,7 @@ public class GameController implements Disposable {
             gameTime += delta;
             handleInput();
             player.update(delta);
-            updateCamera();
+            updateCamera(delta);
             updateBombEmitter(delta);
 
             float criticalHealthRatio = player.getCriticalHealthRatio();
@@ -280,6 +289,10 @@ public class GameController implements Disposable {
 
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
+
+                float shakeTime = camera.getGdxCamera().frustum.pointInFrustum(bombPosition.x, bombPosition.y, 0)
+                        ? 1f : 0.5f;
+                camera.shake(shakeTime);
             }
         }
 
@@ -293,19 +306,12 @@ public class GameController implements Disposable {
         }
     }
 
-    private void updateCamera() {
-        camera.position.x = camera.position.x - (camera.position.x - player.getPosition().x) * 0.1f;
-        camera.position.y = camera.position.y - (camera.position.y - player.getPosition().y + viewport.getWorldHeight() * 0.075f) * 0.166f;
-
-        // check camera in bounds (X)
-        if (camera.position.x - viewport.getWorldWidth() / 2 < 0) {
-            camera.position.x = viewport.getWorldWidth() / 2;
-        } else if (camera.position.x + viewport.getWorldWidth() / 2 > Cfg.WORLD_WIDTH_PPM) {
-            camera.position.x = Cfg.WORLD_WIDTH_PPM - viewport.getWorldWidth() / 2;
-            camera.position.x = Cfg.WORLD_WIDTH_PPM - viewport.getWorldWidth() / 2;
-        }
-
-        camera.update();
+    private void updateCamera(float delta) {
+        Vector2 position = camera.getPosition();
+        position.x -= (position.x - player.getPosition().x) * 0.1f;
+        position.y -= (position.y - player.getPosition().y + viewport.getWorldHeight() * 0.075f) * 0.166f;
+        camera.setPosition(position);
+        camera.update(delta);
     }
 
     private void handleInput() {
@@ -352,7 +358,7 @@ public class GameController implements Disposable {
             Output output = new Output(new FileOutputStream(file));
             output.writeFloat(gameTime);
             kryo.writeObject(output, state);
-            kryo.writeObject(output, camera.position);
+            kryo.writeObject(output, camera.getPosition());
             kryo.writeObject(output, player);
             kryo.writeObject(output, ground);
             kryo.writeObject(output, activeBlastEffects);
@@ -375,7 +381,7 @@ public class GameController implements Disposable {
                     new FileInputStream(file));
             gameTime = input.readFloat();
             state = kryo.readObject(input, GameObjectState.class);
-            camera.position.set(kryo.readObject(input, Vector3.class));
+            camera.setPosition(kryo.readObject(input, Vector2.class));
             player = kryo.readObject(input, Player.class);
             ground = kryo.readObject(input, Ground.class);
             activeBlastEffects.clear();
@@ -404,7 +410,7 @@ public class GameController implements Disposable {
         }
     }
 
-    public OrthographicCamera getCamera() {
+    public Camera2D getCamera() {
         return camera;
     }
 

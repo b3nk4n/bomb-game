@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import de.bsautermeister.bomb.core.FrameBufferManager;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.core.ScreenBase;
 
 public class TransitionContext {

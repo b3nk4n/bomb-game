@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.core.transition.ScreenTransition;
 import de.bsautermeister.bomb.core.transition.TransitionContext;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
@@ -19,7 +20,7 @@ public abstract class GameApp implements ApplicationListener {
     private SpriteBatch batch;
 
     private TransitionContext transitionContext;
-    private FrameBufferManager frameBufferManager;
+    private de.bsautermeister.bomb.core.graphics.FrameBufferManager frameBufferManager;
 
     private IGameServiceClient gameServiceClient;
 
@@ -32,7 +33,7 @@ public abstract class GameApp implements ApplicationListener {
         assetManager = new AssetManager();
         batch = new SpriteBatch();
 
-        frameBufferManager = new FrameBufferManager();
+        frameBufferManager = new de.bsautermeister.bomb.core.graphics.FrameBufferManager();
         transitionContext = new TransitionContext(batch, frameBufferManager);
 
         gameServiceClient.setListener(new IGameServiceListener() {
