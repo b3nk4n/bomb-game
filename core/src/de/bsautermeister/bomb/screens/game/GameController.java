@@ -163,6 +163,8 @@ public class GameController implements Disposable {
     public void initialize() {
         player = new Player(world, Cfg.PLAYER_RADIUS_PPM);
         player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
+        camera.setPosition(player.getPosition());
+
         ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
 
         state = new GameObjectState<>(GameState.PLAYING);
