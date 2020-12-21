@@ -13,7 +13,7 @@ public class AboutContent extends Table {
 
     public static final String TYPE = AboutContent.class.getSimpleName();
 
-    public static final float TEXT_ANIMATION_DURATION = 7.5f;
+    private static final float TEXT_ANIMATION_DURATION = 7.5f;
 
     private final Skin skin;
     private final Table creditContainer = new Table();
@@ -49,7 +49,6 @@ public class AboutContent extends Table {
         creditContainer.add(new Label(entry.title, skin, Styles.Label.TITLE))
                 .pad(32f)
                 .row();
-        int i = 0;
         for (String line : entry.lines) {
             creditContainer.add(new Label(line, skin, Styles.Label.DEFAULT))
                     .row();

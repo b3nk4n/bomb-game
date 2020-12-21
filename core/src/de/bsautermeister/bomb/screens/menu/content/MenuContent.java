@@ -17,7 +17,7 @@ public class MenuContent extends Table {
 
     public static final String TYPE = MenuContent.class.getSimpleName();
 
-    private static float DELAY_OFFSET = 0.25f;
+    private static final float DELAY_OFFSET = 0.25f;
 
     private final boolean canShowAchievements;
     private final boolean canResume;

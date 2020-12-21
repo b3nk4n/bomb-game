@@ -58,7 +58,7 @@ public class Ground {
         }
     }
 
-    public void update(float delta) {
+    public void update() {
         updateRows();
     }
 
@@ -100,6 +100,7 @@ public class Ground {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public Ground read(Kryo kryo, Input input, Class<? extends Ground> type) {
             return new Ground(
                     world,

@@ -249,7 +249,7 @@ public class GameController implements Disposable {
     }
 
     private void updateEnvironment(float delta) {
-        ground.update(delta);
+        ground.update();
 
         for (int i = bombs.size - 1; i >= 0; --i) {
             Bomb bomb = bombs.get(i);
@@ -272,7 +272,7 @@ public class GameController implements Disposable {
                 bombs.addAll(bomb.releaseBombs());
 
                 activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 2.5f));
-                explosionEffect.emit(bombPosition.x, bombPosition.y, 0.0066f * bomb.getDetonationRadius());
+                explosionEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
                 explosionSound.play(
                         MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
                         MathUtils.random(0.9f, 1.1f), 0f);
@@ -362,6 +362,7 @@ public class GameController implements Disposable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void load() {
         File file = game.getGameFile();
         if (!file.exists()) {

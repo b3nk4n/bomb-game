@@ -5,15 +5,11 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.utils.Logger;
 
-import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Player;
 
 public class WorldContactListener implements ContactListener {
-
-    private static final Logger LOG = new Logger(WorldContactListener.class.getSimpleName(), Cfg.LOG_LEVEL);
 
     @Override
     public void beginContact(Contact contact) {

@@ -24,7 +24,6 @@ import de.bsautermeister.bomb.utils.GdxUtils;
 public class LoadingScreen extends ScreenBase {
     private static final Logger LOG = new Logger(LoadingScreen.class.getSimpleName(), Cfg.LOG_LEVEL);
 
-    private Viewport viewport;
     private Stage stage;
 
     private Image logo;
@@ -33,7 +32,6 @@ public class LoadingScreen extends ScreenBase {
     private Image loadingBg;
 
     private float startX, endX;
-    private float percent;
 
     private Actor loadingBar;
 
@@ -47,7 +45,7 @@ public class LoadingScreen extends ScreenBase {
 
     @Override
     public void show() {
-        viewport = new FitViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+        Viewport viewport = new FitViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
         // Tell the manager to load assets for the loading screen
         getAssetManager().load(Assets.Atlas.LOADING);
@@ -123,7 +121,7 @@ public class LoadingScreen extends ScreenBase {
         // Clear the screen
         GdxUtils.clearScreen(Color.BLACK);
 
-        percent = MathUtils.round(getAssetManager().getProgress() * 100) / 100f;
+        float percent = MathUtils.round(getAssetManager().getProgress() * 100) / 100f;
 
         // Update positions (and size) to match the percentage
         loadingBarHidden.setX(startX + endX * percent);

@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.effects;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class ManagedPooledEffect {
@@ -30,14 +31,14 @@ public class ManagedPooledEffect {
         }
     }
 
-    public void emit(float x, float y) {
-        emit(x, y, 1f);
+    public void emit(Vector2 position) {
+        emit(position, 1f);
     }
 
-    public void emit(float x, float y, float scaleFactor) {
+    public void emit(Vector2 position, float scaleFactor) {
         ParticleEffectPool.PooledEffect effect = effectPool.obtain();
         effect.scaleEffect(scaleFactor);
-        effect.setPosition(x, y);
+        effect.setPosition(position.x, position.y);
         effect.start();
         activeEffects.add(effect);
     }

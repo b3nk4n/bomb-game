@@ -19,12 +19,12 @@ public class FragmentData {
     private final boolean[][] gridData;
 
     public FragmentData(int resolution, float size) {
-        this(size, createFilledArray(resolution, true));
+        this(size, createInitialArray(resolution));
     }
 
-    private static boolean[][] createFilledArray(int resolution, boolean value) {
+    private static boolean[][] createInitialArray(int resolution) {
         boolean[][] data = new boolean[resolution][resolution];
-        ArrayUtils.fill2D(data, value);
+        ArrayUtils.fill2D(data, true);
         return data;
     }
 
@@ -108,9 +108,9 @@ public class FragmentData {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < gridData.length; ++i) {
+        for (boolean[] gridDatum : gridData) {
             for (int j = 0; j < gridData[0].length; ++j) {
-                sb.append(gridData[i][j] ? 'X' : '-');
+                sb.append(gridDatum[j] ? 'X' : '-');
             }
             sb.append('\n');
         }

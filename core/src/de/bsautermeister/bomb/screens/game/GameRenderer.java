@@ -64,7 +64,6 @@ public class GameRenderer implements Disposable {
 
     private final ShaderProgram blastShader;
 
-    private final Skin skin;
     private final GameHud hud;
     private final Overlays<GameState> overlays;
 
@@ -93,7 +92,7 @@ public class GameRenderer implements Disposable {
 
         uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
-        skin = assetManager.get(Assets.Skins.UI);
+        Skin skin = assetManager.get(Assets.Skins.UI);
 
         hud = new GameHud(assetManager, uiViewport, batch);
         overlays = new Overlays<>(uiViewport, batch, 0x000000BB);

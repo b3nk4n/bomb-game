@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
-import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.screens.game.GameScreen;
@@ -41,7 +39,6 @@ public class MenuScreen extends ScreenBase {
     public MenuScreen(GameApp game, String contentType) {
         super(game);
         this.uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
-        TextureAtlas atlas = getAssetManager().get(Assets.Atlas.GAME);
         this.initialContentType = contentType;
     }
 
@@ -65,7 +62,7 @@ public class MenuScreen extends ScreenBase {
         stage.addActor(newContent);
     }
 
-    private final Table createContent(String contentType) {
+    private Table createContent(String contentType) {
         if (MenuContent.TYPE.equals(contentType)) {
             return createMainContent();
         } else if (AboutContent.TYPE.equals(contentType)) {

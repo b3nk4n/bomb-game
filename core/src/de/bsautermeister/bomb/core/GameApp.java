@@ -11,7 +11,6 @@ import de.bsautermeister.bomb.core.transition.ScreenTransition;
 import de.bsautermeister.bomb.core.transition.TransitionContext;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
-import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 public abstract class GameApp implements ApplicationListener {
     private static final Logger LOG = new Logger(GameApp.class.getSimpleName(), Cfg.LOG_LEVEL);
@@ -62,10 +61,6 @@ public abstract class GameApp implements ApplicationListener {
 
     public void setScreen(ScreenBase screen, ScreenTransition transition) {
         transitionContext.setScreen(screen, transition);
-    }
-
-    public ScreenBase getScreen() {
-        return transitionContext.getScreen();
     }
 
     @Override
