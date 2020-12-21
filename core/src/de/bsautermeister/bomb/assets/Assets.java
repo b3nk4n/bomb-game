@@ -51,6 +51,8 @@ public interface Assets {
     interface Sounds {
         AssetDescriptor<Sound> EXPLOSION =
                 new AssetDescriptor<>("sounds/explosion.wav", Sound.class);
+        AssetDescriptor<Sound> HEARTBEAT =
+                new AssetDescriptor<>("sounds/heartbeat.wav", Sound.class);
     }
 
     AssetDescriptor[] ALL = {
@@ -58,6 +60,7 @@ public interface Assets {
             Skins.UI,
             ShaderPrograms.BLAST,
             Effects.EXPLOSION,
-            Sounds.EXPLOSION
+            Sounds.EXPLOSION,
+            Sounds.HEARTBEAT
     };
 }

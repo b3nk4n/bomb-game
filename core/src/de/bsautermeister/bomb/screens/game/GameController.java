@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -83,6 +84,9 @@ public class GameController implements Disposable {
 
     private final Sound explosionSound;
 
+    private long heartbeatSoundId = -1;
+    private final Sound heartbeatSound;
+
     private final GameScreenCallbacks gameScreenCallbacks;
 
     private final PauseOverlay.Callback pauseCallback = new PauseOverlay.Callback() {
@@ -126,7 +130,9 @@ public class GameController implements Disposable {
 
         ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
         explosionEffect = new ManagedPooledEffect(explosion);
+
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
+        heartbeatSound = assetManager.get(Assets.Sounds.HEARTBEAT);
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
@@ -201,6 +207,18 @@ public class GameController implements Disposable {
             player.update(delta);
             updateCamera();
             updateBombEmitter(delta);
+
+            if (player.getLifeRatio() < 0.2f) {
+                float volume = Interpolation.pow5Out.apply(1f - player.getLifeRatio() * (1f / 0.2f));
+                if (heartbeatSoundId == -1) {
+                    heartbeatSoundId = heartbeatSound.loop(volume);
+                } else {
+                    heartbeatSound.setVolume(heartbeatSoundId, volume);
+                }
+            } else if (heartbeatSoundId != -1) {
+                heartbeatSound.stop(heartbeatSoundId);
+                heartbeatSoundId = -1;
+            }
         }
 
         updateEnvironment(delta);
@@ -258,6 +276,7 @@ public class GameController implements Disposable {
                 explosionSound.play(
                         MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
                         MathUtils.random(0.9f, 1.1f), 0f);
+
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
             }
