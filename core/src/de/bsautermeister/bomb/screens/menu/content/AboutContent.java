@@ -29,6 +29,7 @@ public class AboutContent extends Table {
         credits = new CreditEntry[] {
                 new CreditEntry("Developer", "Benjamin Sautermeister"),
                 new CreditEntry("SFX", "Benjamin Sautermeister", "Denis Chardonnet"),
+                new CreditEntry("Effects", "Benjamin Sautermeister", "Existical"),
                 new CreditEntry("Music", "TBD"),
         };
 

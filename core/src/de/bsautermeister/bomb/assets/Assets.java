@@ -28,6 +28,9 @@ public interface Assets {
         public static AssetDescriptor<ShaderProgram> BLAST =
                 new AssetDescriptor<>("shader/blast.frag", ShaderProgram.class,
                         usingDefaultVertexShader());
+        public static AssetDescriptor<ShaderProgram> BLUR =
+                new AssetDescriptor<>("shader/blur.frag", ShaderProgram.class,
+                        usingDefaultVertexShader());
 
         private static ShaderProgramLoader.ShaderProgramParameter usingDefaultVertexShader() {
             ShaderProgramLoader.ShaderProgramParameter params = new ShaderProgramLoader.ShaderProgramParameter();
@@ -57,9 +60,8 @@ public interface Assets {
     AssetDescriptor[] ALL = {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
-            ShaderPrograms.BLAST,
+            ShaderPrograms.BLAST, ShaderPrograms.BLUR,
             Effects.EXPLOSION,
-            Sounds.EXPLOSION,
-            Sounds.HEARTBEAT
+            Sounds.EXPLOSION, Sounds.HEARTBEAT
     };
 }

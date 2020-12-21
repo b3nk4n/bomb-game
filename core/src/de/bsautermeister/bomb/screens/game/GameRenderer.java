@@ -15,6 +15,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -63,6 +65,7 @@ public class GameRenderer implements Disposable {
     private final TextureRegion groundRegion;
 
     private final ShaderProgram blastShader;
+    private final ShaderProgram blurShader;
 
     private final GameHud hud;
     private final Overlays<GameState> overlays;
@@ -102,6 +105,7 @@ public class GameRenderer implements Disposable {
                 new GameOverOverlay(skin, controller.getGameOverCallback()));
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
+        blurShader = assetManager.get(Assets.ShaderPrograms.BLUR);
     }
 
     private final Vector3 tmpBlastProjection = new Vector3();
@@ -158,9 +162,14 @@ public class GameRenderer implements Disposable {
             frameBufferManager.end();
         }
 
-        batch.setShader(null);
-
         batch.begin();
+        float criticalHealthRatio = controller.getPlayer().getCriticalHealthRatio();
+        if (criticalHealthRatio > 0f) {
+            batch.setShader(blurShader);
+            blurShader.setUniformf("u_radius", Interpolation.smooth.apply(0f, 0.01f, criticalHealthRatio));
+        } else {
+            batch.setShader(null);
+        }
         fbIdx = ++fbIdx % frameBuffers.length;
         Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
         GdxUtils.clearScreen();
@@ -168,6 +177,7 @@ public class GameRenderer implements Disposable {
                 camera.position.x - camera.viewportWidth / 2, camera.position.y - camera.viewportHeight / 2, camera.viewportWidth, camera.viewportHeight,
                 0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
         batch.end();
+        batch.setShader(null);
 
         if (Cfg.DEBUG_MODE) {
             box2DRenderer.render(controller.getWorld(), camera.combined);

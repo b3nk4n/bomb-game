@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
     int LOG_LEVEL = Logger.DEBUG;
-    boolean DEBUG_MODE = true;
+    boolean DEBUG_MODE = false;
 
     String SAVE_GAME_FILE = "save.bin";
 
@@ -29,6 +29,6 @@ public interface Cfg {
     float WORLD_WIDTH_PPM = GROUND_FRAGMENT_SIZE_PPM * GROUND_FRAGMENTS_NUM_COLS;
 
     float PLAYER_RADIUS_PPM = 1.25f / Cfg.PPM;
-    float PLAYER_SELF_HEALING_PER_SECOND = 0.01f;
+    float PLAYER_SELF_HEALING_PER_SECOND = 0.015f;
     Vector2 PLAYER_START_POSITION = new Vector2(VIEWPORT_WORLD_WIDTH_PPM, 5f / Cfg.PPM);
 }

@@ -26,6 +26,8 @@ import de.bsautermeister.bomb.utils.PhysicsUtils;
 public class Player {
     private final static Logger LOG = new Logger(Player.class.getSimpleName(), Cfg.LOG_LEVEL);
 
+    public static final float CRITICAL_HEALTH_THRESHOLD = 0.33f;
+
     private World world;
     private Body ballBody;
     private Body fixedSensorBody;
@@ -183,6 +185,14 @@ public class Player {
 
     public float getLifeRatio() {
         return lifeRatio;
+    }
+
+    public float getCriticalHealthRatio() {
+        if (lifeRatio > CRITICAL_HEALTH_THRESHOLD) {
+            return 0f;
+        } else {
+            return MathUtils.clamp(1f - lifeRatio * 1 / CRITICAL_HEALTH_THRESHOLD, 0f, 1f);
+        }
     }
 
     public boolean isDead() {

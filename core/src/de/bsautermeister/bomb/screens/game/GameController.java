@@ -208,8 +208,9 @@ public class GameController implements Disposable {
             updateCamera();
             updateBombEmitter(delta);
 
-            if (player.getLifeRatio() < 0.2f) {
-                float volume = Interpolation.pow5Out.apply(1f - player.getLifeRatio() * (1f / 0.2f));
+            float criticalHealthRatio = player.getCriticalHealthRatio();
+            if (criticalHealthRatio > 0f) {
+                float volume = Interpolation.pow5Out.apply(criticalHealthRatio);
                 if (heartbeatSoundId == -1) {
                     heartbeatSoundId = heartbeatSound.loop(volume);
                 } else {
