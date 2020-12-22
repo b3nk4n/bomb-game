@@ -10,7 +10,7 @@ import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.title = "Downfall";
+		config.title = "The Downfall";
 		config.width = Cfg.WINDOW_WIDTH;
 		config.height = Cfg.WINDOW_HEIGHT;
 

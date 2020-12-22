@@ -40,7 +40,7 @@ public class MenuContent extends Table {
         defaults()
                 .pad(8f);
 
-        Label title = new Label("Downfall", skin, Styles.Label.TITLE);
+        Label title = new Label("The Downfall", skin, Styles.Label.TITLE);
         add(title)
                 .pad(8f)
                 .row();
