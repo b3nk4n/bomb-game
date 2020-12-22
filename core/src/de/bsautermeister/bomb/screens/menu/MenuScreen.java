@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.assets.Assets;
+import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.screens.game.GameScreen;
@@ -50,6 +52,13 @@ public class MenuScreen extends ScreenBase {
         setContent(createContent(initialContentType));
 
         Gdx.input.setCatchKey(Input.Keys.BACK, true);
+
+        BombGame game = (BombGame) getGame();
+        if (!game.getMusicPlayer().isSelected(Assets.Music.MENU_SONG)) {
+            game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.MENU_SONG, 46.5f);
+            game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
+            game.getMusicPlayer().playFromBeginning();
+        }
     }
 
     private void setContent(Table newContent) {

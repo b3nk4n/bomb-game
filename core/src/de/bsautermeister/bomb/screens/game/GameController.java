@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
+import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
 import de.bsautermeister.bomb.core.GameObjectState;
@@ -158,16 +159,45 @@ public class GameController implements Disposable {
         kryo.register(ClusterBomb.class, new ClusterBomb.KryoSerializer(world));
         kryo.register(ClusterFragmentBomb.class, new ClusterFragmentBomb.KryoSerializer(world));
         kryo.register(BounceStickyBomb.class, new BounceStickyBomb.KryoSerializer(world));
+        kryo.register(GameObjectState.class, new GameObjectState.KryoSerializer());
     }
 
     public void initialize() {
-        player = new Player(world, Cfg.PLAYER_RADIUS_PPM);
-        player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
-        camera.setPosition(player.getPosition());
+        if (player == null) {
+            player = new Player(world, Cfg.PLAYER_RADIUS_PPM);
+            player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
+            camera.setPosition(player.getPosition());
+        }
 
-        ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+        if (ground == null) {
+            ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+        }
 
-        state = new GameObjectState<>(GameState.PLAYING);
+        if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
+            game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.GAME_SONG, 85f);
+            game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
+            game.getMusicPlayer().playFromBeginning();
+        }
+
+        if (state == null) {
+            state = new GameObjectState<>(GameState.PLAYING);
+        }
+        state.setStateCallback(new GameObjectState.StateCallback<GameState>() {
+            @Override
+            public void changed(GameState previousState, GameState newState) {
+                if (newState == GameState.PAUSED) {
+                    game.getMusicPlayer().setVolume(0.1f, false);
+                }
+                if (previousState == GameState.PAUSED && newState == GameState.PLAYING) {
+                    game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, false);
+                }
+                if (newState == GameState.GAME_OVER) {
+                    game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.MENU_SONG, 46.5f);
+                    game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
+                    game.getMusicPlayer().playFromBeginning();
+                }
+            }
+        });
     }
 
     private void createWorldBoundsBodies(World world) {
@@ -208,6 +238,8 @@ public class GameController implements Disposable {
             return;
         }
 
+        handlePauseInput();
+
         if (state.is(GameState.PAUSED)) {
             return;
         }
@@ -220,6 +252,7 @@ public class GameController implements Disposable {
             updateBombEmitter(delta);
 
             float criticalHealthRatio = player.getCriticalHealthRatio();
+            float musicVolume;
             if (criticalHealthRatio > 0f) {
                 float volume = Interpolation.pow5Out.apply(criticalHealthRatio);
                 if (heartbeatSoundId == -1) {
@@ -227,10 +260,15 @@ public class GameController implements Disposable {
                 } else {
                     heartbeatSound.setVolume(heartbeatSoundId, volume);
                 }
-            } else if (heartbeatSoundId != -1) {
-                heartbeatSound.stop(heartbeatSoundId);
-                heartbeatSoundId = -1;
+                musicVolume = Interpolation.pow5Out.apply(MusicPlayer.MAX_VOLUME, 0.1f, criticalHealthRatio);
+            } else {
+                if (heartbeatSoundId != -1) {
+                    heartbeatSound.stop(heartbeatSoundId);
+                    heartbeatSoundId = -1;
+                }
+                musicVolume = MusicPlayer.MAX_VOLUME;
             }
+            game.getMusicPlayer().setVolume(musicVolume, false);
         }
 
         updateEnvironment(delta);
@@ -317,8 +355,6 @@ public class GameController implements Disposable {
     }
 
     private void handleInput() {
-        handlePauseInput();
-
         boolean upPressed = Gdx.input.isKeyPressed(Input.Keys.UP);
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
@@ -365,6 +401,7 @@ public class GameController implements Disposable {
             kryo.writeObject(output, ground);
             kryo.writeObject(output, activeBlastEffects);
             kryo.writeObject(output, bombs);
+            game.getMusicPlayer().write(kryo, output);
             output.close();
         } catch (Exception e) {
             LOG.error("Failed to save game.", e);
@@ -390,6 +427,7 @@ public class GameController implements Disposable {
             activeBlastEffects.addAll(kryo.readObject(input, Array.class));
             bombs.clear();
             bombs.addAll(kryo.readObject(input, Array.class));
+            game.getMusicPlayer().read(kryo, input);
             input.close();
         } catch (FileNotFoundException e) {
             LOG.error("Failed to load game.", e);
@@ -399,6 +437,8 @@ public class GameController implements Disposable {
         if (!file.delete()) {
             LOG.error("Failed to delete saved game.");
         }
+
+        initialize();
     }
 
     @Override
@@ -410,6 +450,10 @@ public class GameController implements Disposable {
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             state.set(GameState.PAUSED);
         }
+    }
+
+    public float getGameTime() {
+        return gameTime;
     }
 
     public Camera2D getCamera() {

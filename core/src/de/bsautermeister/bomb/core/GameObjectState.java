@@ -1,5 +1,12 @@
 package de.bsautermeister.bomb.core;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Serializer;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
+import de.bsautermeister.bomb.screens.game.GameState;
+
 public class GameObjectState<T extends Enum<T>> {
 
     public interface StateCallback<T> {
@@ -11,10 +18,6 @@ public class GameObjectState<T extends Enum<T>> {
     private float stateTimer;
     private StateCallback<T> stateCallback;
     private boolean frozen;
-
-    public GameObjectState() {
-        // for Kryo
-    }
 
     public GameObjectState(T initialState) {
         current = initialState;
@@ -103,5 +106,25 @@ public class GameObjectState<T extends Enum<T>> {
                 ", stateCallback=" + stateCallback +
                 ", frozen=" + frozen +
                 '}';
+    }
+
+    public static class KryoSerializer extends Serializer<GameObjectState> {
+        @Override
+        public void write(Kryo kryo, Output output, GameObjectState object) {
+            output.writeString(object.current.name());
+            output.writeString(object.previous.name());
+            output.writeFloat(object.stateTimer);
+            output.writeBoolean(object.frozen);
+        }
+
+        @Override
+        public GameObjectState read(Kryo kryo, Input input, Class<? extends GameObjectState> type) {
+            GameState currentState = GameState.valueOf(input.readString());
+            GameObjectState state = new GameObjectState<>(currentState);
+            state.previous = GameState.valueOf(input.readString());
+            state.stateTimer = input.readFloat();
+            state.frozen = input.readBoolean();
+            return state;
+        }
     }
 }

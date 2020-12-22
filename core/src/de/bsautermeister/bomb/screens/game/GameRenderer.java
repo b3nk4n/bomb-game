@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -169,7 +170,8 @@ public class GameRenderer implements Disposable {
         if (criticalHealthRatio > 0f) {
             batch.setShader(blurShader);
             blurShader.setUniformf("u_radius", Interpolation.smooth.apply(0f, 0.01f, criticalHealthRatio));
-            float otherColorRatio = 1f - criticalHealthRatio / 2f;
+            float tintFactor = Math.abs(MathUtils.sin(controller.getGameTime() * MathUtils.PI));
+            float otherColorRatio = 1f - criticalHealthRatio / 2f * tintFactor;
             batch.setColor(1f, otherColorRatio, otherColorRatio, 1f);
         } else {
             batch.setShader(null);

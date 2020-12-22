@@ -25,10 +25,10 @@ public class MenuContent extends Table {
 
     public MenuContent(AssetManager assetManager, Callbacks callbacks,
                        boolean canResume, boolean canShowAchievements) {
-        initialize(assetManager);
         this.canResume = canResume;
         this.canShowAchievements = canShowAchievements;
         this.callbacks = callbacks;
+        initialize(assetManager);
     }
 
     private void initialize(AssetManager assetManager) {
@@ -40,7 +40,7 @@ public class MenuContent extends Table {
         defaults()
                 .pad(8f);
 
-        Label title = new Label("Bombageddon", skin, Styles.Label.TITLE);
+        Label title = new Label("Downfall", skin, Styles.Label.TITLE);
         add(title)
                 .pad(8f)
                 .row();

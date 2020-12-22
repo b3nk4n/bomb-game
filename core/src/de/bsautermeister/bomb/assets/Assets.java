@@ -57,6 +57,11 @@ public interface Assets {
                 new AssetDescriptor<>("sounds/heartbeat.wav", Sound.class);
     }
 
+    interface Music {
+        String MENU_SONG = "sounds/menu-song.mp3";
+        String GAME_SONG = "sounds/game-song.mp3";
+    }
+
     AssetDescriptor[] ALL = {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
