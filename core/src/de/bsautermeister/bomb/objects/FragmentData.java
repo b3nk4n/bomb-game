@@ -125,7 +125,7 @@ public class FragmentData {
         }
 
         @Override
-        public FragmentData read(Kryo kryo, Input input, Class<? extends FragmentData> type) {
+        public FragmentData read(Kryo kryo, Input input, Class<FragmentData> type) {
             return new FragmentData(
                     input.readFloat(),
                     kryo.readObject(input, boolean[][].class));

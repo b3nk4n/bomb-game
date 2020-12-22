@@ -137,7 +137,7 @@ public class StickyBomb extends Bomb {
         }
 
         @Override
-        public StickyBomb read(Kryo kryo, Input input, Class<? extends StickyBomb> type) {
+        public StickyBomb read(Kryo kryo, Input input, Class<StickyBomb> type) {
             StickyBomb bomb = new StickyBomb(
                     world,
                     input.readFloat(),

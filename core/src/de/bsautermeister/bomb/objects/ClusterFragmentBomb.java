@@ -100,7 +100,7 @@ public class ClusterFragmentBomb extends Bomb {
         }
 
         @Override
-        public ClusterFragmentBomb read(Kryo kryo, Input input, Class<? extends ClusterFragmentBomb> type) {
+        public ClusterFragmentBomb read(Kryo kryo, Input input, Class<ClusterFragmentBomb> type) {
             ClusterFragmentBomb bomb = new ClusterFragmentBomb(
                     world,
                     input.readFloat(),

@@ -112,7 +112,7 @@ public class TimedBomb extends Bomb {
         }
 
         @Override
-        public TimedBomb read(Kryo kryo, Input input, Class<? extends TimedBomb> type) {
+        public TimedBomb read(Kryo kryo, Input input, Class<TimedBomb> type) {
             TimedBomb bomb = new TimedBomb(
                     world,
                     input.readFloat(),

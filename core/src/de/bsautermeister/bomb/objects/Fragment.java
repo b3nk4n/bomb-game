@@ -165,7 +165,7 @@ public class Fragment {
         }
 
         @Override
-        public Fragment read(Kryo kryo, Input input, Class<? extends Fragment> type) {
+        public Fragment read(Kryo kryo, Input input, Class<Fragment> type) {
             return new Fragment(
                     world,
                     input.readFloat(),

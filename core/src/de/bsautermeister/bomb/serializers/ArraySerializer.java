@@ -42,7 +42,7 @@ public class ArraySerializer extends Serializer<Array> {
     }
 
     @Override
-    public Array read(Kryo kryo, Input input, Class<? extends Array> type) {
+    public Array read(Kryo kryo, Input input, Class<Array> type) {
         Array array = new Array();
         kryo.reference(array);
         int length = input.readInt(true);

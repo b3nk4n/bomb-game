@@ -118,7 +118,7 @@ public class GameObjectState<T extends Enum<T>> {
         }
 
         @Override
-        public GameObjectState read(Kryo kryo, Input input, Class<? extends GameObjectState> type) {
+        public GameObjectState read(Kryo kryo, Input input, Class<GameObjectState> type) {
             GameState currentState = GameState.valueOf(input.readString());
             GameObjectState state = new GameObjectState<>(currentState);
             state.previous = GameState.valueOf(input.readString());

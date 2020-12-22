@@ -148,7 +148,7 @@ public class BounceStickyBomb extends Bomb {
         }
 
         @Override
-        public BounceStickyBomb read(Kryo kryo, Input input, Class<? extends BounceStickyBomb> type) {
+        public BounceStickyBomb read(Kryo kryo, Input input, Class<BounceStickyBomb> type) {
             BounceStickyBomb bomb = new BounceStickyBomb(
                     world,
                     input.readFloat(),

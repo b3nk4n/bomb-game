@@ -225,7 +225,7 @@ public class Player {
         }
 
         @Override
-        public Player read(Kryo kryo, Input input, Class<? extends Player> type) {
+        public Player read(Kryo kryo, Input input, Class<Player> type) {
             Player player = new Player(world, input.readFloat());
             player.ballBody.setTransform(kryo.readObject(input, Vector2.class), input.readFloat());
             player.ballBody.setLinearVelocity(kryo.readObject(input, Vector2.class));

@@ -50,7 +50,7 @@ public class BlastInstance {
         }
 
         @Override
-        public BlastInstance read(Kryo kryo, Input input, Class<? extends BlastInstance> type) {
+        public BlastInstance read(Kryo kryo, Input input, Class<BlastInstance> type) {
             BlastInstance blastInstance = new BlastInstance(
                     kryo.readObject(input, Vector2.class),
                     input.readFloat(),

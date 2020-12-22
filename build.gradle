@@ -87,7 +87,7 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:1.0.2"
 
-        implementation "com.esotericsoftware:kryo:5.0.2"
+        implementation "com.esotericsoftware:kryo:4.0.2"
     }
 }
 

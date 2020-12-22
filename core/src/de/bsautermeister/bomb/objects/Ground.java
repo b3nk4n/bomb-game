@@ -101,7 +101,7 @@ public class Ground {
 
         @Override
         @SuppressWarnings("unchecked")
-        public Ground read(Kryo kryo, Input input, Class<? extends Ground> type) {
+        public Ground read(Kryo kryo, Input input, Class<Ground> type) {
             return new Ground(
                     world,
                     input.readInt(),
