@@ -288,7 +288,7 @@ public class GameController implements Disposable {
     }
 
     private void emitBomb() {
-        Bomb bomb = bombFactory.createBounceStickyBomb();
+        Bomb bomb = bombFactory.createRandomBomb();
         Vector2 position = new Vector2(
                 MathUtils.random(bomb.getBodyRadius() / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bomb.getBodyRadius() / Cfg.PPM),
                 20f / Cfg.PPM

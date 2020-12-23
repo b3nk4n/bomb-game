@@ -1,89 +1,26 @@
 
 game.png
-size: 128,64
+size: 64,64
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-ball
-  rotate: false
-  xy: 4, 8
-  size: 16, 16
-  orig: 16, 16
-  offset: 0, 0
-  index: -1
 block_ground
   rotate: false
-  xy: 40, 44
+  xy: 4, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 block_surface
   rotate: false
-  xy: 60, 44
+  xy: 4, 4
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-bomb
-  rotate: false
-  xy: 24, 16
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 0
-bomb
-  rotate: false
-  xy: 24, 4
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 1
-bomb
-  rotate: false
-  xy: 40, 32
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 2
-bomb
-  rotate: false
-  xy: 80, 52
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 3
-bomb
-  rotate: false
-  xy: 52, 32
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 4
-bomb
-  rotate: false
-  xy: 92, 52
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 5
-bomb
-  rotate: false
-  xy: 64, 32
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 6
-bomb
-  rotate: false
-  xy: 104, 52
-  size: 8, 8
-  orig: 8, 8
-  offset: 0, 0
-  index: 7
 particle
   rotate: false
-  xy: 4, 28
+  xy: 4, 24
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

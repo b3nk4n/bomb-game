@@ -6,7 +6,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -15,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -32,25 +32,25 @@ import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
+import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
 import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
-import de.bsautermeister.bomb.objects.BounceStickyBomb;
-import de.bsautermeister.bomb.objects.ClusterBomb;
-import de.bsautermeister.bomb.objects.ClusterFragmentBomb;
 import de.bsautermeister.bomb.objects.Fragment;
 import de.bsautermeister.bomb.objects.Ground;
 import de.bsautermeister.bomb.objects.Player;
-import de.bsautermeister.bomb.objects.StickyBomb;
-import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.utils.GdxUtils;
+import de.bsautermeister.bomb.utils.PolygonUtils;
 
 public class GameRenderer implements Disposable {
 
-    private final static short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
+    private static final Color BACKGROUND_COLOR = new Color(0.7f, 0f, 0f, 1f);
+    private static final short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
+    private static final float[] POLYGON_BUFFER = new float[64];
+    private static final float POLYGON_ZOOM = 1.1f;
 
     private final Viewport uiViewport;
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch();
@@ -60,13 +60,13 @@ public class GameRenderer implements Disposable {
     private final GameController controller;
     private final Box2DDebugRenderer box2DRenderer;
 
-    private final TextureRegion ballRegion;
-    private final Array<TextureAtlas.AtlasRegion> bombRegions;
     private final TextureRegion surfaceRegion;
     private final TextureRegion groundRegion;
 
     private final ShaderProgram blastShader;
     private final ShaderProgram blurShader;
+
+    private final ShapeRenderer shapeRenderer;
 
     private final GameHud hud;
     private final Overlays<GameState> overlays;
@@ -76,6 +76,8 @@ public class GameRenderer implements Disposable {
         this.batch = batch;
         this.controller = controller;
         this.frameBufferManager = frameBufferManager;
+
+        shapeRenderer = new ExtendedShapeRenderer();
 
         frameBuffers = new FrameBuffer[2];
         for (int i = 0; i < frameBuffers.length; ++i) {
@@ -91,8 +93,6 @@ public class GameRenderer implements Disposable {
         TextureAtlas atlas =  assetManager.get(Assets.Atlas.GAME);
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
         groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
-        ballRegion = atlas.findRegion(RegionNames.Game.BALL);
-        bombRegions = atlas.findRegions(RegionNames.Game.BOMB);
 
         uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
 
@@ -118,15 +118,19 @@ public class GameRenderer implements Disposable {
         int fbIdx = 0;
         frameBufferManager.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
-        GdxUtils.clearScreen();
+        GdxUtils.clearScreen(BACKGROUND_COLOR);
+
+        shapeRenderer.setProjectionMatrix(controller.getCamera().getGdxCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        renderBall(shapeRenderer, controller.getPlayer());
+        renderBombs(shapeRenderer, controller.getBombs());
+
+        shapeRenderer.end();
 
         batch.setProjectionMatrix(camera.getGdxCamera().combined);
         batch.begin();
-
-        renderBall(batch);
-        renderBombs(batch);
         controller.getExplosionEffect().draw(batch);
-
         batch.end();
 
         polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);
@@ -199,45 +203,32 @@ public class GameRenderer implements Disposable {
         overlays.render(batch);
     }
 
-    private void renderBall(Batch batch) {
-        Player player = controller.getPlayer();
+    private static void renderBall(ShapeRenderer renderer, Player player) {
         if (!player.isDead()) {
             Vector2 position = player.getPosition();
-            float radius = player.getRadius();
-            batch.draw(ballRegion,
-                    position.x - radius, position.y - radius,
-                    radius, radius,
-                    radius * 2f, radius * 2f,
-                    1f, 1f, player.getRotation());
+            float radius = player.getRadius() * POLYGON_ZOOM;
+            renderer.setColor(Color.WHITE);
+            int count = PolygonUtils.polygon(POLYGON_BUFFER, radius, 9, position, player.getRotation());
+            renderer.polygon(POLYGON_BUFFER, 0, count);
         }
     }
 
-    private void renderBombs(Batch batch) {
-        for (Bomb bomb : controller.getBombs()) {
+    private static void renderBombs(ShapeRenderer renderer, Array<Bomb> bombs) {
+        for (Bomb bomb : bombs) {
             Vector2 position = bomb.getPosition();
-            float radius = bomb.getBodyRadius();
-            batch.draw(getTexture(bomb),
-                    position.x - radius, position.y - radius,
-                    radius, radius,
-                    radius * 2f, radius * 2f,
-                    1f, 1f, bomb.getRotation());
+            float radius = bomb.getBodyRadius() * POLYGON_ZOOM;
+            if (!bomb.isFlashing()) {
+                renderer.setColor(Color.BLACK);
+            } else {
+                renderer.setColor(Color.WHITE);
+            }
+            int count = PolygonUtils.polygon(POLYGON_BUFFER, radius, bomb.getBodySegments(), position, bomb.getRotation());
+            renderer.polygon(POLYGON_BUFFER, 0, count);
+            if (bomb.isSticky()) {
+                count = PolygonUtils.spikes(POLYGON_BUFFER, radius * 0.66f, radius * 1.33f, bomb.getBodySegments(), position, bomb.getRotation());
+                renderer.polygon(POLYGON_BUFFER, 0, count);
+            }
         }
-    }
-
-    private TextureRegion getTexture(Bomb bomb) {
-        if (bomb instanceof ClusterBomb) {
-            return bombRegions.get(bomb.isFlashing() ? 3 : 2);
-        } else if (bomb instanceof ClusterFragmentBomb) {
-            return bombRegions.get(2);
-        } else if (bomb instanceof TimedBomb) {
-            return bombRegions.get(bomb.isFlashing() ? 1 : 0);
-        } else if (bomb instanceof StickyBomb) {
-            return bombRegions.get(bomb.isFlashing() ? 5 : 4);
-        } else if (bomb instanceof BounceStickyBomb) {
-            return bombRegions.get(bomb.isFlashing() ? 7 : 6);
-        }
-
-        throw new IllegalArgumentException("The given type is not supported yet.");
     }
 
     private static Vector2 tmpVertex = new Vector2();

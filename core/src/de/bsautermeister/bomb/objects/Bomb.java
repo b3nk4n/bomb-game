@@ -3,11 +3,16 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
+import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.utils.PhysicsUtils;
+import de.bsautermeister.bomb.utils.PolygonUtils;
 
 public abstract class Bomb implements Disposable {
     private static final Bomb[] EMPTY_BOMB_RELEASE = new Bomb[0];
@@ -15,18 +20,44 @@ public abstract class Bomb implements Disposable {
     private final World world;
     private final Body body;
     private final float bodyRadius;
+    private final int bodySegments;
     private final float detonationRadius;
     private final float blastImpactStrengthFactor;
 
-    public Bomb(World world, float bodyRadius, float detonationRadius, float blastImpactStrengthFactor) {
+    public Bomb(World world, float bodyRadius, int bodySegments, float detonationRadius, float blastImpactStrengthFactor) {
         this.world = world;
         this.bodyRadius = bodyRadius;
+        this.bodySegments = bodySegments;
         this.detonationRadius = detonationRadius;
         this.blastImpactStrengthFactor = blastImpactStrengthFactor;
         this.body = createBody();
     }
 
-    protected abstract Body createBody();
+    private Body createBody() {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.linearDamping = 0.25f;
+        bodyDef.angularDamping = 0.9f;
+
+        Body body = getWorld().createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.set(PolygonUtils.createPolygon(getBodyRadius(), getBodySegments()));
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.friction = 0.8f;
+        fixtureDef.density = 10.0f;
+        fixtureDef.restitution = 0.8f;
+        fixtureDef.filter.categoryBits = Bits.BOMB;
+        fixtureDef.filter.groupIndex = 1;
+        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
+        fixtureDef.shape = shape;
+        Fixture fixture = body.createFixture(fixtureDef);
+        fixture.setUserData(this);
+        shape.dispose();
+
+        return body;
+    }
 
     public abstract void update(float delta);
 
@@ -50,6 +81,10 @@ public abstract class Bomb implements Disposable {
 
     public abstract boolean isFlashing();
 
+    public abstract boolean isTicking();
+
+    public abstract boolean isSticky();
+
     public Bomb[] releaseBombs() {
         return EMPTY_BOMB_RELEASE;
     }
@@ -71,6 +106,10 @@ public abstract class Bomb implements Disposable {
         return bodyRadius;
     }
 
+    public int getBodySegments() {
+        return bodySegments;
+    }
+
     public float getDetonationRadius() {
         return detonationRadius;
     }
@@ -80,6 +119,6 @@ public abstract class Bomb implements Disposable {
     }
 
     public float getRotation() {
-        return getBody().getAngle() * MathUtils.radiansToDegrees;
+        return getBody().getAngle();
     }
 }

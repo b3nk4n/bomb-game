@@ -1,18 +1,12 @@
 package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
-import de.bsautermeister.bomb.contact.Bits;
 
 public class ClusterFragmentBomb extends Bomb {
     /**
@@ -24,34 +18,7 @@ public class ClusterFragmentBomb extends Bomb {
     private boolean groundContact;
 
     public ClusterFragmentBomb(World world, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, detonationRadius, 0.05f);
-    }
-
-    @Override
-    protected Body createBody() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.linearDamping = 0.25f;
-        bodyDef.angularDamping = 0.9f;
-
-        Body body = getWorld().createBody(bodyDef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(getBodyRadius());
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0.8f;
-        fixtureDef.density = 10.0f;
-        fixtureDef.restitution = 0.25f;
-        fixtureDef.filter.categoryBits = Bits.BOMB;
-        fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
-        fixtureDef.shape = shape;
-        Fixture fixture = body.createFixture(fixtureDef);
-        fixture.setUserData(this);
-        shape.dispose();
-
-        return body;
+        super(world, bodyRadius, 3, detonationRadius, 0.05f);
     }
 
     @Override
@@ -77,6 +44,16 @@ public class ClusterFragmentBomb extends Bomb {
 
     @Override
     public boolean isFlashing() {
+        return false;
+    }
+
+    @Override
+    public boolean isTicking() {
+        return false;
+    }
+
+    @Override
+    public boolean isSticky() {
         return false;
     }
 

@@ -2,10 +2,7 @@ package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.JointDef;
 import com.badlogic.gdx.physics.box2d.World;
@@ -14,8 +11,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
-import de.bsautermeister.bomb.contact.Bits;
 
 public class StickyBomb extends Bomb {
     private boolean ticking;
@@ -26,36 +21,9 @@ public class StickyBomb extends Bomb {
     private Joint stickyJoint;
 
     public StickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, detonationRadius, 1f);
+        super(world, bodyRadius, 5, detonationRadius, 1f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
-    }
-
-    @Override
-    protected Body createBody() {
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.linearDamping = 0.25f;
-        bodyDef.angularDamping = 0.9f;
-
-        Body body = getWorld().createBody(bodyDef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(getBodyRadius());
-
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0.8f;
-        fixtureDef.density = 10.0f;
-        fixtureDef.restitution = 0.25f;
-        fixtureDef.filter.categoryBits = Bits.BOMB;
-        fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
-        fixtureDef.shape = shape;
-        Fixture fixture = body.createFixture(fixtureDef);
-        fixture.setUserData(this);
-        shape.dispose();
-
-        return body;
     }
 
     @Override
@@ -99,7 +67,13 @@ public class StickyBomb extends Bomb {
         }
     }
 
+    @Override
     public boolean isTicking() {
+        return ticking;
+    }
+
+    @Override
+    public boolean isSticky() {
         return ticking;
     }
 
@@ -110,9 +84,9 @@ public class StickyBomb extends Bomb {
     @Override
     public boolean isFlashing() {
         float progress = getTickingProgress();
-        return progress > 0.20f && progress <= 0.30f
-                || progress > 0.5f && progress <= 0.60f
-                || progress > 0.8f && progress <= 1f;
+        return progress > 0.20f && progress <= 0.25f
+                || progress > 0.6f && progress <= 0.65f
+                || progress > 0.9f && progress <= 1f;
     }
 
     public static class KryoSerializer extends Serializer<StickyBomb> {

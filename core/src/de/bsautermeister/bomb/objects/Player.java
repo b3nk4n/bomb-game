@@ -178,7 +178,7 @@ public class Player {
     }
 
     public float getRotation() {
-        return ballBody.getAngle() * MathUtils.radiansToDegrees;
+        return ballBody.getAngle();
     }
 
     public float getRadius() {
