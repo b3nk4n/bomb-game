@@ -134,7 +134,7 @@ public class GameController implements Disposable {
 
         world = new World(new Vector2(0, -Cfg.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
-        createWorldBoundsBodies(world);
+        createWorldBoundsWallBodies(world);
 
         bombFactory = new BombFactoryImpl(world);
 
@@ -200,26 +200,26 @@ public class GameController implements Disposable {
         });
     }
 
-    private void createWorldBoundsBodies(World world) {
+    private void createWorldBoundsWallBodies(World world) {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.1f;
         fixtureDef.restitution = 0.1f;
-        fixtureDef.filter.categoryBits = Bits.GROUND;
+        fixtureDef.filter.categoryBits = Bits.WALL;
         fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.BALL;
+        fixtureDef.filter.maskBits = Bits.OBJECTS;
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1f, 1e10f);
+        shape.setAsBox(1f, 1e7f);
         fixtureDef.shape = shape;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
-        bodyDef.position.set(-1f, 0f);
+        bodyDef.position.set(-1f, -9e6f);
         Body leftBounds = world.createBody(bodyDef);
         leftBounds.createFixture(fixtureDef);
 
-        bodyDef.position.set(Cfg.WORLD_WIDTH_PPM + 1f, 0f);
+        bodyDef.position.set(Cfg.WORLD_WIDTH_PPM + 1f, -9e6f);
         Body rightBounds = world.createBody(bodyDef);
         rightBounds.createFixture(fixtureDef);
         shape.dispose();
@@ -288,7 +288,7 @@ public class GameController implements Disposable {
     }
 
     private void emitBomb() {
-        Bomb bomb = bombFactory.createRandomBomb();
+        Bomb bomb = bombFactory.createBounceStickyBomb();
         Vector2 position = new Vector2(
                 MathUtils.random(bomb.getBodyRadius() / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bomb.getBodyRadius() / Cfg.PPM),
                 20f / Cfg.PPM

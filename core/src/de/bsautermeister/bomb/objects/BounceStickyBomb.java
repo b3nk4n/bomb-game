@@ -58,7 +58,7 @@ public class BounceStickyBomb extends Bomb {
         fixtureDef.restitution = 0.8f;
         fixtureDef.filter.categoryBits = Bits.BOMB;
         fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.GROUND;
+        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);

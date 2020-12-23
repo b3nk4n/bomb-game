@@ -68,7 +68,7 @@ public class Player {
         fixtureDef.density = 10.0f;
         fixtureDef.filter.categoryBits = Bits.BALL;
         fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.GROUND;
+        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
