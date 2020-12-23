@@ -31,6 +31,8 @@ public class ClusterFragmentBomb extends Bomb {
     protected Body createBody() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.linearDamping = 0.25f;
+        bodyDef.angularDamping = 0.9f;
 
         Body body = getWorld().createBody(bodyDef);
 
@@ -54,8 +56,6 @@ public class ClusterFragmentBomb extends Bomb {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
-
         delayToFirstContact -= delta;
     }
 

@@ -28,9 +28,7 @@ public abstract class Bomb implements Disposable {
 
     protected abstract Body createBody();
 
-    public void update(float delta) {
-        PhysicsUtils.applyAirResistance(getBody(), 0.066f);
-    }
+    public abstract void update(float delta);
 
     public void impact(Vector2 position, float radius) {
         PhysicsUtils.applyBlastImpact(getBody(), position, radius, blastImpactStrengthFactor);

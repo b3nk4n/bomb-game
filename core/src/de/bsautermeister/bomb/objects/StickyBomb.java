@@ -35,6 +35,8 @@ public class StickyBomb extends Bomb {
     protected Body createBody() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.linearDamping = 0.25f;
+        bodyDef.angularDamping = 0.9f;
 
         Body body = getWorld().createBody(bodyDef);
 
@@ -58,8 +60,6 @@ public class StickyBomb extends Bomb {
 
     @Override
     public void update(float delta) {
-        super.update(delta);
-
         if (isTicking()) {
             tickingTimer = Math.max(0f, tickingTimer - delta);
         }

@@ -55,6 +55,8 @@ public class Player {
     private Body createBody(float radius) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.linearDamping = 0.25f;
+        bodyDef.angularDamping = 0.9f;
 
         Body body = world.createBody(bodyDef);
 
@@ -128,7 +130,7 @@ public class Player {
             float lowestPositionY = -ballBody.getPosition().y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));
 
-            PhysicsUtils.applyAirResistance(ballBody, 0.066f);
+            //PhysicsUtils.applyAirResistance(ballBody, 0.5f);
         }
     }
 

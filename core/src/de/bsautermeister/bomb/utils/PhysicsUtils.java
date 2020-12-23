@@ -7,13 +7,6 @@ public final class PhysicsUtils {
 
     private PhysicsUtils() {}
 
-    public static void applyAirResistance(Body body, float strengthFactor) {
-        Vector2 velocity = body.getLinearVelocity();
-        float speed = velocity.len();
-        velocity.nor();
-        body.applyForceToCenter(velocity.scl(-strengthFactor * speed * speed), true);
-    }
-
     private static final Vector2 blastImpactDirection = new Vector2();
     public static float applyBlastImpact(Body body, Vector2 blastCenter, float blastRadius, float strengthFactor) {
         Vector2 bodyPosition = body.getPosition();
