@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.core.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -9,6 +10,13 @@ import com.badlogic.gdx.utils.ShortArray;
 
 public class ExtendedShapeRenderer extends ShapeRenderer {
     private final EarClippingTriangulator triangulator = new EarClippingTriangulator();
+
+    public ExtendedShapeRenderer() {
+    }
+
+    public ExtendedShapeRenderer(ShaderProgram defaultShader) {
+        super(5000, defaultShader);
+    }
 
     public void polygon(float[] vertices, int offset, int count) {
         ShapeType shapeType = getCurrentType();

@@ -77,8 +77,6 @@ public class GameRenderer implements Disposable {
         this.controller = controller;
         this.frameBufferManager = frameBufferManager;
 
-        shapeRenderer = new ExtendedShapeRenderer();
-
         frameBuffers = new FrameBuffer[2];
         for (int i = 0; i < frameBuffers.length; ++i) {
             frameBuffers[i] = new FrameBuffer(
@@ -107,6 +105,8 @@ public class GameRenderer implements Disposable {
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
         blurShader = assetManager.get(Assets.ShaderPrograms.BLUR);
+
+        shapeRenderer = new ExtendedShapeRenderer();
     }
 
     private final Vector3 tmpBlastProjection = new Vector3();
@@ -123,6 +123,7 @@ public class GameRenderer implements Disposable {
         shapeRenderer.setProjectionMatrix(controller.getCamera().getGdxCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
+        renderBackground(shapeRenderer, controller.getCamera()); // TODO blur background
         renderBall(shapeRenderer, controller.getPlayer());
         renderBombs(shapeRenderer, controller.getBombs());
 
@@ -201,6 +202,38 @@ public class GameRenderer implements Disposable {
         renderHud(delta);
         overlays.update(controller.getState());
         overlays.render(batch);
+    }
+
+    private static final Color CITY_FRONT_COLOR = new Color(0.4f, 0f, 0f, 1f);
+    private static final Color CITY_MID_COLOR = new Color(0.5f, 0f, 0f, 1f);
+    private static final Color CITY_BACK_COLOR = new Color(0.6f, 0f, 0f, 1f);
+    private static void renderBackground(ShapeRenderer renderer, Camera2D camera) {
+        Vector2 cameraPosition = camera.getPosition();
+
+        renderer.setColor(CITY_BACK_COLOR);
+        renderCityLayer(renderer,  cameraPosition.x * 0.6f - 10f, cameraPosition.y * 0.9f);
+
+        renderer.setColor(CITY_MID_COLOR);
+        renderCityLayer(renderer, cameraPosition.x * 0.5f, 0.5f + cameraPosition.y * 0.8f);
+
+        renderer.setColor(CITY_FRONT_COLOR);
+        renderCityLayer(renderer, cameraPosition.x * 0.4f - 5f, 1f + cameraPosition.y * 0.7f);
+    }
+
+    private static void renderCityLayer(ShapeRenderer renderer, float offsetX, float offsetY) {
+        renderer.rect(offsetX + -1f, offsetY - 100f, 2f, 103f);
+
+        renderer.rect(offsetX + 3f, offsetY - 100f, 2.5f, 105f);
+        renderer.rect(offsetX + 4.75f, offsetY - 100f, 2f, 102f);
+
+        renderer.rect(offsetX + 7f, offsetY - 100f, 2f, 103f);
+
+        renderer.rect(offsetX + 11f, offsetY - 100f, 2f, 102f);
+
+        renderer.rect(offsetX + 13f, offsetY - 100f, 2.5f, 103f);
+        renderer.rect(offsetX + 14.75f, offsetY - 100f, 2f, 102f);
+
+        renderer.rect(offsetX + 17f, offsetY - 100f, 2f, 102.5f);
     }
 
     private static void renderBall(ShapeRenderer renderer, Player player) {
