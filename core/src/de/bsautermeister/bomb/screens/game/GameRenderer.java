@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -121,25 +122,38 @@ public class GameRenderer implements Disposable {
         GdxUtils.clearScreen(BACKGROUND_COLOR);
 
         shapeRenderer.setProjectionMatrix(controller.getCamera().getGdxCamera().combined);
+        polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);
+        batch.setProjectionMatrix(camera.getGdxCamera().combined);
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-
-        renderBackground(shapeRenderer, controller.getCamera()); // TODO blur background
-        renderBall(shapeRenderer, controller.getPlayer());
-        renderBombs(shapeRenderer, controller.getBombs());
-
+        renderBackground(shapeRenderer, controller.getCamera());
         shapeRenderer.end();
 
-        batch.setProjectionMatrix(camera.getGdxCamera().combined);
+        frameBufferManager.end();
+
+        frameBufferManager.begin(frameBuffers[fbIdx]);
+        fbIdx = ++fbIdx % frameBuffers.length;
+
+        batch.begin();
+        batch.setShader(blurShader);
+        blurShader.setUniformf("u_radius", 0.01f);
+        renderFrameBufferToScreen(batch, camera, frameBuffers[fbIdx]);
+        batch.setShader(null);
+        batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderBall(shapeRenderer, controller.getPlayer());
+        renderBombs(shapeRenderer, controller.getBombs());
+        shapeRenderer.end();
+
         batch.begin();
         controller.getExplosionEffect().draw(batch);
         batch.end();
 
-        polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);
         polygonBatch.begin();
-
         renderGround(polygonBatch);
-
         polygonBatch.end();
+
         frameBufferManager.end();
 
         // set shader once before the loop, because it causes a fair amount of setup under the hood
@@ -149,6 +163,7 @@ public class GameRenderer implements Disposable {
         for (BlastInstance blast : blasts) {
             frameBufferManager.begin(frameBuffers[fbIdx]);
             fbIdx = ++fbIdx % frameBuffers.length;
+
             GdxUtils.clearScreen();
 
             batch.begin();
@@ -159,14 +174,9 @@ public class GameRenderer implements Disposable {
             blastShader.setUniformf("u_time", blast.getProgress());
             blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
             blastShader.setUniformf("u_dist_range", blast.getRadius() / 6f);
-
-            Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
-            batch.draw(sourceTexture,
-                    camera.getPosition().x - camera.getGdxCamera().viewportWidth / 2,
-                    camera.getPosition().y - camera.getGdxCamera().viewportHeight / 2,
-                    camera.getGdxCamera().viewportWidth, camera.getGdxCamera().viewportHeight,
-                    0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
+            renderFrameBufferToScreen(batch, camera, frameBuffers[fbIdx]);
             batch.end();
+
             frameBufferManager.end();
         }
 
@@ -182,13 +192,7 @@ public class GameRenderer implements Disposable {
             batch.setShader(null);
         }
         fbIdx = ++fbIdx % frameBuffers.length;
-        Texture sourceTexture = frameBuffers[fbIdx].getColorBufferTexture();
-        GdxUtils.clearScreen();
-        batch.draw(sourceTexture,
-                camera.getPosition().x - camera.getGdxCamera().viewportWidth / 2,
-                camera.getPosition().y - camera.getGdxCamera().viewportHeight / 2,
-                camera.getGdxCamera().viewportWidth, camera.getGdxCamera().viewportHeight,
-                0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
+        renderFrameBufferToScreen(batch, camera, frameBuffers[fbIdx]);
         batch.end();
         batch.setColor(Color.WHITE);
         batch.setShader(null);
@@ -202,6 +206,16 @@ public class GameRenderer implements Disposable {
         renderHud(delta);
         overlays.update(controller.getState());
         overlays.render(batch);
+    }
+
+    private static void renderFrameBufferToScreen(Batch batch, Camera2D camera, FrameBuffer frameBuffer) {
+        Texture sourceTexture = frameBuffer.getColorBufferTexture();
+        GdxUtils.clearScreen();
+        batch.draw(sourceTexture,
+                camera.getPosition().x - camera.getGdxCamera().viewportWidth / 2,
+                camera.getPosition().y - camera.getGdxCamera().viewportHeight / 2,
+                camera.getGdxCamera().viewportWidth, camera.getGdxCamera().viewportHeight,
+                0, 0, sourceTexture.getWidth(), sourceTexture.getHeight(), false, true);
     }
 
     private static final Color CITY_FRONT_COLOR = new Color(0.4f, 0f, 0f, 1f);
