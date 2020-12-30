@@ -87,7 +87,9 @@ public class GameRenderer implements Disposable {
                     false);
         }
 
-        this.box2DRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
+        this.box2DRenderer = Cfg.DEBUG_MODE
+                ? null
+                : new Box2DDebugRenderer(true, true, false, true, true, true);
 
         TextureAtlas atlas =  assetManager.get(Assets.Atlas.GAME);
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
@@ -111,6 +113,7 @@ public class GameRenderer implements Disposable {
     }
 
     private final Vector3 tmpBlastProjection = new Vector3();
+    private final float[] tmpBlastEntries = new float[64];
     public void render(float delta) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
@@ -156,26 +159,30 @@ public class GameRenderer implements Disposable {
 
         frameBufferManager.end();
 
-        // set shader once before the loop, because it causes a fair amount of setup under the hood
-        batch.setShader(blastShader);
-
         Array<BlastInstance> blasts = controller.getActiveBlastEffects();
-        for (BlastInstance blast : blasts) {
+        if (blasts.size > 0) {
+            for (int i = 0; i < blasts.size; ++i) {
+                BlastInstance blast = blasts.get(i);
+                Vector2 blastPosition = blast.getPosition();
+                tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
+                camera.getGdxCamera().project(tmpBlastProjection);
+                tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
+                tmpBlastEntries[4 * i] = tmpBlastProjection.x;
+                tmpBlastEntries[4 * i + 1] = tmpBlastProjection.y;
+                tmpBlastEntries[4 * i + 2] = blast.getProgress();
+                tmpBlastEntries[4 * i + 3] = blast.getRadius() / 6f;
+            }
+
             frameBufferManager.begin(frameBuffers[fbIdx]);
             fbIdx = ++fbIdx % frameBuffers.length;
 
-            GdxUtils.clearScreen();
-
             batch.begin();
-            Vector2 blastPosition = blast.getPosition();
-            tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
-            camera.getGdxCamera().project(tmpBlastProjection);
-            tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
-            blastShader.setUniformf("u_time", blast.getProgress());
-            blastShader.setUniformf("u_center_uv", tmpBlastProjection.x, tmpBlastProjection.y);
-            blastShader.setUniformf("u_dist_range", blast.getRadius() / 6f);
+            batch.setShader(blastShader);
+            blastShader.setUniform4fv("u_entries", tmpBlastEntries, 0, blasts.size * 4);
+            blastShader.setUniformi("u_num_entries", blasts.size);
             renderFrameBufferToScreen(batch, camera, frameBuffers[fbIdx]);
             batch.end();
+            batch.setShader(null);
 
             frameBufferManager.end();
         }

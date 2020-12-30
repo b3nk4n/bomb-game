@@ -26,7 +26,7 @@ public interface Assets {
 
     abstract class ShaderPrograms {
         public static AssetDescriptor<ShaderProgram> BLAST =
-                new AssetDescriptor<>("shader/blast.frag", ShaderProgram.class,
+                new AssetDescriptor<>("shader/multi-blast.frag", ShaderProgram.class,
                         usingDefaultVertexShader());
         public static AssetDescriptor<ShaderProgram> BLUR =
                 new AssetDescriptor<>("shader/blur.frag", ShaderProgram.class,
