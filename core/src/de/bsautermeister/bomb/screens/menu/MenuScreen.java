@@ -40,7 +40,7 @@ public class MenuScreen extends ScreenBase {
 
     public MenuScreen(GameApp game, String contentType) {
         super(game);
-        this.uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+        this.uiViewport = new StretchViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
         this.initialContentType = contentType;
     }
 

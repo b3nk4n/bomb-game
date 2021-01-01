@@ -48,7 +48,6 @@ import de.bsautermeister.bomb.utils.PolygonUtils;
 
 public class GameRenderer implements Disposable {
 
-    private static final Color BACKGROUND_COLOR = new Color(0.7f, 0f, 0f, 1f);
     private static final short[] TRIANGULATION_IDENTITY = new short[] { 2, 1, 0 };
     private static final float[] POLYGON_BUFFER = new float[64];
     private static final float POLYGON_ZOOM = 1.1f;
@@ -95,7 +94,7 @@ public class GameRenderer implements Disposable {
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);
         groundRegion = atlas.findRegion(RegionNames.Game.BLOCK_GROUND);
 
-        uiViewport = new StretchViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+        uiViewport = new StretchViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
 
         Skin skin = assetManager.get(Assets.Skins.UI);
 
@@ -122,7 +121,7 @@ public class GameRenderer implements Disposable {
         int fbIdx = 0;
         frameBufferManager.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
-        GdxUtils.clearScreen(BACKGROUND_COLOR);
+        GdxUtils.clearScreen(Cfg.Colors.DARK_RED);
 
         shapeRenderer.setProjectionMatrix(controller.getCamera().getGdxCamera().combined);
         polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);

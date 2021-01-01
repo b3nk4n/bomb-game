@@ -60,7 +60,7 @@ public class Overlays<T extends Enum> {
             }
             overlayStage.act();
             batch.begin();
-            batch.draw(backgroundRegion, 0f, 0f, Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+            batch.draw(backgroundRegion, 0f, 0f, Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
             batch.end();
             overlayStage.draw();
         }

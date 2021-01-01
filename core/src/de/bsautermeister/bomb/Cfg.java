@@ -1,34 +1,46 @@
 package de.bsautermeister.bomb;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
+
     int LOG_LEVEL = Logger.DEBUG;
     boolean DEBUG_MODE = false;
-
     String SAVE_GAME_FILE = "save.bin";
 
-    float PPM = 5f;
+    interface World {
+        float GRAVITY = 9.81f;
+        float PPM = 5f;
+        float WIDTH_PPM = Ground.FRAGMENT_SIZE_PPM * Ground.FRAGMENTS_NUM_COLS;
+        float VIEWPORT_HEIGHT_PPM = 41f / PPM;
+        float VIEWPORT_WIDTH_PPM = 64f / PPM;
+    }
 
-    float VIEWPORT_WORLD_WIDTH_PPM = 64f / Cfg.PPM;
-    float VIEWPORT_WORLD_HEIGHT_PPM = 41f / Cfg.PPM;
+    interface Ui {
+        float WIDTH = 1280;
+        float HEIGHT = 720;
+    }
 
-    float UI_WIDTH = 1280;
-    float UI_HEIGHT = 720;
+    interface Window {
+        int WIDTH = 1280;
+        int HEIGHT = 720;
+    }
 
-    int WINDOW_WIDTH = 1280;
-    int WINDOW_HEIGHT = 720;
+    interface Ground {
+        float FRAGMENT_SIZE_PPM = 5f / World.PPM;
+        int FRAGMENTS_NUM_COLS = 20;
+        int FRAGMENTS_NUM_COMPLETE_ROWS = 6;
+    }
 
-    float GRAVITY = 9.81f;
+    interface Player {
+        float RADIUS_PPM = 1.25f / World.PPM;
+        float SELF_HEALING_PER_SECOND = 0.015f;
+        Vector2 START_POSITION = new Vector2(World.VIEWPORT_WIDTH_PPM, 5f / World.PPM);
+    }
 
-    float GROUND_FRAGMENT_SIZE_PPM = 5f / Cfg.PPM;
-    int GROUND_FRAGMENTS_NUM_COLS = 20;
-    int GROUND_FRAGMENTS_NUM_COMPLETE_ROWS = 6;
-
-    float WORLD_WIDTH_PPM = GROUND_FRAGMENT_SIZE_PPM * GROUND_FRAGMENTS_NUM_COLS;
-
-    float PLAYER_RADIUS_PPM = 1.25f / Cfg.PPM;
-    float PLAYER_SELF_HEALING_PER_SECOND = 0.015f;
-    Vector2 PLAYER_START_POSITION = new Vector2(VIEWPORT_WORLD_WIDTH_PPM, 5f / Cfg.PPM);
+    interface Colors {
+        Color DARK_RED = new Color(0.7f, 0f, 0f, 1f);
+    }
 }

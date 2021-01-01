@@ -125,7 +125,7 @@ public class Player {
 
     public void update(float delta) {
         if (!isDead()) {
-            lifeRatio = Math.min(1f, lifeRatio + Cfg.PLAYER_SELF_HEALING_PER_SECOND * delta);
+            lifeRatio = Math.min(1f, lifeRatio + Cfg.Player.SELF_HEALING_PER_SECOND * delta);
 
             float lowestPositionY = -ballBody.getPosition().y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));

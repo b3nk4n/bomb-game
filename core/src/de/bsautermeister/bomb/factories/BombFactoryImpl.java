@@ -42,7 +42,7 @@ public class BombFactoryImpl implements BombFactory {
         float detonationRadius = bodyRadius * 15;
         float tickingTime = MathUtils.random(2f, 5f);
 
-        return new TimedBomb(world, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM);
+        return new TimedBomb(world, tickingTime, bodyRadius / Cfg.World.PPM, detonationRadius / Cfg.World.PPM);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BombFactoryImpl implements BombFactory {
         float detonationRadius = bodyRadius * 15;
         float tickingTime = MathUtils.random(2f, 5f);
 
-        return new ClusterBomb(world, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM);
+        return new ClusterBomb(world, tickingTime, bodyRadius / Cfg.World.PPM, detonationRadius / Cfg.World.PPM);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class BombFactoryImpl implements BombFactory {
         float detonationRadius = bodyRadius * 15;
         float tickingTime = MathUtils.random(2f, 5f);
 
-        return new StickyBomb(world, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM);
+        return new StickyBomb(world, tickingTime, bodyRadius / Cfg.World.PPM, detonationRadius / Cfg.World.PPM);
     }
 
     @Override
@@ -69,6 +69,6 @@ public class BombFactoryImpl implements BombFactory {
         float detonationRadius = bodyRadius * 15;
         float tickingTime = MathUtils.random(2f, 5f);
 
-        return new BounceStickyBomb(world, tickingTime, bodyRadius / Cfg.PPM, detonationRadius / Cfg.PPM);
+        return new BounceStickyBomb(world, tickingTime, bodyRadius / Cfg.World.PPM, detonationRadius / Cfg.World.PPM);
     }
 }

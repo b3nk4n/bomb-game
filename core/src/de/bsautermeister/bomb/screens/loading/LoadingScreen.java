@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
@@ -33,7 +32,7 @@ public class LoadingScreen extends ScreenBase {
 
     private float startX, endX;
 
-    private Actor loadingBar;
+    private LoadingBar loadingBar;
 
     private float remainingTimeWhenFullyLoaded = 0.25f;
 
@@ -45,7 +44,7 @@ public class LoadingScreen extends ScreenBase {
 
     @Override
     public void show() {
-        Viewport viewport = new FitViewport(Cfg.UI_WIDTH, Cfg.UI_HEIGHT);
+        Viewport viewport = new FitViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
 
         // Tell the manager to load assets for the loading screen
         getAssetManager().load(Assets.Atlas.LOADING);
@@ -68,6 +67,7 @@ public class LoadingScreen extends ScreenBase {
         Animation anim = new Animation<>(0.05f, atlas.findRegions(RegionNames.Loading.LOADING_ANIMATION));
         anim.setPlayMode(Animation.PlayMode.LOOP);
         loadingBar = new LoadingBar(anim);
+        loadingBar.setTintColor(Cfg.Colors.DARK_RED);
 
         // Add all the actors to the stage
         stage.addActor(loadingBar);

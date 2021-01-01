@@ -126,13 +126,13 @@ public class GameController implements Disposable {
         camera = new ShakableCamera2D(
                 new BoundedCamera2D(
                         new OrthographicCamera2D(),
-                        Cfg.VIEWPORT_WORLD_WIDTH_PPM / 2f,
-                        Cfg.WORLD_WIDTH_PPM - Cfg.VIEWPORT_WORLD_WIDTH_PPM / 2f,
+                        Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
+                        Cfg.World.WIDTH_PPM - Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
                         Float.MAX_VALUE, -Float.MAX_VALUE)
         );
-        viewport = new StretchViewport(Cfg.VIEWPORT_WORLD_WIDTH_PPM, Cfg.VIEWPORT_WORLD_HEIGHT_PPM, camera.getGdxCamera());
+        viewport = new StretchViewport(Cfg.World.VIEWPORT_WIDTH_PPM, Cfg.World.VIEWPORT_HEIGHT_PPM, camera.getGdxCamera());
 
-        world = new World(new Vector2(0, -Cfg.GRAVITY), true);
+        world = new World(new Vector2(0, -Cfg.World.GRAVITY), true);
         world.setContactListener(new WorldContactListener());
         createWorldBoundsWallBodies(world);
 
@@ -164,13 +164,13 @@ public class GameController implements Disposable {
 
     public void initialize() {
         if (player == null) {
-            player = new Player(world, Cfg.PLAYER_RADIUS_PPM);
-            player.setTransform(Cfg.PLAYER_START_POSITION, 0f);
+            player = new Player(world, Cfg.Player.RADIUS_PPM);
+            player.setTransform(Cfg.Player.START_POSITION, 0f);
             camera.setPosition(player.getPosition());
         }
 
         if (ground == null) {
-            ground = new Ground(world, Cfg.GROUND_FRAGMENTS_NUM_COLS, Cfg.GROUND_FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.GROUND_FRAGMENT_SIZE_PPM);
+            ground = new Ground(world, Cfg.Ground.FRAGMENTS_NUM_COLS, Cfg.Ground.FRAGMENTS_NUM_COMPLETE_ROWS, Cfg.Ground.FRAGMENT_SIZE_PPM);
         }
 
         if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
@@ -219,7 +219,7 @@ public class GameController implements Disposable {
         Body leftBounds = world.createBody(bodyDef);
         leftBounds.createFixture(fixtureDef);
 
-        bodyDef.position.set(Cfg.WORLD_WIDTH_PPM + 1f, -9e6f);
+        bodyDef.position.set(Cfg.World.WIDTH_PPM + 1f, -9e6f);
         Body rightBounds = world.createBody(bodyDef);
         rightBounds.createFixture(fixtureDef);
         shape.dispose();
@@ -290,8 +290,8 @@ public class GameController implements Disposable {
     private void emitBomb() {
         Bomb bomb = bombFactory.createRandomBomb();
         Vector2 position = new Vector2(
-                MathUtils.random(bomb.getBodyRadius() / Cfg.PPM, Cfg.WORLD_WIDTH_PPM - bomb.getBodyRadius() / Cfg.PPM),
-                20f / Cfg.PPM
+                MathUtils.random(bomb.getBodyRadius() / Cfg.World.PPM, Cfg.World.WIDTH_PPM - bomb.getBodyRadius() / Cfg.World.PPM),
+                20f / Cfg.World.PPM
         );
         float angleRad = MathUtils.random(0, MathUtils.PI2);
         bomb.setTransform(position, angleRad);

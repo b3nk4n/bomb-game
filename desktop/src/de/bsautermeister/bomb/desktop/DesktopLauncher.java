@@ -11,8 +11,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "The Downfall";
-		config.width = Cfg.WINDOW_WIDTH;
-		config.height = Cfg.WINDOW_HEIGHT;
+		config.width = Cfg.Window.WIDTH;
+		config.height = Cfg.Window.HEIGHT;
 
 		new LwjglApplication(new BombGame(new NoGameServiceClient()), config);
 	}
