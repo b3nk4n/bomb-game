@@ -336,8 +336,13 @@ public class GameController implements Disposable {
 
                 activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 2.5f));
                 explosionEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
+
+                float explosionVolume = camera.isInView(bombPosition)
+                        ? MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f)
+                        : MathUtils.clamp(bomb.getDetonationRadius() / 8, 0f, 1f);
+
                 explosionSound.play(
-                        MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f),
+                        explosionVolume,
                         MathUtils.random(0.9f, 1.1f), 0f);
 
                 bomb.dispose();
