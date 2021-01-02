@@ -376,8 +376,8 @@ public class GameController implements Disposable {
 
     private void updateCamera(float delta) {
         Vector2 position = camera.getPosition();
-        position.x -= (position.x - player.getPosition().x) * 0.1f;
-        position.y -= (position.y - player.getPosition().y + viewport.getWorldHeight() * 0.075f) * 0.166f;
+        position.x -= (position.x - player.getPosition().x) * 0.0666f;
+        position.y -= (position.y - player.getPosition().y) * 0.1f;
         camera.setPosition(position);
         camera.update(delta);
     }
