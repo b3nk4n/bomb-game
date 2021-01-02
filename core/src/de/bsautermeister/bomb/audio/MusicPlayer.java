@@ -19,8 +19,10 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
     private final static float VOLUME_CHANGE_IN_SECONDS = 2.0f;
     public final static float MAX_VOLUME = 0.25f;
 
+    private float masterVolume = 1.0f;
     private float currentVolume = 0.0f;
     private float targetVolume = MAX_VOLUME;
+
     private Music music;
     private String selectedFilePath;
 
@@ -54,7 +56,7 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
                 }
             }
 
-            music.setVolume(currentVolume);
+            music.setVolume(currentVolume * masterVolume);
 
             if (smoothLoopPosition <= music.getPosition()) {
                 selectSmoothLoopedMusic(selectedFilePath, smoothLoopPosition);
@@ -66,7 +68,7 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
             for (Music fadeOutMusic : fadeOutAndDisposeQueue) {
                 float newVolume = fadeOutMusic.getVolume() - delta;
                 if (newVolume > 0) {
-                    fadeOutMusic.setVolume(newVolume);
+                    fadeOutMusic.setVolume(newVolume * masterVolume);
                 } else {
                     fadeOutMusic.dispose();
                     fadeOutAndDisposeQueue.removeValue(fadeOutMusic, true);
@@ -127,6 +129,10 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
 
         fadeOutAndDisposeQueue.add(music);
         music = null;
+    }
+
+    public void setMasterVolume(float masterVolume) {
+        this.masterVolume = masterVolume;
     }
 
     public void setVolume(float volume, boolean immediate) {

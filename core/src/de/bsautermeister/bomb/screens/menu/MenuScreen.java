@@ -84,6 +84,7 @@ public class MenuScreen extends ScreenBase {
     private Table createMainContent() {
         return new MenuContent(
                 getAssetManager(),
+                ((BombGame) getGame()).getGameSettings(),
                 new MenuContent.Callbacks() {
                     @Override
                     public void playClicked() {

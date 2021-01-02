@@ -1,6 +1,7 @@
 package de.bsautermeister.bomb;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Interpolation;
 
 import java.io.File;
 
@@ -12,6 +13,7 @@ import de.golfgl.gdxgamesvcs.IGameServiceClient;
 
 public class BombGame extends GameApp {
 
+	private GameSettings gameSettings;
 	private GameStats gameStats;
 	private MusicPlayer musicPlayer;
 
@@ -23,6 +25,7 @@ public class BombGame extends GameApp {
 	public void create () {
 		super.create();
 		Gdx.app.setLogLevel(Cfg.LOG_LEVEL);
+		gameSettings = new GameSettings();
 		gameStats = new GameStats();
 		musicPlayer = new MusicPlayer();
 
@@ -32,6 +35,8 @@ public class BombGame extends GameApp {
 	@Override
 	public void render() {
 		super.render();
+		musicPlayer.setMasterVolume(
+				Interpolation.slowFast.apply(gameSettings.getMusicVolumeLevel() * 0.3333333f));
 		musicPlayer.update(Gdx.graphics.getDeltaTime());
 	}
 
@@ -57,6 +62,10 @@ public class BombGame extends GameApp {
 
 	public File getGameFile() {
 		return new File(Gdx.files.getLocalStoragePath() + "/" + Cfg.SAVE_GAME_FILE);
+	}
+
+	public GameSettings getGameSettings() {
+		return gameSettings;
 	}
 
 	public GameStats getGameStats() {

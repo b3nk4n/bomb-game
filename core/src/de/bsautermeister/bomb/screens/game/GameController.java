@@ -323,7 +323,17 @@ public class GameController implements Disposable {
                 ground.impact(bombPosition, bomb.getDetonationRadius());
 
                 if (player.impact(bombPosition, bomb.getDetonationRadius())) {
-                    state.set(GameState.GAME_OVER);
+                    int vibrationMillis;
+                    if (player.isDead()) {
+                        state.set(GameState.GAME_OVER);
+                        vibrationMillis = 500;
+                    } else {
+                        vibrationMillis = 250;
+                    }
+
+                    if (game.getGameSettings().getVibration()) {
+                        Gdx.input.vibrate(vibrationMillis);
+                    }
                 }
 
                 for (Bomb otherBomb : bombs) {

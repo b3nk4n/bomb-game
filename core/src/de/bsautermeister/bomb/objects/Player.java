@@ -142,18 +142,17 @@ public class Player {
         Vector2 bodyPosition = ballBody.getPosition();
         impactCircle.set(position, radius);
         playerCircle.set(bodyPosition, getRadius());
-        if (Intersector.overlaps(impactCircle, playerCircle)) {
+        boolean hasImpact = Intersector.overlaps(impactCircle, playerCircle);
+        if (hasImpact) {
             float damage = -1f / radius * blastDistance + 1.5f;
             lifeRatio = Math.max(0f, lifeRatio - damage);
             LOG.debug("Applied damage: " + damage);
-        }
 
-        if (isDead()) {
-            ballBody.setActive(false);
-            return true;
+            if (isDead()) {
+                ballBody.setActive(false);
+            }
         }
-
-        return false;
+        return hasImpact;
     }
 
     public void setTransform(Vector2 position, float angle) {
