@@ -17,7 +17,7 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
     private static final Logger LOG = new Logger(MusicPlayer.class.getSimpleName(), Cfg.LOG_LEVEL);
 
     private final static float VOLUME_CHANGE_IN_SECONDS = 2.0f;
-    public final static float MAX_VOLUME = 0.33f;
+    public final static float MAX_VOLUME = 0.25f;
 
     private float currentVolume = 0.0f;
     private float targetVolume = MAX_VOLUME;

@@ -177,6 +177,10 @@ public class Player {
         return ballBody.getPosition();
     }
 
+    public Vector2 getLinearVelocity () {
+        return ballBody.getLinearVelocity();
+    }
+
     public float getRotation() {
         return ballBody.getAngle();
     }

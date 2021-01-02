@@ -45,6 +45,7 @@ public class StickyBomb extends Bomb {
 
     @Override
     public void beginContact(Fixture otherFixture) {
+        super.beginContact(otherFixture);
         ticking = true;
 
         if (stickyJoint == null) {
@@ -57,6 +58,8 @@ public class StickyBomb extends Bomb {
 
     @Override
     public void endContact(Fixture otherFixture) {
+        super.endContact(otherFixture);
+
         if (stickyJoint == null) return;
 
         Body otherBody = otherFixture.getBody();

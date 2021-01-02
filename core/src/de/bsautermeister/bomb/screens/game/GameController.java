@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -87,9 +88,9 @@ public class GameController implements Disposable {
     private final ManagedPooledEffect explosionEffect;
 
     private final Sound explosionSound;
-
     private long heartbeatSoundId = -1;
     private final Sound heartbeatSound;
+    private final Sound hitSound;
 
     private final GameScreenCallbacks gameScreenCallbacks;
 
@@ -133,7 +134,18 @@ public class GameController implements Disposable {
         viewport = new StretchViewport(Cfg.World.VIEWPORT_WIDTH_PPM, Cfg.World.VIEWPORT_HEIGHT_PPM, camera.getGdxCamera());
 
         world = new World(new Vector2(0, -Cfg.World.GRAVITY), true);
-        world.setContactListener(new WorldContactListener());
+
+        ContactListener contactListener = new WorldContactListener(new WorldContactListener.Callbacks() {
+            @Override
+            public void hitGround(Bomb bomb, float strength) {
+                Vector2 bombPosition = bomb.getPosition();
+                float volume = camera.isInView(bombPosition)
+                        ? strength * 0.5f : strength * 0.1f;
+                hitSound.play(volume);
+            }
+        });
+
+        world.setContactListener(contactListener);
         createWorldBoundsWallBodies(world);
 
         bombFactory = new BombFactoryImpl(world);
@@ -143,6 +155,7 @@ public class GameController implements Disposable {
 
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
         heartbeatSound = assetManager.get(Assets.Sounds.HEARTBEAT);
+        hitSound = assetManager.get(Assets.Sounds.HIT);
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
@@ -330,7 +343,7 @@ public class GameController implements Disposable {
                 bomb.dispose();
                 bombs.removeValue(bomb, true);
 
-                float shakeTime = camera.getGdxCamera().frustum.pointInFrustum(bombPosition.x, bombPosition.y, 0)
+                float shakeTime = camera.isInView(bombPosition)
                         ? 1f : 0.5f;
                 camera.shake(shakeTime);
             }

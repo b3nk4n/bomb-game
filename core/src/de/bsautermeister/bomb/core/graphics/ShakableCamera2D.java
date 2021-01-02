@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
-public class ShakableCamera2D implements Camera2D {
+public class ShakableCamera2D extends Camera2D {
 
     private final Camera2D camera;
 

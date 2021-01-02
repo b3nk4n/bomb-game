@@ -3,7 +3,7 @@ package de.bsautermeister.bomb.core.graphics;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 
-public class BoundedCamera2D implements Camera2D {
+public class BoundedCamera2D extends Camera2D {
 
     private final float boundsLeft;
     private final float boundsRight;

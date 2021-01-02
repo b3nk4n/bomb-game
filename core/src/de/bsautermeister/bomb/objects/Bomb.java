@@ -1,6 +1,5 @@
 package de.bsautermeister.bomb.objects;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -23,6 +22,8 @@ public abstract class Bomb implements Disposable {
     private final int bodySegments;
     private final float detonationRadius;
     private final float blastImpactStrengthFactor;
+
+    private int contactCounter;
 
     public Bomb(World world, float bodyRadius, int bodySegments, float detonationRadius, float blastImpactStrengthFactor) {
         this.world = world;
@@ -73,9 +74,17 @@ public abstract class Bomb implements Disposable {
         body.setLinearVelocity(velocity);
     }
 
-    public abstract void beginContact(Fixture otherFixture);
+    public void beginContact(Fixture otherFixture) {
+        contactCounter++;
+    }
 
-    public abstract void endContact(Fixture otherFixture);
+    public void endContact(Fixture otherFixture) {
+        contactCounter--;
+    }
+
+    public boolean hasContact() {
+        return contactCounter > 0;
+    }
 
     public abstract boolean doExplode();
 
@@ -116,6 +125,10 @@ public abstract class Bomb implements Disposable {
 
     public Vector2 getPosition() {
         return getBody().getPosition();
+    }
+
+    public Vector2 getLinearVelocity() {
+        return getBody().getLinearVelocity();
     }
 
     public float getRotation() {

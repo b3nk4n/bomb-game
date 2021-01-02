@@ -51,6 +51,7 @@ public class BounceStickyBomb extends Bomb {
 
     @Override
     public void beginContact(Fixture otherFixture) {
+        super.beginContact(otherFixture);
         ticking = true;
 
         if (stickyJoint == null && stickyTimer <= 0f) {
@@ -63,6 +64,7 @@ public class BounceStickyBomb extends Bomb {
 
     @Override
     public void endContact(Fixture otherFixture) {
+        super.endContact(otherFixture);
         if (stickyJoint == null) return;
 
         Body otherBody = otherFixture.getBody();

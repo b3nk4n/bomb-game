@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 
-public class OrthographicCamera2D implements Camera2D {
+public class OrthographicCamera2D extends Camera2D {
 
     private final OrthographicCamera camera = new OrthographicCamera();
 

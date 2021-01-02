@@ -33,12 +33,13 @@ public class TimedBomb extends Bomb {
 
     @Override
     public void beginContact(Fixture otherFixture) {
+        super.beginContact(otherFixture);
         ticking = true;
     }
 
     @Override
     public void endContact(Fixture otherFixture) {
-
+        super.endContact(otherFixture);
     }
 
     @Override
