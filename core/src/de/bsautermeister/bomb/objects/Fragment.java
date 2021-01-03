@@ -18,12 +18,12 @@ import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
+import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
 
 public class Fragment {
 
     private static final float EPSILON = 1e-5f;
-    private static final int RESOLUTION = 8;
     private static final EarClippingTriangulator TRIANGULATOR = new EarClippingTriangulator();
 
     private final World world;
@@ -33,7 +33,7 @@ public class Fragment {
     private Body body;
 
     public Fragment(World world, float leftX, float bottomY, float size) {
-        this(world, leftX, bottomY, size, new FragmentData(RESOLUTION, size));
+        this(world, leftX, bottomY, size, new FragmentData(Cfg.Ground.FRAGMENT_RESOLUTION, size));
     }
 
     public Fragment(World world, float leftX, float bottomY, float size, FragmentData fragmentData) {
@@ -44,12 +44,12 @@ public class Fragment {
     }
 
     private static final Circle tmpImpactCircle = new Circle();
-    public boolean impact(Vector2 position, float radius) {
+    public int impact(float[] outRemovedVertices, int offset, Vector2 position, float radius) {
         tmpImpactCircle.set(position.x, position.y, radius);
         if (!Intersector.overlaps(tmpImpactCircle, bounds)) {
             // early stop: don't check each single fragment grid position when the impact was
             //             outside of the fragments bounds
-            return false;
+            return 0;
         }
 
         float leftX = getLeftX();
@@ -57,12 +57,13 @@ public class Fragment {
         // change to relative position used in the fragment data
         tmpImpactCircle.set(position.x - leftX, position.y - bottomY, radius);
 
-        boolean updated = fragmentData.remove(tmpImpactCircle);
-        if (updated) {
+        int removed = fragmentData.removeWithPositions(
+                outRemovedVertices, offset, leftX, bottomY, tmpImpactCircle);
+        if (removed > 0) {
             world.destroyBody(body);
             updateBody();
         }
-        return updated;
+        return removed;
     }
 
     private void updateBody() {

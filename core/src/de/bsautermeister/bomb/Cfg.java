@@ -32,6 +32,7 @@ public interface Cfg {
         float FRAGMENT_SIZE_PPM = 5f / World.PPM;
         int FRAGMENTS_NUM_COLS = 20;
         int FRAGMENTS_NUM_COMPLETE_ROWS = 6;
+        int FRAGMENT_RESOLUTION = 8;
     }
 
     interface Player {

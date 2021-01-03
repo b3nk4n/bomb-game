@@ -53,6 +53,23 @@ public class FragmentData {
         return updated;
     }
 
+    public int removeWithPositions(float[] outRemovedVertices, int offset, float leftX, float bottomY, Circle circle) {
+        int count = 0;
+        for (int i = 0; i < gridData.length; ++i) {
+            for (int j = 0; j < gridData[i].length; ++j) {
+                float x = getRelativeX(i);
+                float y = getRelativeY(j);
+                if (gridData[i][j] && circle.contains(x, y)) {
+                    gridData[i][j] = false;
+                    outRemovedVertices[offset + 2 * count] = leftX + x;
+                    outRemovedVertices[offset + 2 * count + 1] = bottomY + y;
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     /**
      * Computes the outlines clock-wise, which can result either convex or concave polygons.
      */

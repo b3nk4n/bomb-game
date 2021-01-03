@@ -43,19 +43,24 @@ public class Ground {
         this.fragments = fragments;
     }
 
-    public void impact(Vector2 position, float radius) {
+    public int impact(float[] outRemovedVertices, Vector2 position, float radius) {
+        int count = 0;
         for (int row = 0; row < fragments.size; ++row) {
             Array<Fragment> fragmentRow = fragments.get(row);
             for (int col = fragmentRow.size - 1; col >= 0; --col) {
                 Fragment fragment = fragmentRow.get(col);
-                if (fragment.impact(position, radius)) {
+                int removed = fragment.impact(outRemovedVertices, 2 * count, position, radius);
+                if (removed > 0) {
                     if (fragment.isEmpty()) {
                         fragmentRow.removeValue(fragment, true);
                     }
                     lowestRowImpacted = Math.max(lowestRowImpacted, row);
+                    count += removed;
                 }
             }
         }
+
+        return count;
     }
 
     public void update() {

@@ -86,6 +86,7 @@ public class GameController implements Disposable {
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
 
     private final ManagedPooledEffect explosionEffect;
+    private final ManagedPooledEffect explosionGlowEffect;
 
     private final Sound explosionSound;
     private long heartbeatSoundId = -1;
@@ -150,8 +151,10 @@ public class GameController implements Disposable {
 
         bombFactory = new BombFactoryImpl(world);
 
-        ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION);
+        ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION_PARTICLES);
         explosionEffect = new ManagedPooledEffect(explosion);
+        ParticleEffect explosionGlow = assetManager.get(Assets.Effects.EXPLOSION_GLOW);
+        explosionGlowEffect = new ManagedPooledEffect(explosionGlow);
 
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
         heartbeatSound = assetManager.get(Assets.Sounds.HEARTBEAT);
@@ -286,6 +289,7 @@ public class GameController implements Disposable {
 
         updateEnvironment(delta);
         explosionEffect.update(delta);
+        explosionGlowEffect.update(delta);
 
         world.step(delta, 6, 2);
     }
@@ -311,6 +315,7 @@ public class GameController implements Disposable {
         bombs.add(bomb);
     }
 
+    private static float[] outRemovedVertices = new float[32 * 2 * Cfg.Ground.FRAGMENT_RESOLUTION * Cfg.Ground.FRAGMENT_RESOLUTION];
     private void updateEnvironment(float delta) {
         ground.update();
 
@@ -320,7 +325,7 @@ public class GameController implements Disposable {
 
             if (bomb.doExplode()) {
                 Vector2 bombPosition = bomb.getPosition();
-                ground.impact(bombPosition, bomb.getDetonationRadius());
+                int removed = ground.impact(outRemovedVertices, bombPosition, bomb.getDetonationRadius());
 
                 if (player.impact(bombPosition, bomb.getDetonationRadius())) {
                     int vibrationMillis;
@@ -345,7 +350,15 @@ public class GameController implements Disposable {
                 bombs.addAll(bomb.releaseBombs());
 
                 activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 2.5f));
-                explosionEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
+                explosionGlowEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
+
+                if (removed > 0) {
+                    for (int r = 0; r < removed; ++r) {
+                        float x = outRemovedVertices[2 * r];
+                        float y = outRemovedVertices[2 * r + 1];
+                        explosionEffect.emit(x, y, 0.0066f * bomb.getDetonationRadius());
+                    }
+                }
 
                 float explosionVolume = camera.isInView(bombPosition)
                         ? MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f)
@@ -526,5 +539,9 @@ public class GameController implements Disposable {
 
     public ManagedPooledEffect getExplosionEffect() {
         return explosionEffect;
+    }
+
+    public ManagedPooledEffect getExplosionGlowEffect() {
+        return explosionGlowEffect;
     }
 }

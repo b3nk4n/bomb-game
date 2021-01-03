@@ -36,9 +36,13 @@ public class ManagedPooledEffect {
     }
 
     public void emit(Vector2 position, float scaleFactor) {
+        emit(position.x, position.y, scaleFactor);
+    }
+
+    public void emit(float x, float y, float scaleFactor) {
         ParticleEffectPool.PooledEffect effect = effectPool.obtain();
         effect.scaleEffect(scaleFactor);
-        effect.setPosition(position.x, position.y);
+        effect.setPosition(x, y);
         effect.start();
         activeEffects.add(effect);
     }

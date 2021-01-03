@@ -40,8 +40,12 @@ public interface Assets {
     }
 
     abstract class Effects {
-        public static AssetDescriptor<ParticleEffect> EXPLOSION =
-                new AssetDescriptor<>("pfx/explosion.pfx", ParticleEffect.class, usingAtlas(Atlas.GAME.fileName));
+        public static AssetDescriptor<ParticleEffect> EXPLOSION_PARTICLES =
+                new AssetDescriptor<>("pfx/explosion-particles.pfx", ParticleEffect.class,
+                        usingAtlas(Atlas.GAME.fileName));
+        public static AssetDescriptor<ParticleEffect> EXPLOSION_GLOW =
+                new AssetDescriptor<>("pfx/explosion-glow.pfx", ParticleEffect.class,
+                        usingAtlas(Atlas.GAME.fileName));
 
         private static ParticleEffectLoader.ParticleEffectParameter usingAtlas(String atlasFile) {
             ParticleEffectLoader.ParticleEffectParameter params = new ParticleEffectLoader.ParticleEffectParameter();
@@ -68,7 +72,7 @@ public interface Assets {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
             ShaderPrograms.BLAST, ShaderPrograms.BLUR,
-            Effects.EXPLOSION,
+            Effects.EXPLOSION_PARTICLES, Effects.EXPLOSION_GLOW,
             Sounds.EXPLOSION, Sounds.HEARTBEAT, Sounds.HIT
     };
 }
