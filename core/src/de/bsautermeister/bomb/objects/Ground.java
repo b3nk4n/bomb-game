@@ -30,6 +30,7 @@ public class Ground {
         this.numCompleteRows = numCompleteRows;
         this.fragments = new Array<>(1024);
         for (int r = 0; r < numCompleteRows; ++r) {
+            if (r == 2 || r == 3) continue;
             fragments.add(createRow(world, numCols, r, size));
         }
     }

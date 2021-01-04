@@ -92,7 +92,6 @@ public class WorldContactListener implements ContactListener {
     }
 
     private static float hitStrength(Vector2 objectVelocity) {
-        System.out.println(objectVelocity.len() + "  " + (objectVelocity.len() - 1) / 4f);
         return MathUtils.clamp((objectVelocity.len() - 1) / 4f, 0f, 1f);
     }
 }

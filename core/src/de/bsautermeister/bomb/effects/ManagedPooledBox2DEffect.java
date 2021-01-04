@@ -1,22 +1,20 @@
 package de.bsautermeister.bomb.effects;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-public class ManagedPooledEffect {
-    private final ParticleEffectPool effectPool;
-    private final Array<ParticleEffectPool.PooledEffect> activeEffects = new Array<>(16);
+public class ManagedPooledBox2DEffect {
+    private final ParticleEffectBox2DPool effectPool;
+    private final Array<ParticleEffectBox2DPool.PooledBox2DEffect> activeEffects = new Array<>(16);
 
-    public ManagedPooledEffect(ParticleEffect effect) {
-        effectPool = new ParticleEffectPool(effect, 8, 16);
+    public ManagedPooledBox2DEffect(ParticleEffectBox2D effect) {
+        effectPool = new ParticleEffectBox2DPool(effect, 16, 32);
     }
 
     public void update(float delta) {
         for (int i = activeEffects.size - 1; i >= 0; i--) {
-            ParticleEffectPool.PooledEffect effect = activeEffects.get(i);
+            ParticleEffectBox2DPool.PooledBox2DEffect effect = activeEffects.get(i);
             effect.update(delta);
             effect.getEmitters().get(0);
             if (effect.isComplete()) {
@@ -27,7 +25,7 @@ public class ManagedPooledEffect {
     }
 
     public void draw(Batch batch) {
-        for (ParticleEffectPool.PooledEffect effect : activeEffects) {
+        for (ParticleEffectBox2DPool.PooledBox2DEffect effect : activeEffects) {
             effect.draw(batch);
         }
     }
@@ -41,14 +39,14 @@ public class ManagedPooledEffect {
     }
 
     public void emit(float x, float y, float scaleFactor) {
-        ParticleEffectPool.PooledEffect effect = effectPool.obtain();
+        ParticleEffectBox2DPool.PooledBox2DEffect effect = effectPool.obtain();
         effect.scaleEffect(scaleFactor);
         effect.setPosition(x, y);
         effect.start();
         activeEffects.add(effect);
     }
 
-    public Array<ParticleEffectPool.PooledEffect> getActiveEffects() {
+    public Array<ParticleEffectBox2DPool.PooledBox2DEffect> getActiveEffects() {
         return activeEffects;
     }
 }

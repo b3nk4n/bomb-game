@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.screens.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryo.Kryo;
@@ -39,7 +41,9 @@ import de.bsautermeister.bomb.core.graphics.BoundedCamera2D;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.OrthographicCamera2D;
 import de.bsautermeister.bomb.core.graphics.ShakableCamera2D;
+import de.bsautermeister.bomb.effects.ManagedPooledBox2DEffect;
 import de.bsautermeister.bomb.effects.ManagedPooledEffect;
+import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
 import de.bsautermeister.bomb.factories.BombFactory;
 import de.bsautermeister.bomb.factories.BombFactoryImpl;
 import de.bsautermeister.bomb.objects.BlastInstance;
@@ -85,7 +89,7 @@ public class GameController implements Disposable {
 
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
 
-    private final ManagedPooledEffect explosionEffect;
+    @Null private ManagedPooledBox2DEffect explosionEffect;
     private final ManagedPooledEffect explosionGlowEffect;
 
     private final Sound explosionSound;
@@ -151,8 +155,16 @@ public class GameController implements Disposable {
 
         bombFactory = new BombFactoryImpl(world);
 
-        ParticleEffect explosion = assetManager.get(Assets.Effects.EXPLOSION_PARTICLES);
-        explosionEffect = new ManagedPooledEffect(explosion);
+        AssetDescriptor<ParticleEffectBox2D> explosionParticlesDescriptor = Assets.Effects.lazyExplosionParticles(world);
+        if (assetManager.isLoaded(explosionParticlesDescriptor)) {
+            // unload this effect if it already exists, because it would be associated with the
+            // previous Box2D world instance
+            assetManager.unload(explosionParticlesDescriptor.fileName);
+        }
+        assetManager.load(explosionParticlesDescriptor);
+        ParticleEffectBox2D explosion = assetManager.finishLoadingAsset(explosionParticlesDescriptor); // TODO load async
+        explosionEffect = new ManagedPooledBox2DEffect(explosion);
+
         ParticleEffect explosionGlow = assetManager.get(Assets.Effects.EXPLOSION_GLOW);
         explosionGlowEffect = new ManagedPooledEffect(explosionGlow);
 
@@ -356,7 +368,7 @@ public class GameController implements Disposable {
                     for (int r = 0; r < removed; ++r) {
                         float x = outRemovedVertices[2 * r];
                         float y = outRemovedVertices[2 * r + 1];
-                        explosionEffect.emit(x, y, 0.0066f * bomb.getDetonationRadius());
+                        explosionEffect.emit(x, y, 0.0166f);
                     }
                 }
 
@@ -537,7 +549,7 @@ public class GameController implements Disposable {
         return gameOverCallback;
     }
 
-    public ManagedPooledEffect getExplosionEffect() {
+    public ManagedPooledBox2DEffect getExplosionEffect() {
         return explosionEffect;
     }
 

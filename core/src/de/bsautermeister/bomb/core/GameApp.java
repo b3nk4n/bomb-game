@@ -4,12 +4,15 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.core.transition.ScreenTransition;
 import de.bsautermeister.bomb.core.transition.TransitionContext;
+import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
+import de.bsautermeister.bomb.effects.ParticleEffectBox2DLoader;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 import de.golfgl.gdxgamesvcs.IGameServiceListener;
 
@@ -31,6 +34,8 @@ public abstract class GameApp implements ApplicationListener {
     @Override
     public void create() {
         assetManager = new AssetManager();
+        assetManager.setLoader(ParticleEffectBox2D.class, new ParticleEffectBox2DLoader(assetManager.getFileHandleResolver()));
+
         batch = new SpriteBatch();
 
         frameBufferManager = new de.bsautermeister.bomb.core.graphics.FrameBufferManager();

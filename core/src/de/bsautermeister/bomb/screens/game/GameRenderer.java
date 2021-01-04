@@ -87,8 +87,8 @@ public class GameRenderer implements Disposable {
         }
 
         this.box2DRenderer = Cfg.DEBUG_MODE
-                ? null
-                : new Box2DDebugRenderer(true, true, false, true, true, true);
+                ? new Box2DDebugRenderer(true, true, false, true, true, true)
+                : null;
 
         TextureAtlas atlas =  assetManager.get(Assets.Atlas.GAME);
         surfaceRegion = atlas.findRegion(RegionNames.Game.BLOCK_SURFACE);

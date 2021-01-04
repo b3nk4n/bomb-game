@@ -81,7 +81,7 @@ public class LoadingScreen extends ScreenBase {
     }
 
     private void loadAssets() {
-        for (AssetDescriptor assetDescriptor : Assets.ALL) {
+        for (AssetDescriptor assetDescriptor : Assets.PRELOAD) {
             getAssetManager().load(assetDescriptor);
         }
     }

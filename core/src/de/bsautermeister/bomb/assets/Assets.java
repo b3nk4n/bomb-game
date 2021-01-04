@@ -7,7 +7,11 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+
+import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
+import de.bsautermeister.bomb.effects.ParticleEffectBox2DLoader;
 
 public interface Assets {
     interface Atlas {
@@ -40,9 +44,17 @@ public interface Assets {
     }
 
     abstract class Effects {
-        public static AssetDescriptor<ParticleEffect> EXPLOSION_PARTICLES =
-                new AssetDescriptor<>("pfx/explosion-particles.pfx", ParticleEffect.class,
-                        usingAtlas(Atlas.GAME.fileName));
+        /**
+         * Get the asset descriptor for the box-2d explosion effect for lazy loading, which needs
+         * to be lazy loaded because the {@link World} instance is created after the loading screen,
+         * and has to be recreated for every game session.
+         * @param world The Box2D world instance
+         */
+        public static AssetDescriptor<ParticleEffectBox2D> lazyExplosionParticles(World world) {
+            return new AssetDescriptor<>("pfx/explosion-particles.pfx", ParticleEffectBox2D.class,
+                    new ParticleEffectBox2DLoader.ParticleEffectBox2DParameter(Atlas.GAME.fileName, world));
+        }
+
         public static AssetDescriptor<ParticleEffect> EXPLOSION_GLOW =
                 new AssetDescriptor<>("pfx/explosion-glow.pfx", ParticleEffect.class,
                         usingAtlas(Atlas.GAME.fileName));
@@ -68,11 +80,11 @@ public interface Assets {
         String GAME_SONG = "sounds/game-song.mp3";
     }
 
-    AssetDescriptor[] ALL = {
+    AssetDescriptor[] PRELOAD = {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
             ShaderPrograms.BLAST, ShaderPrograms.BLUR,
-            Effects.EXPLOSION_PARTICLES, Effects.EXPLOSION_GLOW,
+            Effects.EXPLOSION_GLOW,
             Sounds.EXPLOSION, Sounds.HEARTBEAT, Sounds.HIT
     };
 }

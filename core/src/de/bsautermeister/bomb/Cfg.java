@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Logger;
 public interface Cfg {
 
     int LOG_LEVEL = Logger.DEBUG;
-    boolean DEBUG_MODE = false;
+    boolean DEBUG_MODE = true;
     String SAVE_GAME_FILE = "save.bin";
 
     interface World {
