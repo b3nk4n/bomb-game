@@ -151,6 +151,7 @@ public class GameRenderer implements Disposable {
         batch.begin();
         controller.getExplosionEffect().draw(batch);
         controller.getExplosionGlowEffect().draw(batch);
+        controller.getPlayerParticlesEffect().draw(batch);
         batch.end();
 
         polygonBatch.begin();

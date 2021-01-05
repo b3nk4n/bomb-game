@@ -44,14 +44,25 @@ public interface Assets {
     }
 
     abstract class Effects {
+        public enum LazyEffect {
+            EXPLOSION_PARTICLES("pfx/explosion-particles.pfx"),
+            PLAYER_PARTICLES("pfx/player-particles.pfx");
+
+            String value;
+
+            LazyEffect(String value) {
+                this.value = value;
+            }
+        }
+
         /**
          * Get the asset descriptor for the box-2d explosion effect for lazy loading, which needs
          * to be lazy loaded because the {@link World} instance is created after the loading screen,
          * and has to be recreated for every game session.
          * @param world The Box2D world instance
          */
-        public static AssetDescriptor<ParticleEffectBox2D> lazyExplosionParticles(World world) {
-            return new AssetDescriptor<>("pfx/explosion-particles.pfx", ParticleEffectBox2D.class,
+        public static AssetDescriptor<ParticleEffectBox2D> lazyEffect(World world, LazyEffect effect) {
+            return new AssetDescriptor<>(effect.value, ParticleEffectBox2D.class,
                     new ParticleEffectBox2DLoader.ParticleEffectBox2DParameter(Atlas.GAME.fileName, world));
         }
 

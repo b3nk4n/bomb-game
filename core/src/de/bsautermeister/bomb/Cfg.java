@@ -9,6 +9,7 @@ public interface Cfg {
     int LOG_LEVEL = Logger.DEBUG;
     boolean DEBUG_MODE = false;
     String SAVE_GAME_FILE = "save.bin";
+    float GAME_OVER_DELAY = 3f;
 
     interface World {
         float GRAVITY = 9.81f;

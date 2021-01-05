@@ -57,6 +57,10 @@ public class GameObjectState<T extends Enum<T>> {
         return current == state;
     }
 
+    public boolean isAnyOf(T state1, T state2) {
+        return current == state1 || current == state2;
+    }
+
     public boolean was(T state) {
         return previous == state;
     }

@@ -19,7 +19,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryo.Kryo;
@@ -89,7 +88,8 @@ public class GameController implements Disposable {
 
     private final Array<BlastInstance> activeBlastEffects = new Array<>();
 
-    @Null private ManagedPooledBox2DEffect explosionEffect;
+    private ManagedPooledBox2DEffect explosionEffect;
+    private ManagedPooledBox2DEffect playerParticlesEffect;
     private final ManagedPooledEffect explosionGlowEffect;
 
     private final Sound explosionSound;
@@ -155,15 +155,11 @@ public class GameController implements Disposable {
 
         bombFactory = new BombFactoryImpl(world);
 
-        AssetDescriptor<ParticleEffectBox2D> explosionParticlesDescriptor = Assets.Effects.lazyExplosionParticles(world);
-        if (assetManager.isLoaded(explosionParticlesDescriptor)) {
-            // unload this effect if it already exists, because it would be associated with the
-            // previous Box2D world instance
-            assetManager.unload(explosionParticlesDescriptor.fileName);
-        }
-        assetManager.load(explosionParticlesDescriptor);
-        ParticleEffectBox2D explosion = assetManager.finishLoadingAsset(explosionParticlesDescriptor); // TODO load async
-        explosionEffect = new ManagedPooledBox2DEffect(explosion);
+        // TODO load async
+        explosionEffect = blockedLoadPooledBox2DEffect(
+                assetManager, Assets.Effects.LazyEffect.EXPLOSION_PARTICLES);
+        playerParticlesEffect = blockedLoadPooledBox2DEffect(
+                assetManager, Assets.Effects.LazyEffect.PLAYER_PARTICLES);
 
         ParticleEffect explosionGlow = assetManager.get(Assets.Effects.EXPLOSION_GLOW);
         explosionGlowEffect = new ManagedPooledEffect(explosionGlow);
@@ -188,6 +184,19 @@ public class GameController implements Disposable {
         kryo.register(ClusterFragmentBomb.class, new ClusterFragmentBomb.KryoSerializer(world));
         kryo.register(BounceStickyBomb.class, new BounceStickyBomb.KryoSerializer(world));
         kryo.register(GameObjectState.class, new GameObjectState.KryoSerializer());
+    }
+
+    private ManagedPooledBox2DEffect blockedLoadPooledBox2DEffect(AssetManager assetManager, Assets.Effects.LazyEffect lazyEffect) {
+        AssetDescriptor<ParticleEffectBox2D> explosionParticlesDescriptor = Assets.Effects.lazyEffect(
+                world, lazyEffect);
+        if (assetManager.isLoaded(explosionParticlesDescriptor)) {
+            // unload this effect if it already exists, because it would be associated with the
+            // previous Box2D world instance
+            assetManager.unload(explosionParticlesDescriptor.fileName);
+        }
+        assetManager.load(explosionParticlesDescriptor);
+        ParticleEffectBox2D effect = assetManager.finishLoadingAsset(explosionParticlesDescriptor);
+        return new ManagedPooledBox2DEffect(effect);
     }
 
     public void initialize() {
@@ -219,7 +228,7 @@ public class GameController implements Disposable {
                 if (previousState == GameState.PAUSED && newState == GameState.PLAYING) {
                     game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, false);
                 }
-                if (newState == GameState.GAME_OVER) {
+                if (newState.anyGameOver()) {
                     game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.MENU_SONG, 46.5f);
                     game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
                     game.getMusicPlayer().playFromBeginning();
@@ -254,6 +263,8 @@ public class GameController implements Disposable {
     }
 
     public void update(float delta) {
+        state.update(delta);
+
         if (markBackToMenu) {
             markBackToMenu = false;
             gameScreenCallbacks.backToMenu();
@@ -272,7 +283,7 @@ public class GameController implements Disposable {
             return;
         }
 
-        if (!state.is(GameState.GAME_OVER)) {
+        if (!state.isAnyOf(GameState.GAME_OVER, GameState.PLAYER_JUST_DIED)) {
             gameTime += delta;
             handleInput();
             player.update(delta);
@@ -299,8 +310,13 @@ public class GameController implements Disposable {
             game.getMusicPlayer().setVolume(musicVolume, false);
         }
 
+        if (state.is(GameState.PLAYER_JUST_DIED) && state.timer() > Cfg.GAME_OVER_DELAY) {
+            state.set(GameState.GAME_OVER);
+        }
+
         updateEnvironment(delta);
         explosionEffect.update(delta);
+        playerParticlesEffect.update(delta);
         explosionGlowEffect.update(delta);
 
         world.step(delta, 6, 2);
@@ -342,7 +358,8 @@ public class GameController implements Disposable {
                 if (player.impact(bombPosition, bomb.getDetonationRadius())) {
                     int vibrationMillis;
                     if (player.isDead()) {
-                        state.set(GameState.GAME_OVER);
+                        playerParticlesEffect.emit(player.getPosition(), 0.0166f);
+                        state.set(GameState.PLAYER_JUST_DIED);
                         vibrationMillis = 500;
                     } else {
                         vibrationMillis = 250;
@@ -437,7 +454,7 @@ public class GameController implements Disposable {
     }
 
     public void save() {
-        if (state.is(GameState.GAME_OVER)) {
+        if (state.isAnyOf(GameState.GAME_OVER, GameState.PLAYER_JUST_DIED)) {
             return;
         }
 
@@ -551,6 +568,10 @@ public class GameController implements Disposable {
 
     public ManagedPooledBox2DEffect getExplosionEffect() {
         return explosionEffect;
+    }
+
+    public ManagedPooledBox2DEffect getPlayerParticlesEffect() {
+        return playerParticlesEffect;
     }
 
     public ManagedPooledEffect getExplosionGlowEffect() {
