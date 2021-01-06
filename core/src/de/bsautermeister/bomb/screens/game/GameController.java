@@ -336,7 +336,7 @@ public class GameController implements Disposable {
         Bomb bomb = bombFactory.createRandomBomb();
         Vector2 position = new Vector2(
                 MathUtils.random(bomb.getBodyRadius() / Cfg.World.PPM, Cfg.World.WIDTH_PPM - bomb.getBodyRadius() / Cfg.World.PPM),
-                20f / Cfg.World.PPM
+                32f / Cfg.World.PPM
         );
         float angleRad = MathUtils.random(0, MathUtils.PI2);
         bomb.setTransform(position, angleRad);
@@ -401,7 +401,7 @@ public class GameController implements Disposable {
             BlastInstance explosionInstance = activeBlastEffects.get(i);
             explosionInstance.update(delta);
 
-            float radialImpactProgress = Interpolation.fastSlow.apply(0.25f, 1.5f, explosionInstance.getProgress());
+            float radialImpactProgress = Interpolation.fastSlow.apply(0.33f, 2f, explosionInstance.getProgress());
             if (radialImpactProgress <= 1f) {
                 float currentRadius = explosionInstance.getRadius() * radialImpactProgress;
                 int removed = ground.impact(outRemovedVertices, explosionInstance.getPosition(), currentRadius);

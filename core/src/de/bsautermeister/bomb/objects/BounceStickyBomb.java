@@ -21,7 +21,7 @@ public class BounceStickyBomb extends Bomb {
     private float stickyTimer;
 
 
-    private JointDef stickyJointDef;
+    private JointDef stickyJointRequest;
     private Joint stickyJoint;
 
     public BounceStickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
@@ -38,9 +38,9 @@ public class BounceStickyBomb extends Bomb {
             stickyTimer = Math.max(0f, stickyTimer - delta);
         }
 
-        if (stickyJointDef != null) {
-            getWorld().createJoint(stickyJointDef);
-            stickyJointDef = null;
+        if (stickyJointRequest != null) {
+            stickyJoint = getWorld().createJoint(stickyJointRequest);
+            stickyJointRequest = null;
         }
     }
 
@@ -58,20 +58,7 @@ public class BounceStickyBomb extends Bomb {
             Body otherBody = otherFixture.getBody();
             WeldJointDef jointDef = new WeldJointDef();
             jointDef.initialize(getBody(), otherBody, otherBody.getPosition());
-            stickyJointDef = jointDef;
-        }
-    }
-
-    @Override
-    public void endContact(Fixture otherFixture) {
-        super.endContact(otherFixture);
-        if (stickyJoint == null) return;
-
-        Body otherBody = otherFixture.getBody();
-        if (stickyJoint.getBodyA() == otherBody || stickyJoint.getBodyB() == otherBody) {
-            // AFAIK Box2D internally takes care of destroying the joint. Here we just want to get
-            // get rid of the dead reference.
-            stickyJoint = null;
+            stickyJointRequest = jointDef;
         }
     }
 

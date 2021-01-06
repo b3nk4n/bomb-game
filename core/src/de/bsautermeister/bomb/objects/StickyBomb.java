@@ -17,7 +17,7 @@ public class StickyBomb extends Bomb {
     private final float initialTickingTime;
     private float tickingTimer;
 
-    private JointDef stickyJointDef;
+    private JointDef stickyJointRequest;
     private Joint stickyJoint;
 
     public StickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
@@ -32,9 +32,9 @@ public class StickyBomb extends Bomb {
             tickingTimer = Math.max(0f, tickingTimer - delta);
         }
 
-        if (stickyJointDef != null) {
-            getWorld().createJoint(stickyJointDef);
-            stickyJointDef = null;
+        if (stickyJointRequest != null) {
+            stickyJoint = getWorld().createJoint(stickyJointRequest);
+            stickyJointRequest = null;
         }
     }
 
@@ -52,21 +52,7 @@ public class StickyBomb extends Bomb {
             Body otherBody = otherFixture.getBody();
             WeldJointDef jointDef = new WeldJointDef();
             jointDef.initialize(getBody(), otherBody, otherBody.getPosition());
-            stickyJointDef = jointDef;
-        }
-    }
-
-    @Override
-    public void endContact(Fixture otherFixture) {
-        super.endContact(otherFixture);
-
-        if (stickyJoint == null) return;
-
-        Body otherBody = otherFixture.getBody();
-        if (stickyJoint.getBodyA() == otherBody || stickyJoint.getBodyB() == otherBody) {
-            // AFAIK Box2D internally takes care of destroying the joint. Here we just want to get
-            // get rid of the dead reference.
-            stickyJoint = null;
+            stickyJointRequest = jointDef;
         }
     }
 
@@ -77,7 +63,7 @@ public class StickyBomb extends Bomb {
 
     @Override
     public boolean isSticky() {
-        return ticking;
+        return true;
     }
 
     public float getTickingProgress() {
