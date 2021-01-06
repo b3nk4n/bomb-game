@@ -40,8 +40,8 @@ public class Player {
     private boolean blockJumpUntilRelease;
     private int groundContacts;
 
-    private final static float CAMP_INVALIDATE_DISTANCE = 1f;
-    private final static float MAX_CAMP_TIME = 20f;
+    private final static float CAMP_INVALIDATE_DISTANCE = 0.66f;
+    private final static float MAX_CAMP_TIME = 10f;
     float previousCampPositionX;
     float campTime = 0f;
 

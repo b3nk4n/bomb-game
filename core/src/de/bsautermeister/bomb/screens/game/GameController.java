@@ -80,6 +80,8 @@ public class GameController implements Disposable {
     private final Array<Bomb> bombs = new Array<>();
 
     private final static float MIN_AIR_STRIKE_DELAY = 15f;
+    private static final Vector2 AIR_STRIKE_VELOCITY = new Vector2(2f, -6f);
+    private static final float AIR_STRIKE_ANGLE = AIR_STRIKE_VELOCITY.angleRad();
     private float airStrikeUnlockTimer = 0f;
 
     private GameObjectState<GameState> state;
@@ -87,6 +89,7 @@ public class GameController implements Disposable {
     private boolean markBackToMenu;
     private boolean markRestartGame;
 
+    private static final float BOMB_START_Y = 32f / Cfg.World.PPM;
     private static final float INITIAL_BOMB_EMIT_DELAY = 3f;
     private static final float MIN_BOMB_EMIT_DELAY = 1f;
     private float bombEmitTimer = INITIAL_BOMB_EMIT_DELAY;
@@ -333,10 +336,22 @@ public class GameController implements Disposable {
             airStrikeUnlockTimer = MIN_AIR_STRIKE_DELAY;
 
             // launch new air strike
-            emitBomb(player.getPosition().x - 1f);
-            emitBomb(player.getPosition().x);
-            emitBomb(player.getPosition().x + 1f);
+            Vector2 playerPosition = player.getPosition();
+            emitAirStrikeBomb(playerPosition.sub(1f, 0f), 0f);
+            emitAirStrikeBomb(playerPosition.add(1f, 0f), 0.75f);
+            emitAirStrikeBomb(playerPosition.add(1f, 0f), 1.5f);
         }
+    }
+
+    private void emitAirStrikeBomb(Vector2 target, float offsetY) {
+        Bomb bomb = bombFactory.createAirStrikeBomb();
+        tmpBombEmitPosition.set(
+                target.x - ((target.y - BOMB_START_Y) / AIR_STRIKE_VELOCITY.y) * AIR_STRIKE_VELOCITY.x,
+                BOMB_START_Y + offsetY
+        );
+        bomb.setTransform(tmpBombEmitPosition, AIR_STRIKE_ANGLE);
+        bomb.setLinearVelocity(AIR_STRIKE_VELOCITY);
+        bombs.add(bomb);
     }
 
     private void updateBombEmitter(float delta) {
@@ -350,15 +365,16 @@ public class GameController implements Disposable {
         }
     }
 
+    private final Vector2 tmpBombEmitPosition = new Vector2();
     private void emitBomb(float x) {
         Bomb bomb = bombFactory.createRandomBomb();
         float bodyRadiusPPM = bomb.getBodyRadius() / Cfg.World.PPM;
-        Vector2 position = new Vector2(
+        tmpBombEmitPosition.set(
                 MathUtils.clamp(x, bodyRadiusPPM, Cfg.World.WIDTH_PPM - bodyRadiusPPM),
-                32f / Cfg.World.PPM
+                BOMB_START_Y
         );
         float angleRad = MathUtils.random(0, MathUtils.PI2);
-        bomb.setTransform(position, angleRad);
+        bomb.setTransform(tmpBombEmitPosition, angleRad);
         bombs.add(bomb);
     }
 

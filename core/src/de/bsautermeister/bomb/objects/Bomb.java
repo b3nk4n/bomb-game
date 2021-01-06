@@ -39,6 +39,7 @@ public abstract class Bomb implements Disposable {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.linearDamping = 0.25f;
         bodyDef.angularDamping = 0.9f;
+        bodyDef = defineBody(bodyDef);
 
         Body body = getWorld().createBody(bodyDef);
 
@@ -60,9 +61,18 @@ public abstract class Bomb implements Disposable {
         return body;
     }
 
+    /**
+     * Allow a subclass to modify the body definition
+     */
+    protected BodyDef defineBody(BodyDef bodyDef) {
+        return bodyDef;
+    }
+
     public abstract void update(float delta);
 
     public void impact(Vector2 position, float radius) {
+        if (!impactedByExplosions()) return;
+
         PhysicsUtils.applyBlastImpact(getBody(), position, radius, blastImpactStrengthFactor);
     }
 
@@ -87,6 +97,10 @@ public abstract class Bomb implements Disposable {
     }
 
     public abstract boolean doExplode();
+
+    public boolean impactedByExplosions() {
+        return true;
+    }
 
     public abstract boolean isFlashing();
 

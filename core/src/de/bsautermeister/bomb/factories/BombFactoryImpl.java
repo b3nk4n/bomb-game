@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
 
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.objects.AirStrikeBomb;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
 import de.bsautermeister.bomb.objects.ClusterBomb;
@@ -70,5 +71,12 @@ public class BombFactoryImpl implements BombFactory {
         float tickingTime = MathUtils.random(2f, 5f);
 
         return new BounceStickyBomb(world, tickingTime, bodyRadius / Cfg.World.PPM, detonationRadius / Cfg.World.PPM);
+    }
+
+    @Override
+    public Bomb createAirStrikeBomb() {
+        float bodyRadius = 0.66f  / Cfg.World.PPM;
+        float detonationRadius = bodyRadius * 15;
+        return new AirStrikeBomb(world, bodyRadius, detonationRadius);
     }
 }

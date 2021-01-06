@@ -8,4 +8,5 @@ public interface BombFactory {
     Bomb createClusterBomb();
     Bomb createStickyBomb();
     Bomb createBounceStickyBomb();
+    Bomb createAirStrikeBomb();
 }
