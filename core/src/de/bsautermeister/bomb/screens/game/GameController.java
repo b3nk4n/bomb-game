@@ -355,7 +355,7 @@ public class GameController implements Disposable {
                 Vector2 bombPosition = bomb.getPosition();
                 int removed = ground.impact(outRemovedVertices, bombPosition, bomb.getDetonationRadius());
 
-                if (player.impact(bombPosition, bomb.getDetonationRadius())) {
+                if (!player.isDead() && player.impact(bombPosition, bomb.getDetonationRadius())) {
                     int vibrationMillis;
                     if (player.isDead()) {
                         playerParticlesEffect.emit(player.getPosition(), 0.0166f);
