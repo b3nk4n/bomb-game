@@ -240,7 +240,7 @@ public class GameController implements Disposable {
                 if (previousState == GameState.PAUSED && newState == GameState.PLAYING) {
                     game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, false);
                 }
-                if (newState.anyGameOver()) {
+                if (!previousState.anyGameOver() && newState.anyGameOver()) {
                     game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.MENU_SONG, 46.5f);
                     game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
                     game.getMusicPlayer().playFromBeginning();
