@@ -40,6 +40,11 @@ public class Player {
     private boolean blockJumpUntilRelease;
     private int groundContacts;
 
+    private final static float CAMP_INVALIDATE_DISTANCE = 1f;
+    private final static float MAX_CAMP_TIME = 20f;
+    float previousCampPositionX;
+    float campTime = 0f;
+
     public Player(World world, float radius) {
         this.world = world;
         this.radius = radius;
@@ -127,11 +132,29 @@ public class Player {
         if (!isDead()) {
             lifeRatio = Math.min(1f, lifeRatio + Cfg.Player.SELF_HEALING_PER_SECOND * delta);
 
-            float lowestPositionY = -ballBody.getPosition().y - radius;
+            Vector2 position = ballBody.getPosition();
+            float lowestPositionY = -position.y - radius;
             score = Math.max(score, (int)(lowestPositionY * 10));
 
-            //PhysicsUtils.applyAirResistance(ballBody, 0.5f);
+            updateCampDetection(delta, position);
         }
+    }
+
+    private void updateCampDetection(float delta, Vector2 position) {
+        float distance = Math.abs(position.x - previousCampPositionX);
+
+        if (distance > CAMP_INVALIDATE_DISTANCE) {
+            campTime = 0f;
+            previousCampPositionX = position.x;
+        } else {
+            campTime += delta;
+        }
+
+        System.out.println(campTime);
+    }
+
+    public boolean isCamping() {
+        return campTime > MAX_CAMP_TIME;
     }
 
     private static final Circle impactCircle = new Circle();
@@ -227,6 +250,8 @@ public class Player {
             output.writeFloat(object.lifeRatio);
             output.writeInt(object.score);
             output.writeBoolean(object.blockJumpUntilRelease);
+            output.writeFloat(object.previousCampPositionX);
+            output.writeFloat(object.campTime);
         }
 
         @Override
@@ -239,6 +264,8 @@ public class Player {
             player.lifeRatio = input.readFloat();
             player.score = input.readInt();
             player.blockJumpUntilRelease = input.readBoolean();
+            player.previousCampPositionX = input.readFloat();
+            player.campTime = input.readFloat();
             return player;
         }
     }

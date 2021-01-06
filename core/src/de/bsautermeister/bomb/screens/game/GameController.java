@@ -63,6 +63,8 @@ import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 import de.bsautermeister.bomb.serializers.Vector3Serializer;
 
+import static com.badlogic.gdx.Input.Keys.SPACE;
+
 public class GameController implements Disposable {
 
     private static final Logger LOG = new Logger(GameController.class.getSimpleName(), Cfg.LOG_LEVEL);
@@ -76,6 +78,9 @@ public class GameController implements Disposable {
     private Ground ground;
     private final BombFactory bombFactory;
     private final Array<Bomb> bombs = new Array<>();
+
+    private final static float MIN_AIR_STRIKE_DELAY = 15f;
+    private float airStrikeUnlockTimer = 0f;
 
     private GameObjectState<GameState> state;
 
@@ -266,8 +271,6 @@ public class GameController implements Disposable {
         shape.dispose();
     }
 
-
-
     public void update(float delta) {
         state.update(delta);
 
@@ -294,6 +297,7 @@ public class GameController implements Disposable {
             gameTime += delta;
             handleInput();
             player.update(delta);
+            updateAirStrike(delta);
             updateCamera(delta);
             updateBombEmitter(delta);
 
@@ -322,20 +326,35 @@ public class GameController implements Disposable {
         world.step(delta, 6, 2);
     }
 
+    private void updateAirStrike(float delta) {
+        airStrikeUnlockTimer -= delta;
+
+        if (airStrikeUnlockTimer < 0 && player.isCamping()) {
+            airStrikeUnlockTimer = MIN_AIR_STRIKE_DELAY;
+
+            // launch new air strike
+            emitBomb(player.getPosition().x - 1f);
+            emitBomb(player.getPosition().x);
+            emitBomb(player.getPosition().x + 1f);
+        }
+    }
+
     private void updateBombEmitter(float delta) {
         bombEmitTimer -= delta;
 
         if (bombEmitTimer < 0) {
             float delay = INITIAL_BOMB_EMIT_DELAY - gameTime * 0.005f - 0.5f + MathUtils.random();
             bombEmitTimer = Math.max(MIN_BOMB_EMIT_DELAY, delay);
-            emitBomb();
+            float x = MathUtils.random(Cfg.World.WIDTH_PPM);
+            emitBomb(x);
         }
     }
 
-    private void emitBomb() {
+    private void emitBomb(float x) {
         Bomb bomb = bombFactory.createRandomBomb();
+        float bodyRadiusPPM = bomb.getBodyRadius() / Cfg.World.PPM;
         Vector2 position = new Vector2(
-                MathUtils.random(bomb.getBodyRadius() / Cfg.World.PPM, Cfg.World.WIDTH_PPM - bomb.getBodyRadius() / Cfg.World.PPM),
+                MathUtils.clamp(x, bodyRadiusPPM, Cfg.World.WIDTH_PPM - bodyRadiusPPM),
                 32f / Cfg.World.PPM
         );
         float angleRad = MathUtils.random(0, MathUtils.PI2);
@@ -454,6 +473,13 @@ public class GameController implements Disposable {
             }
         }
 
+        if (Cfg.DEBUG_MODE) {
+            boolean space = Gdx.input.isKeyJustPressed(SPACE);
+            if (space) {
+                emitBomb(player.getPosition().x);
+            }
+        }
+
         player.control(upPressed, leftPressed, rightPressed);
     }
 
@@ -474,6 +500,7 @@ public class GameController implements Disposable {
             File file = game.getGameFile();
             Output output = new Output(new FileOutputStream(file));
             output.writeFloat(gameTime);
+            output.writeFloat(airStrikeUnlockTimer);
             kryo.writeObject(output, state);
             kryo.writeObject(output, camera.getPosition());
             kryo.writeObject(output, player);
@@ -498,6 +525,7 @@ public class GameController implements Disposable {
             com.esotericsoftware.kryo.io.Input input = new com.esotericsoftware.kryo.io.Input(
                     new FileInputStream(file));
             gameTime = input.readFloat();
+            airStrikeUnlockTimer = input.readFloat();
             state = kryo.readObject(input, GameObjectState.class);
             camera.setPosition(kryo.readObject(input, Vector2.class));
             player = kryo.readObject(input, Player.class);
