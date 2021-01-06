@@ -353,7 +353,6 @@ public class GameController implements Disposable {
 
             if (bomb.doExplode()) {
                 Vector2 bombPosition = bomb.getPosition();
-                int removed = ground.impact(outRemovedVertices, bombPosition, bomb.getDetonationRadius());
 
                 if (!player.isDead() && player.impact(bombPosition, bomb.getDetonationRadius())) {
                     int vibrationMillis;
@@ -378,16 +377,8 @@ public class GameController implements Disposable {
 
                 bombs.addAll(bomb.releaseBombs());
 
-                activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 2.5f));
+                activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 1f));
                 explosionGlowEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
-
-                if (removed > 0) {
-                    for (int r = 0; r < removed; ++r) {
-                        float x = outRemovedVertices[2 * r];
-                        float y = outRemovedVertices[2 * r + 1];
-                        explosionEffect.emit(x, y, 0.0166f);
-                    }
-                }
 
                 float explosionVolume = camera.isInView(bombPosition)
                         ? MathUtils.clamp(bomb.getDetonationRadius() / 2, 0f, 1f)
@@ -409,6 +400,19 @@ public class GameController implements Disposable {
         for (int i = activeBlastEffects.size - 1; i >= 0; --i) {
             BlastInstance explosionInstance = activeBlastEffects.get(i);
             explosionInstance.update(delta);
+
+            float radialImpactProgress = Interpolation.fastSlow.apply(0.25f, 1.5f, explosionInstance.getProgress());
+            if (radialImpactProgress <= 1f) {
+                float currentRadius = explosionInstance.getRadius() * radialImpactProgress;
+                int removed = ground.impact(outRemovedVertices, explosionInstance.getPosition(), currentRadius);
+                if (removed > 0) {
+                    for (int r = 0; r < removed; ++r) {
+                        float x = outRemovedVertices[2 * r];
+                        float y = outRemovedVertices[2 * r + 1];
+                        explosionEffect.emit(x, y, 0.0166f);
+                    }
+                }
+            }
 
             if (explosionInstance.isExpired()) {
                 activeBlastEffects.removeIndex(i);

@@ -5,7 +5,7 @@
 #endif
 
 // affects the distortion speed
-#define TIME_FACTOR 2.0
+#define TIME_FACTOR 0.5
 
 // PI constant
 #define M_PI 3.1415926535897932384626433832795
