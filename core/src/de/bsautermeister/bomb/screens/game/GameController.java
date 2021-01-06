@@ -32,6 +32,7 @@ import java.io.FileOutputStream;
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
+import de.bsautermeister.bomb.audio.LoopSound;
 import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.contact.WorldContactListener;
@@ -93,8 +94,7 @@ public class GameController implements Disposable {
     private final ManagedPooledEffect explosionGlowEffect;
 
     private final Sound explosionSound;
-    private long heartbeatSoundId = -1;
-    private final Sound heartbeatSound;
+    private final LoopSound heartbeatSound;
     private final Sound hitSound;
 
     private final GameScreenCallbacks gameScreenCallbacks;
@@ -165,7 +165,7 @@ public class GameController implements Disposable {
         explosionGlowEffect = new ManagedPooledEffect(explosionGlow);
 
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
-        heartbeatSound = assetManager.get(Assets.Sounds.HEARTBEAT);
+        heartbeatSound = new LoopSound(assetManager.get(Assets.Sounds.HEARTBEAT));
         hitSound = assetManager.get(Assets.Sounds.HIT);
 
         kryo = new Kryo();
@@ -199,7 +199,11 @@ public class GameController implements Disposable {
         return new ManagedPooledBox2DEffect(effect);
     }
 
-    public void initialize() {
+    public void initialize(boolean resume) {
+        if (resume) {
+            load();
+        }
+
         if (player == null) {
             player = new Player(world, Cfg.Player.RADIUS_PPM);
             player.setTransform(Cfg.Player.START_POSITION, 0f);
@@ -262,6 +266,8 @@ public class GameController implements Disposable {
         shape.dispose();
     }
 
+
+
     public void update(float delta) {
         state.update(delta);
 
@@ -280,6 +286,7 @@ public class GameController implements Disposable {
         handlePauseInput();
 
         if (state.is(GameState.PAUSED)) {
+            heartbeatSound.stop();
             return;
         }
 
@@ -294,17 +301,10 @@ public class GameController implements Disposable {
             float musicVolume;
             if (criticalHealthRatio > 0f) {
                 float volume = Interpolation.pow5Out.apply(criticalHealthRatio);
-                if (heartbeatSoundId == -1) {
-                    heartbeatSoundId = heartbeatSound.loop(volume);
-                } else {
-                    heartbeatSound.setVolume(heartbeatSoundId, volume);
-                }
+                heartbeatSound.loop(volume);
                 musicVolume = Interpolation.pow5Out.apply(MusicPlayer.MAX_VOLUME, 0.1f, criticalHealthRatio);
             } else {
-                if (heartbeatSoundId != -1) {
-                    heartbeatSound.stop(heartbeatSoundId);
-                    heartbeatSoundId = -1;
-                }
+                heartbeatSound.stop();
                 musicVolume = MusicPlayer.MAX_VOLUME;
             }
             game.getMusicPlayer().setVolume(musicVolume, false);
@@ -453,7 +453,12 @@ public class GameController implements Disposable {
         player.control(upPressed, leftPressed, rightPressed);
     }
 
-    public void save() {
+    public void pause() {
+        heartbeatSound.stop();
+        save();
+    }
+
+    private void save() {
         if (state.isAnyOf(GameState.GAME_OVER, GameState.PLAYER_JUST_DIED)) {
             return;
         }
@@ -479,7 +484,7 @@ public class GameController implements Disposable {
     }
 
     @SuppressWarnings("unchecked")
-    public void load() {
+    private void load() {
         File file = game.getGameFile();
         if (!file.exists()) {
             return;
@@ -507,8 +512,6 @@ public class GameController implements Disposable {
         if (!file.delete()) {
             LOG.error("Failed to delete saved game.");
         }
-
-        initialize();
     }
 
     @Override

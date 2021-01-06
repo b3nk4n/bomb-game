@@ -36,11 +36,7 @@ public class GameScreen extends ScreenBase {
         super.show();
 
         controller = new GameController((BombGame) getGame(), callbacks, getAssetManager());
-        if (resume) {
-            controller.load();
-        } else {
-            controller.initialize();
-        }
+        controller.initialize(resume);
         renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
                 getGame().getFrameBufferManager());
     }
@@ -48,7 +44,7 @@ public class GameScreen extends ScreenBase {
     @Override
     public void pause() {
         super.pause();
-        controller.save();
+        controller.pause();
     }
 
     @Override
