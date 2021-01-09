@@ -17,4 +17,13 @@ public final class GdxUtils {
         Gdx.gl.glClearColor(color.r, color.g, color.b, color.a);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
+
+    public static void enableAlpha() {
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    public static void disableAlpha() {
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
 }

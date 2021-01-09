@@ -22,7 +22,8 @@ public class DisappearParticleEmitterBox2D extends ParticleEmitter {
     private final static float EPSILON = 0.001f;
 
     /** default visibility to prevent synthetic accessor creation */
-    final RayCastCallback rayCallBack = new RayCastCallback() {
+    final RayCastCallback rayCastCallback = new RayCastCallback() {
+        @Override
         public float reportRayFixture (Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
             DisappearParticleEmitterBox2D.this.particleCollided = true;
             DisappearParticleEmitterBox2D.this.normalAngle = MathUtils.atan2(normal.y, normal.x) * MathUtils.radiansToDegrees;
@@ -82,7 +83,7 @@ public class DisappearParticleEmitterBox2D extends ParticleEmitter {
             particleCollided = false;
             startPoint.set(x, y);
             endPoint.set(x + velocityX, y + velocityY);
-            if (world != null) world.rayCast(rayCallBack, startPoint, endPoint);
+            if (world != null) world.rayCast(rayCastCallback, startPoint, endPoint);
 
             /** If ray collided boolean has set to true at rayCallBack */
             if (particleCollided) {

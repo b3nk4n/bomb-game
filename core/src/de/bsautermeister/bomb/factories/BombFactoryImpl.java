@@ -75,8 +75,8 @@ public class BombFactoryImpl implements BombFactory {
 
     @Override
     public Bomb createAirStrikeBomb() {
-        float bodyRadius = 0.66f  / Cfg.World.PPM;
-        float detonationRadius = bodyRadius * 15;
+        float bodyRadius = 0.4f  / Cfg.World.PPM;
+        float detonationRadius = bodyRadius * 10;
         return new AirStrikeBomb(world, bodyRadius, detonationRadius);
     }
 }

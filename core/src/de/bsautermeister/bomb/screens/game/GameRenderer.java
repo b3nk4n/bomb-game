@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -34,6 +35,7 @@ import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
 import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
+import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.Fragment;
@@ -158,6 +160,20 @@ public class GameRenderer implements Disposable {
         polygonBatch.begin();
         renderGround(polygonBatch);
         polygonBatch.end();
+
+        Array<AirStrikeTargetMarker> airStrikeTargets = controller.getAirStrikeTargets();
+        if (!airStrikeTargets.isEmpty()) {
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            for (AirStrikeTargetMarker targetMarker : airStrikeTargets) {
+                Vector2 pos = targetMarker.getPosition();
+                float progress = targetMarker.getProgress();
+                float size = Interpolation.elasticOut.apply(progress) * 0.15f * (1f - Interpolation.exp10In.apply(progress));
+                shapeRenderer.setColor(Color.WHITE);
+                shapeRenderer.rectLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size, size);
+                shapeRenderer.rectLine(pos.x - size, pos.y + size, pos.x + size, pos.y - size, size);
+            }
+            shapeRenderer.end();
+        }
 
         frameBufferManager.end();
 

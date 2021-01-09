@@ -19,6 +19,13 @@ public interface Cfg {
         float VIEWPORT_WIDTH_PPM = 64f / PPM;
     }
 
+    interface AirStrike {
+        float MIN_DELAY = 15f;
+        Vector2 VELOCITY = new Vector2(2f, -6f);
+        float ANGLE = VELOCITY.angleRad();
+        float START_OFFSET_FACTOR = 15f;
+    }
+
     interface Ui {
         float WIDTH = 1280;
         float HEIGHT = 720;

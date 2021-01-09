@@ -41,7 +41,7 @@ public class Player {
     private int groundContacts;
 
     private final static float CAMP_INVALIDATE_DISTANCE = 0.66f;
-    private final static float MAX_CAMP_TIME = 10f;
+    private final static float MAX_CAMP_TIME = 5f;
     float previousCampPositionX;
     float campTime = 0f;
 

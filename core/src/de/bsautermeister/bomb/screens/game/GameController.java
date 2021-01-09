@@ -46,6 +46,7 @@ import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
 import de.bsautermeister.bomb.factories.BombFactory;
 import de.bsautermeister.bomb.factories.BombFactoryImpl;
+import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
 import de.bsautermeister.bomb.objects.BounceStickyBomb;
@@ -79,10 +80,8 @@ public class GameController implements Disposable {
     private final BombFactory bombFactory;
     private final Array<Bomb> bombs = new Array<>();
 
-    private final static float MIN_AIR_STRIKE_DELAY = 15f;
-    private static final Vector2 AIR_STRIKE_VELOCITY = new Vector2(2f, -6f);
-    private static final float AIR_STRIKE_ANGLE = AIR_STRIKE_VELOCITY.angleRad();
     private float airStrikeUnlockTimer = 0f;
+    private final AirStrikeManager airStrikeManager;
 
     private GameObjectState<GameState> state;
 
@@ -175,6 +174,8 @@ public class GameController implements Disposable {
         explosionSound = assetManager.get(Assets.Sounds.EXPLOSION);
         heartbeatSound = new LoopSound(assetManager.get(Assets.Sounds.HEARTBEAT));
         hitSound = assetManager.get(Assets.Sounds.HIT);
+
+        airStrikeManager = new AirStrikeManager(world);
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
@@ -321,6 +322,7 @@ public class GameController implements Disposable {
             state.set(GameState.GAME_OVER);
         }
 
+        updateAirStrikeTargetMarkers(delta);
         updateEnvironment(delta);
         explosionEffect.update(delta);
         playerParticlesEffect.update(delta);
@@ -333,24 +335,46 @@ public class GameController implements Disposable {
         airStrikeUnlockTimer -= delta;
 
         if (airStrikeUnlockTimer < 0 && player.isCamping()) {
-            airStrikeUnlockTimer = MIN_AIR_STRIKE_DELAY;
+            airStrikeUnlockTimer = Cfg.AirStrike.MIN_DELAY;
 
             // launch new air strike
             Vector2 playerPosition = player.getPosition();
-            emitAirStrikeBomb(playerPosition.sub(1f, 0f), 0f);
-            emitAirStrikeBomb(playerPosition.add(1f, 0f), 0.75f);
-            emitAirStrikeBomb(playerPosition.add(1f, 0f), 1.5f);
+            airStrikeManager.request(playerPosition);
         }
+
+        airStrikeManager.update(delta);
+
+        if (airStrikeManager.isReady()) {
+            Vector2 target = airStrikeManager.getTargetAndReset();
+            airStrikeTargets.add(new AirStrikeTargetMarker(target, 1f));
+            emitAirStrikeBomb(target, 0f);
+        }
+    }
+
+    private void updateAirStrikeTargetMarkers(float delta) {
+        for (int i = airStrikeTargets.size - 1; i >= 0; i--) {
+            AirStrikeTargetMarker targetMarker = airStrikeTargets.get(i);
+            targetMarker.update(delta);
+            if (targetMarker.isReady()) {
+                airStrikeTargets.removeIndex(i);
+            }
+        }
+    }
+
+    private final Array<AirStrikeTargetMarker> airStrikeTargets = new Array<>();
+
+    public Array<AirStrikeTargetMarker> getAirStrikeTargets() {
+        return airStrikeTargets;
     }
 
     private void emitAirStrikeBomb(Vector2 target, float offsetY) {
         Bomb bomb = bombFactory.createAirStrikeBomb();
         tmpBombEmitPosition.set(
-                target.x - ((target.y - BOMB_START_Y) / AIR_STRIKE_VELOCITY.y) * AIR_STRIKE_VELOCITY.x,
+                target.x - ((target.y - BOMB_START_Y) / Cfg.AirStrike.VELOCITY.y) * Cfg.AirStrike.VELOCITY.x,
                 BOMB_START_Y + offsetY
         );
-        bomb.setTransform(tmpBombEmitPosition, AIR_STRIKE_ANGLE);
-        bomb.setLinearVelocity(AIR_STRIKE_VELOCITY);
+        bomb.setTransform(tmpBombEmitPosition, Cfg.AirStrike.ANGLE);
+        bomb.setLinearVelocity(Cfg.AirStrike.VELOCITY);
         bombs.add(bomb);
     }
 
