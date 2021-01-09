@@ -46,6 +46,7 @@ import de.bsautermeister.bomb.effects.ManagedPooledEffect;
 import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
 import de.bsautermeister.bomb.factories.BombFactory;
 import de.bsautermeister.bomb.factories.BombFactoryImpl;
+import de.bsautermeister.bomb.objects.AirStrikeBomb;
 import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
@@ -82,6 +83,7 @@ public class GameController implements Disposable {
 
     private float airStrikeUnlockTimer = 0f;
     private final AirStrikeManager airStrikeManager;
+    private final Array<AirStrikeTargetMarker> airStrikeTargets = new Array<>();
 
     private GameObjectState<GameState> state;
 
@@ -192,6 +194,8 @@ public class GameController implements Disposable {
         kryo.register(ClusterBomb.class, new ClusterBomb.KryoSerializer(world));
         kryo.register(ClusterFragmentBomb.class, new ClusterFragmentBomb.KryoSerializer(world));
         kryo.register(BounceStickyBomb.class, new BounceStickyBomb.KryoSerializer(world));
+        kryo.register(AirStrikeBomb.class, new AirStrikeBomb.KryoSerializer(world));
+        kryo.register(AirStrikeTargetMarker.class, new AirStrikeTargetMarker.KryoSerializer());
         kryo.register(GameObjectState.class, new GameObjectState.KryoSerializer());
     }
 
@@ -360,8 +364,6 @@ public class GameController implements Disposable {
             }
         }
     }
-
-    private final Array<AirStrikeTargetMarker> airStrikeTargets = new Array<>();
 
     public Array<AirStrikeTargetMarker> getAirStrikeTargets() {
         return airStrikeTargets;
@@ -547,6 +549,8 @@ public class GameController implements Disposable {
             kryo.writeObject(output, ground);
             kryo.writeObject(output, activeBlastEffects);
             kryo.writeObject(output, bombs);
+            airStrikeManager.write(kryo, output);
+            kryo.writeObject(output, airStrikeTargets);
             game.getMusicPlayer().write(kryo, output);
             output.close();
         } catch (Exception e) {
@@ -574,6 +578,9 @@ public class GameController implements Disposable {
             activeBlastEffects.addAll(kryo.readObject(input, Array.class));
             bombs.clear();
             bombs.addAll(kryo.readObject(input, Array.class));
+            airStrikeManager.read(kryo, input);
+            airStrikeTargets.clear();
+            airStrikeTargets.addAll(kryo.readObject(input, Array.class));
             game.getMusicPlayer().read(kryo, input);
             input.close();
         } catch (FileNotFoundException e) {

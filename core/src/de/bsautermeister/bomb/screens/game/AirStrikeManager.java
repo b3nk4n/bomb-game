@@ -4,18 +4,22 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
+import de.bsautermeister.bomb.serializers.KryoExternalSerializer;
 
-public class AirStrikeManager {
+public class AirStrikeManager implements KryoExternalSerializer {
     private final World world;
     private final Vector2 result = new Vector2();
     private boolean ready = false;
 
     private final static float REQUEST_TIME = 1f;
     private float requestTimer;
-    private float requestIndex;
+    private int requestIndex;
     private final Vector2 requestedTarget = new Vector2();
 
     private final RayCastCallback rayCastCallback = new RayCastCallback() {
@@ -74,5 +78,21 @@ public class AirStrikeManager {
         tmpStart.sub(Cfg.AirStrike.VELOCITY.x * Cfg.AirStrike.START_OFFSET_FACTOR,
                 Cfg.AirStrike.VELOCITY.y * Cfg.AirStrike.START_OFFSET_FACTOR);
         return  tmpStart;
+    }
+
+    @Override
+    public void write(Kryo kryo, Output output) {
+        output.writeBoolean(ready);
+        output.writeFloat(requestTimer);
+        output.writeInt(requestIndex);
+        kryo.writeObject(output, requestedTarget);
+    }
+
+    @Override
+    public void read(Kryo kryo, Input input) {
+        ready = input.readBoolean();
+        requestTimer = input.readFloat();
+        requestIndex = input.readInt();
+        requestedTarget.set(kryo.readObject(input, Vector2.class));
     }
 }
