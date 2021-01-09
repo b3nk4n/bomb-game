@@ -13,8 +13,4 @@ public interface RegionNames {
         String BAR_HIDDEN = "loading-hidden";
         String FRAME_BACKGROUND = "frame-bg";
     }
-
-    interface Ui {
-        String LIFE_BAR = "life_bar";
-    }
 }

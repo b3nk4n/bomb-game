@@ -351,7 +351,6 @@ public class GameRenderer implements Disposable {
 
     private void renderHud(float delta) {
         Player player = controller.getPlayer();
-        hud.updateLifeRatio(player.getLifeRatio());
         hud.updateScore(player.getScore());
         hud.render(delta);
     }

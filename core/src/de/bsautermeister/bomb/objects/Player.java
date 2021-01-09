@@ -1,6 +1,7 @@
 package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -26,7 +27,7 @@ import de.bsautermeister.bomb.utils.PhysicsUtils;
 public class Player {
     private final static Logger LOG = new Logger(Player.class.getSimpleName(), Cfg.LOG_LEVEL);
 
-    public static final float CRITICAL_HEALTH_THRESHOLD = 0.33f;
+    public static final float CRITICAL_HEALTH_THRESHOLD = 0.5f;
 
     private World world;
     private Body ballBody;
@@ -217,7 +218,8 @@ public class Player {
         if (lifeRatio > CRITICAL_HEALTH_THRESHOLD) {
             return 0f;
         } else {
-            return MathUtils.clamp(1f - lifeRatio * 1 / CRITICAL_HEALTH_THRESHOLD, 0f, 1f);
+            float ratio = Interpolation.pow3Out.apply(1f - lifeRatio / CRITICAL_HEALTH_THRESHOLD);
+            return MathUtils.clamp(ratio, 0f, 1f);
         }
     }
 
