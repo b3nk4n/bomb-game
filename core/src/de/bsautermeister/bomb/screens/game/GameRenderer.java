@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -65,6 +64,7 @@ public class GameRenderer implements Disposable {
 
     private final ShaderProgram blastShader;
     private final ShaderProgram blurShader;
+    private final ShaderProgram vignettingShader;
 
     private final ShapeRenderer shapeRenderer;
 
@@ -107,11 +107,12 @@ public class GameRenderer implements Disposable {
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
         blurShader = assetManager.get(Assets.ShaderPrograms.BLUR);
+        vignettingShader = assetManager.get(Assets.ShaderPrograms.VIGNETTING);
 
         shapeRenderer = new ExtendedShapeRenderer();
     }
 
-    private final Vector3 tmpBlastProjection = new Vector3();
+    private final Vector3 tmpProjection = new Vector3();
     private final float[] tmpBlastEntries = new float[64];
     public void render(float delta) {
         Camera2D camera = controller.getCamera();
@@ -165,11 +166,11 @@ public class GameRenderer implements Disposable {
             for (int i = 0; i < blasts.size; ++i) {
                 BlastInstance blast = blasts.get(i);
                 Vector2 blastPosition = blast.getPosition();
-                tmpBlastProjection.set(blastPosition.x, blastPosition.y, 0f);
-                camera.getGdxCamera().project(tmpBlastProjection);
-                tmpBlastProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
-                tmpBlastEntries[4 * i] = tmpBlastProjection.x;
-                tmpBlastEntries[4 * i + 1] = tmpBlastProjection.y;
+                tmpProjection.set(blastPosition.x, blastPosition.y, 0f);
+                camera.getGdxCamera().project(tmpProjection);
+                tmpProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
+                tmpBlastEntries[4 * i] = tmpProjection.x;
+                tmpBlastEntries[4 * i + 1] = tmpProjection.y;
                 tmpBlastEntries[4 * i + 2] = blast.getProgress();
                 tmpBlastEntries[4 * i + 3] = blast.getRadius() / 6f;
             }
@@ -189,10 +190,21 @@ public class GameRenderer implements Disposable {
         }
 
         batch.begin();
-        float criticalHealthRatio = controller.getPlayer().getCriticalHealthRatio();
+        Player player = controller.getPlayer();
+        Vector2 playerPosition = player.getPosition();
+        tmpProjection.set(playerPosition.x, playerPosition.y, 0f);
+        camera.getGdxCamera().project(tmpProjection);
+        tmpProjection.scl(1f / viewport.getScreenWidth(), 1f / viewport.getScreenHeight(), 1f);
+
+        float criticalHealthRatio = player.getCriticalHealthRatio();
         if (criticalHealthRatio > 0f) {
-            batch.setShader(blurShader);
-            blurShader.setUniformf("u_radius", Interpolation.smooth.apply(0f, 0.01f, criticalHealthRatio));
+            batch.setShader(vignettingShader);
+            float intensityFactor = player.isDead() ? 1f : 1f + MathUtils.sin(controller.getGameTime() * MathUtils.PI) / 2f;
+            vignettingShader.setUniformf("u_vignetteIntensity", criticalHealthRatio * intensityFactor);
+            vignettingShader.setUniformf("u_vignetteX", 0.66f);
+            vignettingShader.setUniformf("u_vignetteY", 0f);
+            vignettingShader.setUniformf("u_centerX", tmpProjection.x);
+            vignettingShader.setUniformf("u_centerY", tmpProjection.y);
             float tintFactor = Math.abs(MathUtils.sin(controller.getGameTime() * MathUtils.PI));
             float otherColorRatio = 1f - criticalHealthRatio / 2f * tintFactor;
             batch.setColor(1f, otherColorRatio, otherColorRatio, 1f);

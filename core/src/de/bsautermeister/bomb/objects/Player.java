@@ -149,8 +149,6 @@ public class Player {
         } else {
             campTime += delta;
         }
-
-        System.out.println(campTime);
     }
 
     public boolean isCamping() {

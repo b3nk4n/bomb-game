@@ -36,6 +36,10 @@ public interface Assets {
                 new AssetDescriptor<>("shader/blur.frag", ShaderProgram.class,
                         usingDefaultVertexShader());
 
+        public static AssetDescriptor<ShaderProgram> VIGNETTING =
+                new AssetDescriptor<>("shader/vignetting.frag", ShaderProgram.class,
+                        usingDefaultVertexShader());
+
         private static ShaderProgramLoader.ShaderProgramParameter usingDefaultVertexShader() {
             ShaderProgramLoader.ShaderProgramParameter params = new ShaderProgramLoader.ShaderProgramParameter();
             params.vertexFile = "shader/default.vert";
@@ -94,7 +98,7 @@ public interface Assets {
     AssetDescriptor[] PRELOAD = {
             Atlas.LOADING, Atlas.GAME, Atlas.UI,
             Skins.UI,
-            ShaderPrograms.BLAST, ShaderPrograms.BLUR,
+            ShaderPrograms.BLAST, ShaderPrograms.BLUR, ShaderPrograms.VIGNETTING,
             Effects.EXPLOSION_GLOW,
             Sounds.EXPLOSION, Sounds.HEARTBEAT, Sounds.HIT
     };
