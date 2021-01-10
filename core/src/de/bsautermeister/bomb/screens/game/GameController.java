@@ -408,9 +408,8 @@ public class GameController implements Disposable {
             Bomb bomb = bombs.get(i);
             bomb.update(delta);
 
+            Vector2 bombPosition = bomb.getPosition();
             if (bomb.doExplode()) {
-                Vector2 bombPosition = bomb.getPosition();
-
                 if (!player.isDead() && player.impact(bombPosition, bomb.getDetonationRadius())) {
                     int vibrationMillis;
                     if (player.isDead()) {
@@ -451,7 +450,11 @@ public class GameController implements Disposable {
                 float shakeTime = camera.isInView(bombPosition)
                         ? 1f : 0.5f;
                 camera.shake(shakeTime);
+            } else if (bombPosition.x < -10f || bombPosition.x > Cfg.World.WIDTH_PPM + 10f) {
+                // remove if bomb out of bounds
+                bombs.removeIndex(i);
             }
+
         }
 
         for (int i = activeBlastEffects.size - 1; i >= 0; --i) {

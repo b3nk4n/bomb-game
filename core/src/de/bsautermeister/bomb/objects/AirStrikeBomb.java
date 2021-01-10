@@ -32,7 +32,6 @@ public class AirStrikeBomb extends Bomb {
 
     @Override
     public void update(float delta) {
-        System.out.println(getBody().getPosition());
     }
 
     @Override

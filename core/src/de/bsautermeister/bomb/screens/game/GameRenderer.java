@@ -35,6 +35,7 @@ import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
 import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
+import de.bsautermeister.bomb.objects.AirStrikeBomb;
 import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
 import de.bsautermeister.bomb.objects.Bomb;
@@ -146,10 +147,12 @@ public class GameRenderer implements Disposable {
         batch.setShader(null);
         batch.end();
 
+        GdxUtils.enableAlpha();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         renderBall(shapeRenderer, controller.getPlayer());
         renderBombs(shapeRenderer, controller.getBombs());
         shapeRenderer.end();
+        GdxUtils.disableAlpha();
 
         batch.begin();
         controller.getExplosionEffect().draw(batch);
@@ -296,16 +299,31 @@ public class GameRenderer implements Disposable {
         }
     }
 
+    private static final float[] tmpPolyBuffer = new float[64];
     private static void renderBombs(ShapeRenderer renderer, Array<Bomb> bombs) {
         for (Bomb bomb : bombs) {
             Vector2 position = bomb.getPosition();
             float radius = bomb.getBodyRadius() * POLYGON_ZOOM;
+            int count = PolygonUtils.polygon(POLYGON_BUFFER, radius, bomb.getBodySegments(), position, bomb.getRotation());
+
+            if (bomb instanceof AirStrikeBomb) {
+                System.arraycopy(POLYGON_BUFFER, 0, tmpPolyBuffer, 0, count);
+                Vector2 linearVelocity = bomb.getLinearVelocity();
+                for (int i = 0; i < 6; i++) {
+                    for (int j = 0; j < count; j++) {
+                        tmpPolyBuffer[j * 2] -= linearVelocity.x * 0.01f;
+                        tmpPolyBuffer[j * 2 + 1] -= linearVelocity.y * 0.01f;
+                    }
+                    renderer.setColor(1f, 1f, 1f, 0.6f - 0.1f * i);
+                    renderer.polygon(tmpPolyBuffer, 0, count);
+                }
+            }
+
             if (!bomb.isFlashing()) {
                 renderer.setColor(Color.BLACK);
             } else {
                 renderer.setColor(Color.WHITE);
             }
-            int count = PolygonUtils.polygon(POLYGON_BUFFER, radius, bomb.getBodySegments(), position, bomb.getRotation());
             renderer.polygon(POLYGON_BUFFER, 0, count);
             if (bomb.isSticky()) {
                 count = PolygonUtils.spikes(POLYGON_BUFFER, radius * 0.66f, radius * 1.33f, bomb.getBodySegments(), position, bomb.getRotation());
