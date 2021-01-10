@@ -42,7 +42,7 @@ public class Player {
     private int groundContacts;
 
     private final static float CAMP_INVALIDATE_DISTANCE = 0.66f;
-    private final static float MAX_CAMP_TIME = 5f;
+    public final static float MAX_CAMP_TIME = 10f;
     float previousCampPositionX;
     float campTime = 0f;
 
@@ -73,8 +73,7 @@ public class Player {
         fixtureDef.friction = 0.9f;
         fixtureDef.density = 10.0f;
         fixtureDef.filter.categoryBits = Bits.BALL;
-        fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
+        fixtureDef.filter.maskBits = Bits.ENVIRONMENT | Bits.BOMB;
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -91,7 +90,6 @@ public class Player {
                 radius * 0.66f, -radius * 1.1f);
         groundSensorFixtureDef.filter.categoryBits = Bits.BALL_SENSOR;
         groundSensorFixtureDef.filter.maskBits = Bits.GROUND;
-        groundSensorFixtureDef.filter.groupIndex = 1;
         groundSensorFixtureDef.shape = groundSensorShape;
         groundSensorFixtureDef.isSensor = true;
 

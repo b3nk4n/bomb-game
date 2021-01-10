@@ -13,13 +13,19 @@ import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.serializers.KryoExternalSerializer;
 
 public class AirStrikeManager implements KryoExternalSerializer {
+    private final static Vector2 VELOCITY_RIGHT = new Vector2(3f, -9f);
+    private final static Vector2 VELOCITY_LEFT = new Vector2(-3f, -9f);
+    private final static float START_OFFSET_FACTOR = 2.5f;
+
     private final World world;
-    private final Vector2 result = new Vector2();
+    private final Vector2 resultStart = new Vector2();
+    private final Vector2 resultTarget = new Vector2();
     private boolean ready = false;
 
     private final static float REQUEST_TIME = 1f;
     private float requestTimer;
-    private int requestIndex;
+    private int requestIndex = -1;
+    private final Vector2 requestVelocity = new Vector2();
     private final Vector2 requestedTarget = new Vector2();
 
     private final RayCastCallback rayCastCallback = new RayCastCallback() {
@@ -28,10 +34,16 @@ public class AirStrikeManager implements KryoExternalSerializer {
             if (fixture.getFilterData().categoryBits != Bits.GROUND) {
                 return -1f;
             }
-
-            ready = true;
-            result.set(point);
-            return fraction;
+            if (isWithinWorldX(point)) {
+                ready = true;
+                resultTarget.set(point);
+                float factor = START_OFFSET_FACTOR;
+                resultStart
+                        .set(point)
+                        .sub(requestVelocity.x * factor * fraction, requestVelocity.y * factor * fraction);
+                return fraction;
+            }
+            return -1f;
         }
     };
 
@@ -39,33 +51,55 @@ public class AirStrikeManager implements KryoExternalSerializer {
         this.world = world;
     }
 
+    private final Vector2 tmpTarget = new Vector2();
     void update(float delta) {
         if (requestIndex == 0 && requestTimer <= REQUEST_TIME) {
             requestIndex++;
-            requestedTarget.sub(1f, 0f);
-            world.rayCast(rayCastCallback, getStart(requestedTarget), requestedTarget);
+            tmpTarget
+                    .set(requestedTarget)
+                    .add(isWorldLeft(requestedTarget) ? 1f : -1f, 0f)
+                    .add(requestVelocity);
+            world.rayCast(rayCastCallback, getStart(tmpTarget, requestVelocity), tmpTarget);
         } else if (requestIndex == 1 && requestTimer <= REQUEST_TIME / 2) {
             requestIndex++;
-            requestedTarget.add(1f, 0f);
-            world.rayCast(rayCastCallback, getStart(requestedTarget), requestedTarget);
+            tmpTarget
+                    .set(requestedTarget)
+                    .add(requestVelocity);
+            world.rayCast(rayCastCallback, getStart(tmpTarget, requestVelocity), tmpTarget);
         } else if (requestIndex == 2 && requestTimer <= 0f) {
-            requestIndex++;
-            requestedTarget.add(1f, 0f);
-            world.rayCast(rayCastCallback, getStart(requestedTarget), requestedTarget);
+            requestIndex = -1;
+            tmpTarget
+                    .set(requestedTarget)
+                    .add(isWorldLeft(requestedTarget) ? -1f : 1f, 0f)
+                    .add(requestVelocity);
+            world.rayCast(rayCastCallback, getStart(tmpTarget, requestVelocity), tmpTarget);
         }
 
         requestTimer -= delta;
     }
 
+    private boolean isWithinWorldX(Vector2 position) {
+        return position.x > 0f && position.x < Cfg.World.WIDTH_PPM;
+    }
+
+    private boolean isWorldLeft(Vector2 position) {
+        return position.x < Cfg.World.WIDTH_PPM / 2f;
+    }
+
     public void request(Vector2 target) {
-        requestedTarget.set(target).add(Cfg.AirStrike.VELOCITY);
+        requestedTarget.set(target);
+        requestVelocity.set(isWorldLeft(target) ? VELOCITY_LEFT : VELOCITY_RIGHT);
         requestTimer = REQUEST_TIME;
         requestIndex = 0;
     }
 
-    public Vector2 getTargetAndReset() {
+    private final EmitInfo outEmitInfo = new EmitInfo();
+    public EmitInfo getTargetAndReset() {
         ready = false;
-        return result;
+        outEmitInfo.start.set(resultStart);
+        outEmitInfo.target.set(resultTarget);
+        outEmitInfo.velocity.set(requestVelocity);
+        return outEmitInfo;
     }
 
     public boolean isReady() {
@@ -73,10 +107,10 @@ public class AirStrikeManager implements KryoExternalSerializer {
     }
 
     private final Vector2 tmpStart = new Vector2();
-    private Vector2 getStart(Vector2 target) {
+    private Vector2 getStart(Vector2 target, Vector2 velocity) {
         tmpStart.set(target);
-        tmpStart.sub(Cfg.AirStrike.VELOCITY.x * Cfg.AirStrike.START_OFFSET_FACTOR,
-                Cfg.AirStrike.VELOCITY.y * Cfg.AirStrike.START_OFFSET_FACTOR);
+        tmpStart.sub(velocity.x * START_OFFSET_FACTOR,
+                velocity.y * START_OFFSET_FACTOR);
         return  tmpStart;
     }
 
@@ -94,5 +128,27 @@ public class AirStrikeManager implements KryoExternalSerializer {
         requestTimer = input.readFloat();
         requestIndex = input.readInt();
         requestedTarget.set(kryo.readObject(input, Vector2.class));
+    }
+
+    public class EmitInfo {
+        private final Vector2 target = new Vector2();
+        private final Vector2 start = new Vector2();
+        private final Vector2 velocity = new Vector2();
+
+        public Vector2 getTarget() {
+            return target;
+        }
+
+        public Vector2 getStart() {
+            return start;
+        }
+
+        public Vector2 getVelocity() {
+            return velocity;
+        }
+
+        public float getAngle() {
+            return velocity.angleRad();
+        }
     }
 }

@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.objects;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -39,7 +40,7 @@ public abstract class Bomb implements Disposable {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.linearDamping = 0.25f;
         bodyDef.angularDamping = 0.9f;
-        bodyDef = defineBody(bodyDef);
+        defineBody(bodyDef);
 
         Body body = getWorld().createBody(bodyDef);
 
@@ -50,9 +51,7 @@ public abstract class Bomb implements Disposable {
         fixtureDef.friction = 0.8f;
         fixtureDef.density = 10.0f;
         fixtureDef.restitution = 0.8f;
-        fixtureDef.filter.categoryBits = Bits.BOMB;
-        fixtureDef.filter.groupIndex = 1;
-        fixtureDef.filter.maskBits = Bits.ENVIRONMENT;
+        defineFilter(fixtureDef.filter);
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);
         fixture.setUserData(this);
@@ -64,8 +63,13 @@ public abstract class Bomb implements Disposable {
     /**
      * Allow a subclass to modify the body definition
      */
-    protected BodyDef defineBody(BodyDef bodyDef) {
-        return bodyDef;
+    protected void defineBody(BodyDef bodyDef) {
+        // noop
+    }
+
+    protected void defineFilter(Filter filter) {
+        filter.categoryBits = Bits.BOMB;
+        filter.maskBits = Bits.ENVIRONMENT | Bits.BALL;
     }
 
     public abstract void update(float delta);

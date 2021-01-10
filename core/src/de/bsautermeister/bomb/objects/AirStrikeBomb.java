@@ -2,12 +2,15 @@ package de.bsautermeister.bomb.objects;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+
+import de.bsautermeister.bomb.contact.Bits;
 
 public class AirStrikeBomb extends Bomb {
     private boolean groundContact;
@@ -17,13 +20,20 @@ public class AirStrikeBomb extends Bomb {
     }
 
     @Override
-    protected BodyDef defineBody(BodyDef bodyDef) {
+    protected void defineBody(BodyDef bodyDef) {
         bodyDef.gravityScale = 0f;
-        return bodyDef;
     }
 
     @Override
-    public void update(float delta) { }
+    protected void defineFilter(Filter filter) {
+        super.defineFilter(filter);
+        filter.maskBits = Bits.GROUND | Bits.BALL;
+    }
+
+    @Override
+    public void update(float delta) {
+        System.out.println(getBody().getPosition());
+    }
 
     @Override
     public boolean doExplode() {

@@ -81,6 +81,7 @@ public class GameController implements Disposable {
     private final BombFactory bombFactory;
     private final Array<Bomb> bombs = new Array<>();
 
+    private static final float MIN_AIR_STRIKE_DELAY = Player.MAX_CAMP_TIME + 5f;
     private float airStrikeUnlockTimer = 0f;
     private final AirStrikeManager airStrikeManager;
     private final Array<AirStrikeTargetMarker> airStrikeTargets = new Array<>();
@@ -260,7 +261,6 @@ public class GameController implements Disposable {
         fixtureDef.friction = 0.1f;
         fixtureDef.restitution = 0.1f;
         fixtureDef.filter.categoryBits = Bits.WALL;
-        fixtureDef.filter.groupIndex = 1;
         fixtureDef.filter.maskBits = Bits.OBJECTS;
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(1f, 1e7f);
@@ -339,7 +339,7 @@ public class GameController implements Disposable {
         airStrikeUnlockTimer -= delta;
 
         if (airStrikeUnlockTimer < 0 && player.isCamping()) {
-            airStrikeUnlockTimer = Cfg.AirStrike.MIN_DELAY;
+            airStrikeUnlockTimer = MIN_AIR_STRIKE_DELAY;
 
             // launch new air strike
             Vector2 playerPosition = player.getPosition();
@@ -349,9 +349,9 @@ public class GameController implements Disposable {
         airStrikeManager.update(delta);
 
         if (airStrikeManager.isReady()) {
-            Vector2 target = airStrikeManager.getTargetAndReset();
-            airStrikeTargets.add(new AirStrikeTargetMarker(target, 1f));
-            emitAirStrikeBomb(target, 0f);
+            AirStrikeManager.EmitInfo emitInfo = airStrikeManager.getTargetAndReset();
+            airStrikeTargets.add(new AirStrikeTargetMarker(emitInfo.getTarget(), 1f));
+            emitAirStrikeBomb(emitInfo);
         }
     }
 
@@ -369,14 +369,10 @@ public class GameController implements Disposable {
         return airStrikeTargets;
     }
 
-    private void emitAirStrikeBomb(Vector2 target, float offsetY) {
+    private void emitAirStrikeBomb(AirStrikeManager.EmitInfo emitInfo) {
         Bomb bomb = bombFactory.createAirStrikeBomb();
-        tmpBombEmitPosition.set(
-                target.x - ((target.y - BOMB_START_Y) / Cfg.AirStrike.VELOCITY.y) * Cfg.AirStrike.VELOCITY.x,
-                BOMB_START_Y + offsetY
-        );
-        bomb.setTransform(tmpBombEmitPosition, Cfg.AirStrike.ANGLE);
-        bomb.setLinearVelocity(Cfg.AirStrike.VELOCITY);
+        bomb.setTransform(emitInfo.getStart(), emitInfo.getAngle());
+        bomb.setLinearVelocity(emitInfo.getVelocity());
         bombs.add(bomb);
     }
 
@@ -450,7 +446,7 @@ public class GameController implements Disposable {
                         MathUtils.random(0.9f, 1.1f), 0f);
 
                 bomb.dispose();
-                bombs.removeValue(bomb, true);
+                bombs.removeIndex(i);
 
                 float shakeTime = camera.isInView(bombPosition)
                         ? 1f : 0.5f;
