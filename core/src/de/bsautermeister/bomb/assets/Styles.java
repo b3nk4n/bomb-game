@@ -9,10 +9,12 @@ public interface Styles {
 
     interface TextButton {
         String DEFAULT = "default";
+        String SMALL = "small";
         String PLAY = "play";
     }
 
     interface Fonts {
+        String TINY = "tiny";
         String SMALL = "small";
         String DEFAULT = "default";
         String LARGE = "large";

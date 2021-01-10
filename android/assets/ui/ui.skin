@@ -1,7 +1,10 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-    "small": {
+    "tiny": {
       "file": "ui/fonts/MetalLord-16.fnt"
+    },
+    "small": {
+      "file": "ui/fonts/MetalLord-32.fnt"
     },
     "default": {
       "file": "ui/fonts/MetalLord-42.fnt"
@@ -36,6 +39,11 @@
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
     "default": {
       "font": "default",
+      "fontColor": "white",
+      "downFontColor": "light"
+    },
+    "small": {
+      "font": "small",
       "fontColor": "white",
       "downFontColor": "light"
     },

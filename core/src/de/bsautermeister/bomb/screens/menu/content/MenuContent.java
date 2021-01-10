@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.GameSettings;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
@@ -49,11 +50,11 @@ public class MenuContent extends Table {
         setFillParent(true);
 
         defaults()
-                .pad(8f);
+                .pad(16f);
 
         final Label title = new Label("The Downfall", skin, Styles.Label.TITLE);
+        title.setColor(Cfg.Colors.DARK_RED);
         add(title)
-                .pad(8f)
                 .row();
 
         float delay = 1.0f;
@@ -109,8 +110,26 @@ public class MenuContent extends Table {
                     .row();
         }
 
+        final Button aboutButton = new TextButton("About", skin);
+        aboutButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                callbacks.aboutClicked();
+            }
+        });
+        aboutButton.addAction(Actions.sequence(
+                Actions.hide(),
+                Actions.delay(delay),
+                Actions.show()
+        ));
+        add(aboutButton)
+                .row();
+
+        Table settingsTable = new Table();
+        settingsTable.padTop(32f);
         String vibrationText = getVibrationText(gameSettings.getVibration());
-        final TextButton toggleVibrateButton = new TextButton(vibrationText, skin);
+        final TextButton toggleVibrateButton = new TextButton(vibrationText, skin, Styles.TextButton.SMALL);
+        toggleVibrateButton.getLabel().setColor(Cfg.Colors.DARK_RED);
         toggleVibrateButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -127,11 +146,11 @@ public class MenuContent extends Table {
                 Actions.delay(delay),
                 Actions.show()
         ));
-        add(toggleVibrateButton)
-                .row();
+        settingsTable.add(toggleVibrateButton).width(512f);
 
         String musicVolumeText = getMusicVolumeText(gameSettings.getMusicVolumeLevel());
-        final TextButton musicVolumeButton = new TextButton(musicVolumeText, skin);
+        final TextButton musicVolumeButton = new TextButton(musicVolumeText, skin, Styles.TextButton.SMALL);
+        musicVolumeButton.getLabel().setColor(Cfg.Colors.DARK_RED);
         musicVolumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -145,23 +164,9 @@ public class MenuContent extends Table {
                 Actions.delay(delay),
                 Actions.show()
         ));
-        add(musicVolumeButton)
+        settingsTable.add(musicVolumeButton).width(512f)
                 .row();
-
-        final Button aboutButton = new TextButton("About", skin);
-        aboutButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                callbacks.aboutClicked();
-            }
-        });
-        aboutButton.addAction(Actions.sequence(
-                Actions.hide(),
-                Actions.delay(delay),
-                Actions.show()
-        ));
-        add(aboutButton)
-                .row();
+        add(settingsTable);
 
         pack();
     }
