@@ -69,4 +69,8 @@ public class Overlays<T extends Enum> {
     public InputProcessor getInputProcessor() {
         return overlayStage;
     }
+
+    public Stage getStage() {
+        return overlayStage;
+    }
 }

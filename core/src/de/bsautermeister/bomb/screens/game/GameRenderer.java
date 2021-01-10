@@ -3,6 +3,7 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -74,7 +75,7 @@ public class GameRenderer implements Disposable {
 
     private final ShapeRenderer shapeRenderer;
 
-    private final GameHud hud;
+    private final Camera uiCamera;
     private final Overlays<GameState> overlays;
 
     private final BitmapFont font;
@@ -107,12 +108,12 @@ public class GameRenderer implements Disposable {
         Skin skin = assetManager.get(Assets.Skins.UI);
         font = skin.getFont(Styles.Fonts.TINY);
 
-        hud = new GameHud(assetManager, uiViewport, batch);
         overlays = new Overlays<>(uiViewport, batch, 0x000000BB);
         overlays.register(GameState.PAUSED,
                 new PauseOverlay(skin, controller.getPauseCallback()));
         overlays.register(GameState.GAME_OVER,
                 new GameOverOverlay(skin, controller.getGameOverCallback()));
+        uiCamera = overlays.getStage().getCamera();
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
         blurShader = assetManager.get(Assets.ShaderPrograms.BLUR);
@@ -195,7 +196,7 @@ public class GameRenderer implements Disposable {
         shapeRenderer.end();
         GdxUtils.disableAlpha();
 
-        batch.setProjectionMatrix(hud.getCamera().combined);
+        batch.setProjectionMatrix(uiCamera.combined);
         batch.begin();
         float uiWidth = uiViewport.getWorldWidth();
         tmpProjection.set(0f, -personalBest, 0f);
@@ -271,8 +272,7 @@ public class GameRenderer implements Disposable {
         }
 
         uiViewport.apply();
-        batch.setProjectionMatrix(hud.getCamera().combined);
-        renderHud(delta);
+        batch.setProjectionMatrix(uiCamera.combined);
         overlays.update(controller.getState());
         overlays.render(batch);
     }
@@ -396,14 +396,6 @@ public class GameRenderer implements Disposable {
             }
         }
     }
-
-    private void renderHud(float delta) {
-        Player player = controller.getPlayer();
-        hud.updateScore(player.getScore());
-        hud.render(delta);
-    }
-
-
 
     public void resize(int width, int height) {
         controller.getViewport().update(width, height, false);
