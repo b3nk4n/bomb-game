@@ -36,7 +36,7 @@ public class Player {
     private float radius;
 
     private float lifeRatio;
-    private int score;
+    private float lowestPositionY;
 
     private boolean blockJumpUntilRelease;
     private int groundContacts;
@@ -132,8 +132,8 @@ public class Player {
             lifeRatio = Math.min(1f, lifeRatio + Cfg.Player.SELF_HEALING_PER_SECOND * delta);
 
             Vector2 position = ballBody.getPosition();
-            float lowestPositionY = -position.y - radius;
-            score = Math.max(score, (int)(lowestPositionY * 10));
+            float bottomY = -position.y + radius;
+            lowestPositionY = Math.max(bottomY, lowestPositionY);
 
             updateCampDetection(delta, position);
         }
@@ -225,8 +225,12 @@ public class Player {
         return lifeRatio <= 0f;
     }
 
+    public float getLowestPositionY() {
+        return lowestPositionY;
+    }
+
     public int getScore() {
-        return score;
+        return (int)(lowestPositionY);
     }
 
     public static class KryoSerializer extends Serializer<Player> {
@@ -246,7 +250,7 @@ public class Player {
             kryo.writeObject(output, object.ballBody.getAngularVelocity());
             kryo.writeObject(output, object.fixedSensorBody.getPosition());
             output.writeFloat(object.lifeRatio);
-            output.writeInt(object.score);
+            output.writeFloat(object.lowestPositionY);
             output.writeBoolean(object.blockJumpUntilRelease);
             output.writeFloat(object.previousCampPositionX);
             output.writeFloat(object.campTime);
@@ -260,7 +264,7 @@ public class Player {
             player.ballBody.setAngularVelocity(input.readFloat());
             player.fixedSensorBody.setTransform(kryo.readObject(input, Vector2.class), 0f);
             player.lifeRatio = input.readFloat();
-            player.score = input.readInt();
+            player.lowestPositionY = input.readFloat();
             player.blockJumpUntilRelease = input.readBoolean();
             player.previousCampPositionX = input.readFloat();
             player.campTime = input.readFloat();

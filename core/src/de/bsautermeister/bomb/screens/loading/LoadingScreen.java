@@ -3,10 +3,13 @@ package de.bsautermeister.bomb.screens.loading;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -25,7 +28,7 @@ public class LoadingScreen extends ScreenBase {
 
     private Stage stage;
 
-    private Image logo;
+    private Label loadingLabel;
     private Image loadingFrame;
     private Image loadingBarHidden;
     private Image loadingBg;
@@ -48,6 +51,7 @@ public class LoadingScreen extends ScreenBase {
 
         // Tell the manager to load assets for the loading screen
         getAssetManager().load(Assets.Atlas.LOADING);
+        getAssetManager().load(Assets.Skins.LOADING);
         // Wait until they are finished loading
         getAssetManager().finishLoading();
 
@@ -58,7 +62,8 @@ public class LoadingScreen extends ScreenBase {
         TextureAtlas atlas = getAssetManager().get(Assets.Atlas.LOADING);
 
         // Grab the regions from the atlas and create some images
-        logo = new Image(atlas.findRegion(RegionNames.Loading.LOADING_TEXT));
+        Skin skin = getAssetManager().get(Assets.Skins.LOADING);
+        loadingLabel = new Label("Loading...", skin);
         loadingFrame = new Image(atlas.findRegion(RegionNames.Loading.FRAME));
         loadingBarHidden = new Image(atlas.findRegion(RegionNames.Loading.BAR_HIDDEN));
         loadingBg = new Image(atlas.findRegion(RegionNames.Loading.FRAME_BACKGROUND));
@@ -74,7 +79,7 @@ public class LoadingScreen extends ScreenBase {
         stage.addActor(loadingBg);
         stage.addActor(loadingBarHidden);
         stage.addActor(loadingFrame);
-        stage.addActor(logo);
+        stage.addActor(loadingLabel);
 
         // Add everything to be loaded, for instance:
         loadAssets();
@@ -91,9 +96,9 @@ public class LoadingScreen extends ScreenBase {
         stage.getViewport().update(width , height, true);
 
         // Place the logo in the middle of the screen on top of the loading bar
-        logo.setX((stage.getWidth() - logo.getWidth()) / 2);
-        logo.setY((stage.getHeight() - logo.getHeight()) / 2 + 80);
-        logo.setOrigin(Align.center);
+        loadingLabel.setX((stage.getWidth() - loadingLabel.getWidth()) / 2);
+        loadingLabel.setY((stage.getHeight() - loadingLabel.getHeight()) / 2 + 80);
+        loadingLabel.setOrigin(Align.center);
 
         // Place the loading frame in the middle of the screen
         loadingFrame.setX((stage.getWidth() - loadingFrame.getWidth()) / 2);

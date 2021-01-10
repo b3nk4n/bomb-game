@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -26,6 +27,8 @@ public interface Assets {
     interface Skins {
         AssetDescriptor<Skin> UI =
                 new AssetDescriptor<>("ui/ui.skin", Skin.class);
+        AssetDescriptor<Skin> LOADING =
+                new AssetDescriptor<>("loading/loading.skin", Skin.class);
     }
 
     abstract class ShaderPrograms {

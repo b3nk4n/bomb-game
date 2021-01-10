@@ -1,41 +1,13 @@
 
 ui.png
-size: 1024,64
+size: 16,16
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-life_bar
+frame-bg
   rotate: false
   xy: 4, 4
-  size: 180, 48
-  orig: 180, 48
+  size: 5, 5
+  orig: 5, 5
   offset: 0, 0
-  index: 0
-life_bar
-  rotate: false
-  xy: 188, 4
-  size: 180, 48
-  orig: 180, 48
-  offset: 0, 0
-  index: 1
-life_bar
-  rotate: false
-  xy: 372, 4
-  size: 180, 48
-  orig: 180, 48
-  offset: 0, 0
-  index: 2
-life_bar
-  rotate: false
-  xy: 556, 4
-  size: 180, 48
-  orig: 180, 48
-  offset: 0, 0
-  index: 3
-life_bar
-  rotate: false
-  xy: 740, 4
-  size: 180, 48
-  orig: 180, 48
-  offset: 0, 0
-  index: 4
+  index: -1

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -32,6 +34,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.RegionNames;
+import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
 import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
@@ -74,6 +77,8 @@ public class GameRenderer implements Disposable {
     private final GameHud hud;
     private final Overlays<GameState> overlays;
 
+    private final BitmapFont font;
+
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
                         FrameBufferManager frameBufferManager) {
         this.batch = batch;
@@ -100,6 +105,7 @@ public class GameRenderer implements Disposable {
         uiViewport = new StretchViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
 
         Skin skin = assetManager.get(Assets.Skins.UI);
+        font = skin.getFont(Styles.Fonts.SMALL);
 
         hud = new GameHud(assetManager, uiViewport, batch);
         overlays = new Overlays<>(uiViewport, batch, 0x000000BB);
@@ -164,9 +170,10 @@ public class GameRenderer implements Disposable {
         renderGround(polygonBatch);
         polygonBatch.end();
 
+        GdxUtils.enableAlpha();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         Array<AirStrikeTargetMarker> airStrikeTargets = controller.getAirStrikeTargets();
         if (!airStrikeTargets.isEmpty()) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
             for (AirStrikeTargetMarker targetMarker : airStrikeTargets) {
                 Vector2 pos = targetMarker.getPosition();
                 float progress = targetMarker.getProgress();
@@ -175,10 +182,34 @@ public class GameRenderer implements Disposable {
                 shapeRenderer.rectLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size, size);
                 shapeRenderer.rectLine(pos.x - size, pos.y + size, pos.x + size, pos.y - size, size);
             }
-            shapeRenderer.end();
         }
 
+        // score line
+        Player player = controller.getPlayer();
+        //float lowestPosY = player.getLowestPositionY();
+        float personalBest = 5f;
+        //shapeRenderer.setColor(1f, 1f, 1f, 0.33f);
+        shapeRenderer.setColor(Cfg.Colors.SEMI_WHITE);
+        final float lineWidth = 0.05f;
+        shapeRenderer.rectLine(0, -personalBest, Cfg.World.WIDTH_PPM, -personalBest, lineWidth);
+        shapeRenderer.end();
+        GdxUtils.disableAlpha();
+
+        batch.setProjectionMatrix(hud.getCamera().combined);
+        batch.begin();
+        float uiWidth = uiViewport.getWorldWidth();
+        tmpProjection.set(0f, -personalBest, 0f);
+        camera.getGdxCamera().project(tmpProjection);
+        font.setColor(Cfg.Colors.SEMI_WHITE);
+        //font.draw(batch, "- 1234ft", -5f, tmpProjection.y, 512f, Align.left, false);
+        //font.draw(batch, "1234ft -", uiWidth - 512f + 8f, tmpProjection.y, 512f, Align.right, false);
+        font.draw(batch, "Personal Best", 0f, tmpProjection.y, uiWidth, Align.center, false);
+        batch.end();
+
         frameBufferManager.end();
+
+        viewport.apply();
+        batch.setProjectionMatrix(camera.getGdxCamera().combined);
 
         Array<BlastInstance> blasts = controller.getActiveBlastEffects();
         if (blasts.size > 0) {
@@ -209,7 +240,6 @@ public class GameRenderer implements Disposable {
         }
 
         batch.begin();
-        Player player = controller.getPlayer();
         Vector2 playerPosition = player.getPosition();
         tmpProjection.set(playerPosition.x, playerPosition.y, 0f);
         camera.getGdxCamera().project(tmpProjection);

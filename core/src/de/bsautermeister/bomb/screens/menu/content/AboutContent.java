@@ -47,8 +47,8 @@ public class AboutContent extends Table {
 
     private void updateLabels(CreditEntry entry) {
         creditContainer.clearChildren();
-        creditContainer.add(new Label(entry.title, skin, Styles.Label.TITLE))
-                .pad(32f)
+        creditContainer.add(new Label(entry.title, skin, Styles.Label.LARGE))
+                .pad(16f)
                 .row();
         for (String line : entry.lines) {
             creditContainer.add(new Label(line, skin, Styles.Label.DEFAULT))

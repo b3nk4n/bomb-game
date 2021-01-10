@@ -57,7 +57,7 @@ public class MenuContent extends Table {
                 .row();
 
         float delay = 1.0f;
-        final Button playButton = new TextButton("Play", skin);
+        final Button playButton = new TextButton("Play", skin, Styles.TextButton.PLAY);
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

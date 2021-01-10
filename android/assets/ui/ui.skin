@@ -1,10 +1,16 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "small": {
+      "file": "ui/fonts/MetalLord-16.fnt"
+    },
     "default": {
-      "file": "ui/fonts/KarmaticArcade-31.fnt"
-    }
+      "file": "ui/fonts/MetalLord-42.fnt"
+    },
+    "large": {
+      "file": "ui/fonts/MetalLord-64.fnt"
+    },
     "title": {
-      "file": "ui/fonts/KarmaticArcade-61.fnt"
+      "file": "ui/fonts/MetalLord-96.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {
@@ -28,17 +34,26 @@
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
-      "default": {
-        "font": "default",
-        "fontColor": "white",
-        "downFontColor": "light"
-      }
+    "default": {
+      "font": "default",
+      "fontColor": "white",
+      "downFontColor": "light"
     },
+    "play": {
+      "font": "large",
+      "fontColor": "white",
+      "downFontColor": "light"
+    }
+  },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "default": {
       "font": "default",
       "fontColor": "white"
     },
+    "large": {
+      "font": "large",
+      "fontColor": "white"
+    }
     "title": {
       "font": "title",
       "fontColor": "white"
