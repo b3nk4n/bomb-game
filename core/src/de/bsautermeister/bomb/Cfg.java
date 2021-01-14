@@ -44,6 +44,5 @@ public interface Cfg {
 
     interface Colors {
         Color DARK_RED = new Color(0.7f, 0f, 0f, 1f);
-        Color SEMI_WHITE = new Color(1f, 1f, 1f, 0.66f);
     }
 }

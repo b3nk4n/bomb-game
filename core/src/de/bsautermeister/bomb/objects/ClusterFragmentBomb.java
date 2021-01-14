@@ -45,7 +45,7 @@ public class ClusterFragmentBomb extends Bomb {
 
     @Override
     public boolean isFlashing() {
-        return false;
+        return true;
     }
 
     @Override

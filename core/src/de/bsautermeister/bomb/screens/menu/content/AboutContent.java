@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
 
@@ -41,13 +42,18 @@ public class AboutContent extends Table {
         setFillParent(true);
 
         addActor(creditContainer);
-        creditContainer.center().setFillParent(true);
+        creditContainer
+                .center()
+                .padBottom(32f)
+                .setFillParent(true);
         updateLabels(credits[currentCreditIndex]);
     }
 
     private void updateLabels(CreditEntry entry) {
         creditContainer.clearChildren();
-        creditContainer.add(new Label(entry.title, skin, Styles.Label.LARGE))
+        Label titleLabel = new Label(entry.title, skin, Styles.Label.LARGE);
+        titleLabel.setColor(Cfg.Colors.DARK_RED);
+        creditContainer.add(titleLabel)
                 .pad(16f)
                 .row();
         for (String line : entry.lines) {
