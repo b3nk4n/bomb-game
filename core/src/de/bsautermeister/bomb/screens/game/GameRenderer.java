@@ -49,6 +49,7 @@ import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
+import de.bsautermeister.bomb.screens.game.score.ScoreMarker;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.bsautermeister.bomb.utils.PolygonUtils;
 
@@ -124,6 +125,7 @@ public class GameRenderer implements Disposable {
 
     private final Vector3 tmpProjection = new Vector3();
     private final float[] tmpBlastEntries = new float[64];
+    private final Color tmpScoreMarkerColor = new Color(Color.WHITE);
     public void render(float delta) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
@@ -187,24 +189,22 @@ public class GameRenderer implements Disposable {
 
         // score line
         Player player = controller.getPlayer();
-        //float lowestPosY = player.getLowestPositionY();
-        float personalBest = 5f;
-        //shapeRenderer.setColor(1f, 1f, 1f, 0.33f);
-        shapeRenderer.setColor(Cfg.Colors.SEMI_WHITE);
-        final float lineWidth = 0.05f;
-        shapeRenderer.rectLine(0, -personalBest, Cfg.World.WIDTH_PPM, -personalBest, lineWidth);
+        Array<ScoreMarker> scoreMarkers = controller.getScoreMarkers();
+        for (ScoreMarker scoreMarker : scoreMarkers) {
+            float factor = Interpolation.smooth.apply(scoreMarker.inverseProgress());
+            tmpScoreMarkerColor.a = factor * 0.66f;
+            drawMarkerLine(shapeRenderer, scoreMarker.getScore(), tmpScoreMarkerColor, factor);
+        }
+
         shapeRenderer.end();
         GdxUtils.disableAlpha();
 
         batch.setProjectionMatrix(uiCamera.combined);
         batch.begin();
-        float uiWidth = uiViewport.getWorldWidth();
-        tmpProjection.set(0f, -personalBest, 0f);
-        camera.getGdxCamera().project(tmpProjection);
-        font.setColor(Cfg.Colors.SEMI_WHITE);
-        //font.draw(batch, "- 1234ft", -5f, tmpProjection.y, 512f, Align.left, false);
-        //font.draw(batch, "1234ft -", uiWidth - 512f + 8f, tmpProjection.y, 512f, Align.right, false);
-        font.draw(batch, "Personal Best", 0f, tmpProjection.y, uiWidth, Align.center, false);
+        for (ScoreMarker scoreMarker : scoreMarkers) {
+            tmpScoreMarkerColor.a = Interpolation.smooth.apply(scoreMarker.inverseProgress()) * 0.66f;
+            drawMarkerText(camera, scoreMarker.getScore(), scoreMarker.getLabel(), tmpScoreMarkerColor);
+        }
         batch.end();
 
         frameBufferManager.end();
@@ -275,6 +275,18 @@ public class GameRenderer implements Disposable {
         batch.setProjectionMatrix(uiCamera.combined);
         overlays.update(controller.getState());
         overlays.render(batch);
+    }
+
+    private void drawMarkerText(Camera2D camera, int value, String text, Color color) {
+        tmpProjection.set(0f, -value, 0f);
+        camera.getGdxCamera().project(tmpProjection);
+        font.setColor(color);
+        font.draw(batch, text, 0f, tmpProjection.y, Cfg.Ui.WIDTH, Align.center, false);
+    }
+
+    private static void drawMarkerLine(ShapeRenderer shapeRenderer, float value, Color color, float widthFactor) {
+        shapeRenderer.setColor(color);
+        shapeRenderer.rectLine(0, -value, Cfg.World.WIDTH_PPM, -value, 0.05f * widthFactor);
     }
 
     private static void renderFrameBufferToScreen(Batch batch, Camera2D camera, FrameBuffer frameBuffer) {

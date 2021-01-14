@@ -61,6 +61,8 @@ import de.bsautermeister.bomb.objects.StickyBomb;
 import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
+import de.bsautermeister.bomb.screens.game.score.GameScores;
+import de.bsautermeister.bomb.screens.game.score.ScoreMarker;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 import de.bsautermeister.bomb.serializers.Vector3Serializer;
@@ -70,6 +72,8 @@ import static com.badlogic.gdx.Input.Keys.SPACE;
 public class GameController implements Disposable {
 
     private static final Logger LOG = new Logger(GameController.class.getSimpleName(), Cfg.LOG_LEVEL);
+
+    private static final String PERSONAL_TOP_STRING = "My Highscore";
 
     private final BombGame game;
     private ShakableCamera2D camera;
@@ -106,6 +110,8 @@ public class GameController implements Disposable {
     private final Sound explosionSound;
     private final LoopSound heartbeatSound;
     private final Sound hitSound;
+
+    private final Array<ScoreMarker> scoreMarkers = new Array<>();
 
     private final GameScreenCallbacks gameScreenCallbacks;
 
@@ -253,6 +259,17 @@ public class GameController implements Disposable {
                 }
             }
         });
+
+        GameScores gameScores = game.getGameScores();
+        scoreMarkers.clear();
+        for (Integer score : gameScores.getTopList()) {
+            if (score > player.getScore()) {
+                scoreMarkers.add(new ScoreMarker(score, "TBD")); // TODO find way to apply the appropriate label here (e.g. 3rd)
+            }
+        }
+        if (gameScores.getPersonalBest() > player.getScore()) {
+            scoreMarkers.add(new ScoreMarker(gameScores.getPersonalBest(), PERSONAL_TOP_STRING));
+        }
     }
 
     private void createWorldBoundsWallBodies(World world) {
@@ -305,6 +322,7 @@ public class GameController implements Disposable {
             gameTime += delta;
             handleInput();
             player.update(delta);
+            updateScoreMarkers(delta);
             updateAirStrike(delta);
             updateCamera(delta);
             updateBombEmitter(delta);
@@ -333,6 +351,16 @@ public class GameController implements Disposable {
         explosionGlowEffect.update(delta);
 
         world.step(delta, 6, 2);
+    }
+
+    private void updateScoreMarkers(float delta) {
+        for (int i = scoreMarkers.size - 1; i >= 0; --i) {
+            ScoreMarker scoreMarker = scoreMarkers.get(i);
+            scoreMarker.update(delta, player.getScore());
+            if (scoreMarker.isExpired()) {
+                scoreMarkers.removeIndex(i);
+            }
+        }
     }
 
     private void updateAirStrike(float delta) {
@@ -657,5 +685,9 @@ public class GameController implements Disposable {
 
     public ManagedPooledEffect getExplosionGlowEffect() {
         return explosionGlowEffect;
+    }
+
+    public Array<ScoreMarker> getScoreMarkers() {
+        return scoreMarkers;
     }
 }
