@@ -126,7 +126,7 @@ public class GameRenderer implements Disposable {
     private final Vector3 tmpProjection = new Vector3();
     private final float[] tmpBlastEntries = new float[64];
     private final Color tmpScoreMarkerColor = new Color(Color.WHITE);
-    public void render(float delta) {
+    public void render() {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
@@ -402,7 +402,9 @@ public class GameRenderer implements Disposable {
                     PolygonRegion polyReg = new PolygonRegion(textureRegion, tmpVerticesArray, TRIANGULATION_IDENTITY);
                     PolygonSprite polySprite = new PolygonSprite(polyReg);
                     polySprite.setPosition(fragment.getLeftX(), fragment.getBottomY());
-                    polySprite.setSize(1f, 1f);
+                    // we pick a size slightly bigger than 1, because otherwise there are gaps
+                    // as visual glitches visible between each ground fragment from time to time
+                    polySprite.setSize(1.001f, 1.001f);
                     polySprite.draw(polygonBatch);
                 }
             }
