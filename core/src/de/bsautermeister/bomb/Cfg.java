@@ -1,7 +1,6 @@
 package de.bsautermeister.bomb;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
@@ -16,7 +15,6 @@ public interface Cfg {
         float PPM = 5f;
         float WIDTH_PPM = Ground.FRAGMENT_SIZE_PPM * Ground.FRAGMENTS_NUM_COLS;
         float VIEWPORT_HEIGHT_PPM = 41f / PPM;
-        float VIEWPORT_WIDTH_PPM = 64f / PPM;
     }
 
     interface Ui {
@@ -39,7 +37,7 @@ public interface Cfg {
     interface Player {
         float RADIUS_PPM = 1.25f / World.PPM;
         float SELF_HEALING_PER_SECOND = 0.015f;
-        Vector2 START_POSITION = new Vector2(World.VIEWPORT_WIDTH_PPM, 24f / World.PPM);
+        float START_POSITION_Y = 24f / World.PPM;
     }
 
     interface Colors {

@@ -145,14 +145,16 @@ public class GameController implements Disposable {
         this.game = game;
         this.gameScreenCallbacks = gameScreenCallbacks;
 
+        float viewportWidthPPM = Cfg.World.VIEWPORT_HEIGHT_PPM * ((float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight());
+
         camera = new ShakableCamera2D(
                 new BoundedCamera2D(
                         new OrthographicCamera2D(),
-                        Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
-                        Cfg.World.WIDTH_PPM - Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
+                        viewportWidthPPM / 2f,
+                        Cfg.World.WIDTH_PPM - viewportWidthPPM / 2f,
                         0f, -Float.MAX_VALUE)
         );
-        viewport = new StretchViewport(Cfg.World.VIEWPORT_WIDTH_PPM, Cfg.World.VIEWPORT_HEIGHT_PPM, camera.getGdxCamera());
+        viewport = new StretchViewport(viewportWidthPPM, Cfg.World.VIEWPORT_HEIGHT_PPM, camera.getGdxCamera());
 
         world = new World(new Vector2(0, -Cfg.World.GRAVITY), true);
 
@@ -226,7 +228,7 @@ public class GameController implements Disposable {
 
         if (player == null) {
             player = new Player(world, Cfg.Player.RADIUS_PPM);
-            player.setTransform(Cfg.Player.START_POSITION, 0f);
+            player.setTransform(new Vector2(viewport.getWorldWidth() / 2f, Cfg.Player.START_POSITION_Y), 0f);
             camera.setPosition(player.getPosition());
         }
 

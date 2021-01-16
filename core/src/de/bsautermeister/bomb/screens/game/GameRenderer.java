@@ -59,7 +59,6 @@ public class GameRenderer implements Disposable {
     private static final float[] POLYGON_BUFFER = new float[64];
     private static final float POLYGON_ZOOM = 1.1f;
 
-    private final Viewport uiViewport;
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch();
     private final SpriteBatch batch;
     private final FrameBufferManager frameBufferManager;
@@ -76,6 +75,7 @@ public class GameRenderer implements Disposable {
 
     private final ShapeRenderer shapeRenderer;
 
+    private final Viewport uiViewport;
     private final Camera uiCamera;
     private final Overlays<GameState> overlays;
 
@@ -279,7 +279,11 @@ public class GameRenderer implements Disposable {
 
     private void drawMarkerText(Camera2D camera, int value, String text, Color color) {
         tmpProjection.set(0f, -value, 0f);
-        camera.getGdxCamera().project(tmpProjection);
+        System.out.println("GdxGraphics " + Gdx.graphics.getWidth() + " - " + Gdx.graphics.getHeight());
+        System.out.println("UIViewport " + uiViewport.getScreenWidth() + " - " + uiViewport.getScreenHeight());
+        System.out.println("Camera VP " + camera.getGdxCamera().viewportWidth + " - " + camera.getGdxCamera().viewportHeight);
+        camera.getGdxCamera().project(
+                tmpProjection, 0f, 0f, Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
         font.setColor(color);
         font.draw(batch, text, 0f, tmpProjection.y, Cfg.Ui.WIDTH, Align.center, false);
     }
