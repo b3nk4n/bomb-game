@@ -150,7 +150,7 @@ public class GameController implements Disposable {
                         new OrthographicCamera2D(),
                         Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
                         Cfg.World.WIDTH_PPM - Cfg.World.VIEWPORT_WIDTH_PPM / 2f,
-                        Float.MAX_VALUE, -Float.MAX_VALUE)
+                        0f, -Float.MAX_VALUE)
         );
         viewport = new StretchViewport(Cfg.World.VIEWPORT_WIDTH_PPM, Cfg.World.VIEWPORT_HEIGHT_PPM, camera.getGdxCamera());
 

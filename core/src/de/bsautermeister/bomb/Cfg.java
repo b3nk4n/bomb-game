@@ -39,7 +39,7 @@ public interface Cfg {
     interface Player {
         float RADIUS_PPM = 1.25f / World.PPM;
         float SELF_HEALING_PER_SECOND = 0.015f;
-        Vector2 START_POSITION = new Vector2(World.VIEWPORT_WIDTH_PPM, 5f / World.PPM);
+        Vector2 START_POSITION = new Vector2(World.VIEWPORT_WIDTH_PPM, 24f / World.PPM);
     }
 
     interface Colors {
