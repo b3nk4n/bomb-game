@@ -1,15 +1,14 @@
 package de.bsautermeister.bomb;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 
 import java.io.File;
 
 import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.core.GameApp;
-import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.game.GameStats;
+import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.loading.LoadingScreen;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 

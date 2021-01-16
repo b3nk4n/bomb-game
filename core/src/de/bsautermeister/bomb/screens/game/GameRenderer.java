@@ -306,30 +306,39 @@ public class GameRenderer implements Disposable {
     private static void renderBackground(ShapeRenderer renderer, Camera2D camera) {
         Vector2 cameraPosition = camera.getPosition();
 
+        // fix building at some point because they are drawn with limited height
+        boolean fix = cameraPosition.y < -0.5f * BUILDING_BASE_HEIGHT;
+
         renderer.setColor(CITY_BACK_COLOR);
-        renderCityLayer(renderer,  cameraPosition.x * 0.6f - 10f, cameraPosition.y * 0.9f);
+        renderCityLayer(renderer,  cameraPosition.x * 0.6f - 10f, fix ? cameraPosition.y : cameraPosition.y * 0.9f);
 
         renderer.setColor(CITY_MID_COLOR);
-        renderCityLayer(renderer, cameraPosition.x * 0.5f, 0.5f + cameraPosition.y * 0.8f);
+        renderCityLayer(renderer, cameraPosition.x * 0.5f, 0.5f + (fix ? cameraPosition.y : cameraPosition.y * 0.8f) + 0.1f);
 
         renderer.setColor(CITY_FRONT_COLOR);
-        renderCityLayer(renderer, cameraPosition.x * 0.4f - 5f, 1f + cameraPosition.y * 0.7f);
+        renderCityLayer(renderer, cameraPosition.x * 0.4f - 5f, 1f + (fix ? cameraPosition.y : cameraPosition.y * 0.7f) + 0.2f);
     }
 
+    private final static float BUILDING_BASE_HEIGHT = 100f;
     private static void renderCityLayer(ShapeRenderer renderer, float offsetX, float offsetY) {
-        renderer.rect(offsetX + -1f, offsetY - 100f, 2f, 103f);
+        final float y = offsetY - BUILDING_BASE_HEIGHT;
+        renderer.rect(offsetX - 4f, y, 1f, BUILDING_BASE_HEIGHT + 2.8f);
+        renderer.rect(offsetX - 4.5f, y, 2f, BUILDING_BASE_HEIGHT + 2.2f);
 
-        renderer.rect(offsetX + 3f, offsetY - 100f, 2.5f, 105f);
-        renderer.rect(offsetX + 4.75f, offsetY - 100f, 2f, 102f);
+        renderer.rect(offsetX - 1f, y, 2f, BUILDING_BASE_HEIGHT + 3f);
 
-        renderer.rect(offsetX + 7f, offsetY - 100f, 2f, 103f);
+        renderer.rect(offsetX + 3f, y, 2.5f, BUILDING_BASE_HEIGHT + 5f);
 
-        renderer.rect(offsetX + 11f, offsetY - 100f, 2f, 102f);
+        renderer.rect(offsetX + 7f, y, 2f, BUILDING_BASE_HEIGHT + 3.2f);
 
-        renderer.rect(offsetX + 13f, offsetY - 100f, 2.5f, 103f);
-        renderer.rect(offsetX + 14.75f, offsetY - 100f, 2f, 102f);
+        renderer.rect(offsetX + 11f, y, 2f, BUILDING_BASE_HEIGHT + 2.0f);
 
-        renderer.rect(offsetX + 17f, offsetY - 100f, 2f, 102.5f);
+        renderer.rect(offsetX + 15f, y, 1f, BUILDING_BASE_HEIGHT + 3.1f);
+        renderer.rect(offsetX + 14.5f, y, 2f, BUILDING_BASE_HEIGHT + 2.4f);
+
+        renderer.rect(offsetX + 17f, y, 2f, BUILDING_BASE_HEIGHT + 2.8f);
+
+        renderer.rect(offsetX + 19.5f, y, 2.5f, BUILDING_BASE_HEIGHT + 1.3f);
     }
 
     private static void renderBall(ShapeRenderer renderer, Player player) {

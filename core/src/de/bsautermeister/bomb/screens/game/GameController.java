@@ -359,7 +359,6 @@ public class GameController implements Disposable {
 
     private void updateScoreMarkers(float delta) {
         int playerScore = ScoreUtils.toScore(player.getMaxDepth());
-        System.out.println(playerScore);
         for (int i = scoreMarkers.size - 1; i >= 0; --i) {
             ScoreMarker scoreMarker = scoreMarkers.get(i);
             scoreMarker.update(delta, playerScore);
