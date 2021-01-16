@@ -63,6 +63,7 @@ import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.game.score.ScoreMarker;
+import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 import de.bsautermeister.bomb.serializers.Vector3Serializer;
@@ -264,12 +265,13 @@ public class GameController implements Disposable {
 
         GameScores gameScores = game.getGameScores();
         scoreMarkers.clear();
+        float playerScore = ScoreUtils.toScore(player.getMaxDepth());
         for (Integer score : gameScores.getTopList()) {
-            if (score > player.getScore()) {
+            if (score > playerScore) {
                 scoreMarkers.add(new ScoreMarker(score, "TBD")); // TODO find way to apply the appropriate label here (e.g. 3rd)
             }
         }
-        if (gameScores.getPersonalBest() > player.getScore()) {
+        if (gameScores.getPersonalBest() > playerScore) {
             scoreMarkers.add(new ScoreMarker(gameScores.getPersonalBest(), PERSONAL_TOP_STRING));
         }
     }
@@ -356,9 +358,11 @@ public class GameController implements Disposable {
     }
 
     private void updateScoreMarkers(float delta) {
+        int playerScore = ScoreUtils.toScore(player.getMaxDepth());
+        System.out.println(playerScore);
         for (int i = scoreMarkers.size - 1; i >= 0; --i) {
             ScoreMarker scoreMarker = scoreMarkers.get(i);
-            scoreMarker.update(delta, player.getScore());
+            scoreMarker.update(delta, playerScore);
             if (scoreMarker.isExpired()) {
                 scoreMarkers.removeIndex(i);
             }

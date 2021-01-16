@@ -36,7 +36,7 @@ public class Player {
     private float radius;
 
     private float lifeRatio;
-    private float lowestPositionY;
+    private float maxDepth;
 
     private boolean blockJumpUntilRelease;
     private int groundContacts;
@@ -133,7 +133,7 @@ public class Player {
 
             Vector2 position = ballBody.getPosition();
             float bottomY = -position.y + radius;
-            lowestPositionY = Math.max(bottomY, lowestPositionY);
+            maxDepth = Math.max(bottomY, maxDepth);
 
             updateCampDetection(delta, position);
         }
@@ -228,12 +228,8 @@ public class Player {
         return lifeRatio <= 0f;
     }
 
-    public float getLowestPositionY() {
-        return lowestPositionY;
-    }
-
-    public int getScore() {
-        return (int)(lowestPositionY);
+    public float getMaxDepth() {
+        return maxDepth;
     }
 
     public static class KryoSerializer extends Serializer<Player> {
@@ -253,7 +249,7 @@ public class Player {
             kryo.writeObject(output, object.ballBody.getAngularVelocity());
             kryo.writeObject(output, object.fixedSensorBody.getPosition());
             output.writeFloat(object.lifeRatio);
-            output.writeFloat(object.lowestPositionY);
+            output.writeFloat(object.maxDepth);
             output.writeBoolean(object.blockJumpUntilRelease);
             output.writeFloat(object.previousCampPositionX);
             output.writeFloat(object.campTime);
@@ -267,7 +263,7 @@ public class Player {
             player.ballBody.setAngularVelocity(input.readFloat());
             player.fixedSensorBody.setTransform(kryo.readObject(input, Vector2.class), 0f);
             player.lifeRatio = input.readFloat();
-            player.lowestPositionY = input.readFloat();
+            player.maxDepth = input.readFloat();
             player.blockJumpUntilRelease = input.readBoolean();
             player.previousCampPositionX = input.readFloat();
             player.campTime = input.readFloat();

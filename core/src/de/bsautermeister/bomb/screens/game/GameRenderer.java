@@ -193,7 +193,7 @@ public class GameRenderer implements Disposable {
         for (ScoreMarker scoreMarker : scoreMarkers) {
             float factor = Interpolation.smooth.apply(scoreMarker.inverseProgress());
             tmpScoreMarkerColor.a = factor * 0.66f;
-            drawMarkerLine(shapeRenderer, scoreMarker.getScore(), tmpScoreMarkerColor, factor);
+            drawMarkerLine(shapeRenderer, scoreMarker.getDepth(), tmpScoreMarkerColor, factor);
         }
 
         shapeRenderer.end();
@@ -203,7 +203,7 @@ public class GameRenderer implements Disposable {
         batch.begin();
         for (ScoreMarker scoreMarker : scoreMarkers) {
             tmpScoreMarkerColor.a = Interpolation.smooth.apply(scoreMarker.inverseProgress()) * 0.66f;
-            drawMarkerText(camera, scoreMarker.getScore(), scoreMarker.getLabel(), tmpScoreMarkerColor);
+            drawMarkerText(camera, scoreMarker.getDepth(), scoreMarker.getLabel(), tmpScoreMarkerColor);
         }
         batch.end();
 
@@ -277,17 +277,17 @@ public class GameRenderer implements Disposable {
         overlays.render(batch);
     }
 
-    private void drawMarkerText(Camera2D camera, int value, String text, Color color) {
-        tmpProjection.set(0f, -value, 0f);
+    private void drawMarkerText(Camera2D camera, float depth, String text, Color color) {
+        tmpProjection.set(0f, -depth, 0f);
         camera.getGdxCamera().project(
                 tmpProjection, 0f, 0f, Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
         font.setColor(color);
         font.draw(batch, text, 0f, tmpProjection.y, Cfg.Ui.WIDTH, Align.center, false);
     }
 
-    private static void drawMarkerLine(ShapeRenderer shapeRenderer, float value, Color color, float widthFactor) {
+    private static void drawMarkerLine(ShapeRenderer shapeRenderer, float depth, Color color, float widthFactor) {
         shapeRenderer.setColor(color);
-        shapeRenderer.rectLine(0, -value, Cfg.World.WIDTH_PPM, -value, 0.05f * widthFactor);
+        shapeRenderer.rectLine(0, -depth, Cfg.World.WIDTH_PPM, -depth, 0.05f * widthFactor);
     }
 
     private static void renderFrameBufferToScreen(Batch batch, Camera2D camera, FrameBuffer frameBuffer) {

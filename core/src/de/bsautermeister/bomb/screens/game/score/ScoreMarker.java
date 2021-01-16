@@ -4,6 +4,7 @@ public class ScoreMarker {
     private static final float TOTAL_EXPIRY_TIME = 0.5f;
 
     private final int score;
+    private final float depth;
     private final String label;
     private float ttl;
 
@@ -11,6 +12,7 @@ public class ScoreMarker {
         this.score = score;
         this.label = label;
         this.ttl = TOTAL_EXPIRY_TIME;
+        this.depth = ScoreUtils.toDepth(score);
     }
 
     public void update(float delta, int currentScore) {
@@ -21,6 +23,10 @@ public class ScoreMarker {
 
     public int getScore() {
         return score;
+    }
+
+    public float getDepth() {
+        return depth;
     }
 
     public String getLabel() {
