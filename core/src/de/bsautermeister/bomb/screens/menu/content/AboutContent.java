@@ -63,9 +63,10 @@ public class AboutContent extends Table {
         creditContainer.pack();
         creditContainer.addAction(
                 Actions.sequence(
-                        Actions.show(),
+                        Actions.alpha(0f),
+                        Actions.alpha(1f, 0.5f),
                         Actions.delay(TEXT_ANIMATION_DURATION),
-                        Actions.hide(),
+                        Actions.alpha(0f, 0.5f),
                         Actions.run(new Runnable() {
                             @Override
                             public void run() {

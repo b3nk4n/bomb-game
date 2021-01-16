@@ -5,9 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -16,7 +14,7 @@ import de.bsautermeister.bomb.utils.TextureUtils;
 
 public class Overlays<T extends Enum> {
 
-    private final ObjectMap<T, Actor> overlays;
+    private final ObjectMap<T, Overlay> overlays;
     private final Stage overlayStage;
 
     // workaround: do not act during the first frame, otherwise button event which triggered
@@ -36,15 +34,16 @@ public class Overlays<T extends Enum> {
         Gdx.input.setInputProcessor(overlayStage);
     }
 
-    public void register(T state, Table overlay) {
+    public void register(T state, Overlay overlay) {
         overlays.put(state, overlay);
     }
 
     public void update(T state) {
         if (overlayStage.getActors().isEmpty()) {
-            Actor overlay = overlays.get(state);
+            Overlay overlay = overlays.get(state);
             if (overlay != null) {
                 overlayStage.addActor(overlay);
+                overlay.show();
                 skipNextOverlayAct = true;
             }
         } else if (!overlays.containsKey(state)) {

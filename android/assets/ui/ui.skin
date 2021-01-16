@@ -1,6 +1,6 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-    "tiny": {
+    "xsmall": {
       "file": "ui/fonts/MetalLord-16.fnt"
     },
     "small": {
@@ -47,7 +47,7 @@
       "fontColor": "white",
       "downFontColor": "light"
     },
-    "play": {
+    "large": {
       "font": "large",
       "fontColor": "white",
       "downFontColor": "light"

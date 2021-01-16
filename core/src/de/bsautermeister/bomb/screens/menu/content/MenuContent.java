@@ -52,13 +52,19 @@ public class MenuContent extends Table {
         defaults()
                 .pad(16f);
 
+        float delay = 0f;
         final Label title = new Label("The Downfall", skin, Styles.Label.TITLE);
         title.setColor(Cfg.Colors.DARK_RED);
+        title.addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.delay(delay),
+                Actions.alpha(1f, 0.5f)
+        ));
+        delay += DELAY_OFFSET;
         add(title)
                 .row();
 
-        float delay = 1.0f;
-        final Button playButton = new TextButton("Play", skin, Styles.TextButton.PLAY);
+        final Button playButton = new TextButton("Play", skin, Styles.TextButton.LARGE);
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -66,9 +72,9 @@ public class MenuContent extends Table {
             }
         });
         playButton.addAction(Actions.sequence(
-                Actions.hide(),
+                Actions.alpha(0f),
                 Actions.delay(delay),
-                Actions.show()
+                Actions.alpha(1f, 0.5f)
         ));
         delay += DELAY_OFFSET;
         add(playButton)
@@ -83,9 +89,9 @@ public class MenuContent extends Table {
                 }
             });
             continueButton.addAction(Actions.sequence(
-                    Actions.hide(),
+                    Actions.alpha(0f),
                     Actions.delay(delay),
-                    Actions.show()
+                    Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
             add(continueButton)
@@ -101,9 +107,9 @@ public class MenuContent extends Table {
                 }
             });
             aboutButton.addAction(Actions.sequence(
-                    Actions.hide(),
+                    Actions.alpha(0f),
                     Actions.delay(delay),
-                    Actions.show()
+                    Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
             add(aboutButton)
@@ -118,15 +124,22 @@ public class MenuContent extends Table {
             }
         });
         aboutButton.addAction(Actions.sequence(
-                Actions.hide(),
+                Actions.alpha(0f),
                 Actions.delay(delay),
-                Actions.show()
+                Actions.alpha(1f, 0.5f)
         ));
+        delay += DELAY_OFFSET;
         add(aboutButton)
                 .row();
 
         Table settingsTable = new Table();
         settingsTable.padTop(32f);
+        settingsTable.addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.delay(delay),
+                Actions.alpha(1f, 0.5f)
+        ));
+        delay += DELAY_OFFSET;
         String vibrationText = getVibrationText(gameSettings.getVibration());
         final TextButton toggleVibrateButton = new TextButton(vibrationText, skin, Styles.TextButton.SMALL);
         toggleVibrateButton.getLabel().setColor(Cfg.Colors.DARK_RED);
