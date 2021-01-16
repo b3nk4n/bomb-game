@@ -22,19 +22,16 @@ public class BombFactoryImpl implements BombFactory {
     @Override
     public Bomb createRandomBomb() {
         float rnd = MathUtils.random();
-        if (rnd < 0.20f) {
+        if (rnd < 0.4f) {
             return createTimedBomb();
         }
-        if (rnd < 0.40f) {
+        if (rnd < 0.55f) {
             return createStickyBomb();
         }
-        if (rnd < 0.6f) {
-            return createClusterBomb();
+        if (rnd < 0.75f) {
+            return createBounceStickyBomb();
         }
-        if (rnd < 0.8f) {
-            return createStickyBomb();
-        }
-        return createBounceStickyBomb();
+        return createClusterBomb();
     }
 
     @Override

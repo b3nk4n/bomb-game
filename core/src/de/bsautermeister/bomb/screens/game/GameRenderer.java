@@ -279,9 +279,6 @@ public class GameRenderer implements Disposable {
 
     private void drawMarkerText(Camera2D camera, int value, String text, Color color) {
         tmpProjection.set(0f, -value, 0f);
-        System.out.println("GdxGraphics " + Gdx.graphics.getWidth() + " - " + Gdx.graphics.getHeight());
-        System.out.println("UIViewport " + uiViewport.getScreenWidth() + " - " + uiViewport.getScreenHeight());
-        System.out.println("Camera VP " + camera.getGdxCamera().viewportWidth + " - " + camera.getGdxCamera().viewportHeight);
         camera.getGdxCamera().project(
                 tmpProjection, 0f, 0f, Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
         font.setColor(color);

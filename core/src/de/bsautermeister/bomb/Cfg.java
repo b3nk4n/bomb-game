@@ -40,6 +40,10 @@ public interface Cfg {
         float START_POSITION_Y = 24f / World.PPM;
     }
 
+    interface Bomb {
+        float DETONATION_TO_BLAST_OFFSET = 1.1f;
+    }
+
     interface Colors {
         Color DARK_RED = new Color(0.7f, 0f, 0f, 1f);
     }

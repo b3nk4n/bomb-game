@@ -159,14 +159,17 @@ public class Player {
     public boolean impact(Vector2 position, float radius) {
         float blastDistance = PhysicsUtils.applyBlastImpact(ballBody, position, radius, 1f);
 
+        float blastRadius = radius * Cfg.Bomb.DETONATION_TO_BLAST_OFFSET;
         Vector2 bodyPosition = ballBody.getPosition();
-        impactCircle.set(position, radius);
+        impactCircle.set(position, blastRadius);
         playerCircle.set(bodyPosition, getRadius());
         boolean hasImpact = Intersector.overlaps(impactCircle, playerCircle);
         if (hasImpact) {
-            float damage = -1f / radius * blastDistance + 1.5f;
+            float inverseRelativeDistance = 1f - blastDistance / blastRadius;
+            float damage = Interpolation.sineIn.apply(
+                    MathUtils.clamp(inverseRelativeDistance + 0.5f, 0f, 1f));
             lifeRatio = Math.max(0f, lifeRatio - damage);
-            LOG.debug("Applied damage: " + damage);
+            LOG.debug("Applied damage: " + damage + " with relative inv-dist: " + inverseRelativeDistance);
 
             if (isDead()) {
                 ballBody.setActive(false);
