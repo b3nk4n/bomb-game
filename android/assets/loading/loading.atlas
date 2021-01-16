@@ -1,76 +1,34 @@
 
 loading.png
-size: 1024,1024
+size: 1024,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
 frame
   rotate: false
-  xy: 4, 522
+  xy: 4, 87
   size: 535, 70
   orig: 535, 70
   offset: 0, 0
   index: -1
 frame-bg
   rotate: false
-  xy: 543, 533
+  xy: 4, 4
   size: 5, 5
   orig: 5, 5
   offset: 0, 0
   index: -1
 loading
   rotate: false
-  xy: 4, 448
+  xy: 4, 13
   size: 535, 70
   orig: 535, 70
-  offset: 0, 0
-  index: 0
-loading
-  rotate: false
-  xy: 4, 374
-  size: 535, 70
-  orig: 535, 70
-  offset: 0, 0
-  index: 1
-loading
-  rotate: false
-  xy: 4, 300
-  size: 535, 70
-  orig: 535, 70
-  offset: 0, 0
-  index: 2
-loading
-  rotate: false
-  xy: 4, 226
-  size: 535, 70
-  orig: 535, 70
-  offset: 0, 0
-  index: 3
-loading
-  rotate: false
-  xy: 4, 152
-  size: 535, 70
-  orig: 535, 70
-  offset: 0, 0
-  index: 4
-loading
-  rotate: false
-  xy: 4, 78
-  size: 535, 70
-  orig: 535, 70
-  offset: 0, 0
-  index: 5
-loading-hidden
-  rotate: false
-  xy: 4, 4
-  size: 20, 70
-  orig: 20, 70
   offset: 0, 0
   index: -1
-loading_text
+loading-hidden
   rotate: false
-  xy: 543, 542
-  size: 375, 50
-  orig: 375, 50
+  xy: 543, 87
+  size: 20, 70
+  orig: 20, 70
   offset: 0, 0
   index: -1

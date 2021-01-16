@@ -318,6 +318,8 @@ public class GameController implements Disposable {
             return;
         }
 
+        world.step(delta, 6, 2);
+
         if (!state.isAnyOf(GameState.GAME_OVER, GameState.PLAYER_JUST_DIED)) {
             gameTime += delta;
             handleInput();
@@ -349,8 +351,6 @@ public class GameController implements Disposable {
         explosionEffect.update(delta);
         playerParticlesEffect.update(delta);
         explosionGlowEffect.update(delta);
-
-        world.step(delta, 6, 2);
     }
 
     private void updateScoreMarkers(float delta) {

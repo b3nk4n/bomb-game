@@ -2,8 +2,6 @@ package de.bsautermeister.bomb.screens.loading;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -35,7 +33,7 @@ public class LoadingScreen extends ScreenBase {
 
     private float startX, endX;
 
-    private LoadingBar loadingBar;
+    private Image loadingBar;
 
     private float remainingTimeWhenFullyLoaded = 0.25f;
 
@@ -67,12 +65,8 @@ public class LoadingScreen extends ScreenBase {
         loadingFrame = new Image(atlas.findRegion(RegionNames.Loading.FRAME));
         loadingBarHidden = new Image(atlas.findRegion(RegionNames.Loading.BAR_HIDDEN));
         loadingBg = new Image(atlas.findRegion(RegionNames.Loading.FRAME_BACKGROUND));
-
-        // Add the loading bar animation
-        Animation anim = new Animation<>(0.05f, atlas.findRegions(RegionNames.Loading.LOADING_ANIMATION));
-        anim.setPlayMode(Animation.PlayMode.LOOP);
-        loadingBar = new LoadingBar(anim);
-        loadingBar.setTintColor(Cfg.Colors.DARK_RED);
+        loadingBar = new Image(atlas.findRegion(RegionNames.Loading.LOADING_ANIMATION));
+        loadingBar.setColor(Cfg.Colors.DARK_RED);
 
         // Add all the actors to the stage
         stage.addActor(loadingBar);
