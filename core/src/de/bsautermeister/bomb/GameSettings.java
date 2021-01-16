@@ -17,7 +17,7 @@ public final class GameSettings {
     public GameSettings() {
         prefs = Gdx.app.getPreferences(GameSettings.class.getName());
         localVibration = prefs.getBoolean(KEY_VIBRATION, true);
-        localMusicVolumeLevel = prefs.getInteger(KEY_MUSIC_VOLUME_LEVEL, 3);
+        localMusicVolumeLevel = prefs.getInteger(KEY_MUSIC_VOLUME_LEVEL, 2);
     }
 
     public boolean toggleVibration() {
@@ -40,5 +40,19 @@ public final class GameSettings {
 
     public int getMusicVolumeLevel() {
         return localMusicVolumeLevel;
+    }
+
+    public float getMusicVolume() {
+        switch (localMusicVolumeLevel) {
+            case 0:
+                return 0;
+            case 1:
+                return 0.2f;
+            case 2:
+                return 0.5f;
+            case 3:
+            default:
+                return 0.75f;
+        }
     }
 }

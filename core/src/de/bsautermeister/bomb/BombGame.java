@@ -48,8 +48,7 @@ public class BombGame extends GameApp {
 	@Override
 	public void render() {
 		super.render();
-		musicPlayer.setMasterVolume(
-				Interpolation.slowFast.apply(gameSettings.getMusicVolumeLevel() * 0.3333333f));
+		musicPlayer.setMasterVolume(gameSettings.getMusicVolume());
 		musicPlayer.update(Gdx.graphics.getDeltaTime());
 	}
 
