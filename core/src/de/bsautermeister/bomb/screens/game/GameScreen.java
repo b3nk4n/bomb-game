@@ -23,7 +23,7 @@ public class GameScreen extends ScreenBase {
 
         @Override
         public void restartGame() {
-            setScreen(new GameScreen(getGame(), false));
+            setScreen(new GameScreen(getGame(), false), ScreenTransitions.FADE);
         }
     };
 

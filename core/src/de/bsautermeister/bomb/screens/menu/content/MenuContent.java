@@ -2,6 +2,7 @@ package de.bsautermeister.bomb.screens.menu.content;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -132,17 +133,35 @@ public class MenuContent extends Table {
         add(aboutButton)
                 .row();
 
-        Table settingsTable = new Table();
-        settingsTable.padTop(32f);
-        settingsTable.addAction(Actions.sequence(
+        final int score = 123; // TODO show actual player's highscore
+        boolean hasScore = score > 0;
+
+        Table footerTable = new Table();
+        footerTable.padTop(32f);
+        footerTable.addAction(Actions.sequence(
                 Actions.alpha(0f),
                 Actions.delay(delay),
                 Actions.alpha(1f, 0.5f)
         ));
-        delay += DELAY_OFFSET;
-        String vibrationText = getVibrationText(gameSettings.getVibration());
-        final TextButton toggleVibrateButton = new TextButton(vibrationText, skin, Styles.TextButton.SMALL);
-        toggleVibrateButton.getLabel().setColor(Cfg.Colors.DARK_RED);
+
+        Label vibrationLabel = new Label("Vibration", skin, Styles.Label.XSMALL);
+        vibrationLabel.setColor(Cfg.Colors.DARK_RED);
+        footerTable.add(vibrationLabel);
+
+        if (hasScore) {
+            Label highscoreLabel = new Label("Highscore", skin, Styles.Label.XSMALL);
+            highscoreLabel.setColor(Cfg.Colors.DARK_RED);
+            footerTable.add(highscoreLabel);
+        } else {
+            footerTable.add(new Actor());
+        }
+
+        Label musicVolumeLabel = new Label("Music Volume", skin, Styles.Label.XSMALL);
+        musicVolumeLabel.setColor(Cfg.Colors.DARK_RED);
+        footerTable.add(musicVolumeLabel).row();
+
+        String vibrationValueText = getVibrationText(gameSettings.getVibration());
+        final TextButton toggleVibrateButton = new TextButton(vibrationValueText, skin, Styles.TextButton.SMALL);
         toggleVibrateButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -154,50 +173,49 @@ public class MenuContent extends Table {
                 }
             }
         });
-        toggleVibrateButton.addAction(Actions.sequence(
-                Actions.hide(),
-                Actions.delay(delay),
-                Actions.show()
-        ));
-        settingsTable.add(toggleVibrateButton).width(512f);
+        footerTable.add(toggleVibrateButton).width(256f);
 
-        String musicVolumeText = getMusicVolumeText(gameSettings.getMusicVolumeLevel());
-        final TextButton musicVolumeButton = new TextButton(musicVolumeText, skin, Styles.TextButton.SMALL);
-        musicVolumeButton.getLabel().setColor(Cfg.Colors.DARK_RED);
-        musicVolumeButton.addListener(new ClickListener() {
+        if (hasScore) {
+            Table scoreTable = new Table();
+            Label scoreLabel = new Label("1234", skin, Styles.Label.DEFAULT);
+            Label feetLabel = new Label("ft", skin, Styles.Label.XXSMALL);
+            scoreTable.add(scoreLabel);
+            scoreTable.add(feetLabel).padLeft(4f).padTop(16f);
+            footerTable.add(scoreTable).width(512f);
+        } else {
+            footerTable.add(new Actor()).width(512f);
+        }
+
+        String musicVolumeValueText = getMusicVolumeText(gameSettings.getMusicVolumeLevel());
+        final TextButton toggleMusicVolumeButton = new TextButton(musicVolumeValueText, skin, Styles.TextButton.SMALL);
+        toggleMusicVolumeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 int musicVolumeLevel = gameSettings.toggleMusicVolumeLevel();
-                musicVolumeButton.setText(getMusicVolumeText(musicVolumeLevel));
+                toggleMusicVolumeButton.setText(getMusicVolumeText(musicVolumeLevel));
 
             }
         });
-        musicVolumeButton.addAction(Actions.sequence(
-                Actions.hide(),
-                Actions.delay(delay),
-                Actions.show()
-        ));
-        settingsTable.add(musicVolumeButton).width(512f)
-                .row();
-        add(settingsTable);
+        footerTable.add(toggleMusicVolumeButton).width(256f).row();
+        add(footerTable);
 
         pack();
     }
 
     private String getVibrationText(boolean enabled) {
-        return enabled ? "Vibration: ON" : "Vibration: OFF";
+        return enabled ? "ON" : "OFF";
     }
 
     private String getMusicVolumeText(int level) {
         switch (level) {
             case 1:
-                return "Music Volume: LOW";
+                return "LOW";
             case 2:
-                return "Music Volume: MEDIUM";
+                return "MEDIUM";
             case 3:
-                return "Music Volume: HIGH";
+                return "HIGH";
             default:
-                return "Music Volume: OFF";
+                return "OFF";
         }
     }
 }

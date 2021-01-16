@@ -107,7 +107,7 @@ public class GameRenderer implements Disposable {
         uiViewport = new StretchViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
 
         Skin skin = assetManager.get(Assets.Skins.UI);
-        font = skin.getFont(Styles.Fonts.XSMALL);
+        font = skin.getFont(Styles.Fonts.XXSMALL);
 
         overlays = new Overlays<>(uiViewport, batch, 0x000000BB);
         overlays.register(GameState.PAUSED,

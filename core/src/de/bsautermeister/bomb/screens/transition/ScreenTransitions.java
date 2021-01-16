@@ -7,4 +7,5 @@ public interface ScreenTransitions {
             SlideScreenTransition.SlideType.SLIDE_PARALLEL, Direction.UP);
     SlideScreenTransition SLIDE_DOWN = new SlideScreenTransition(.5f, Interpolation.smooth,
             SlideScreenTransition.SlideType.SLIDE_PARALLEL, Direction.DOWN);
+    FadeScreenTransition FADE = new FadeScreenTransition(0.5f, Interpolation.smooth);
 }

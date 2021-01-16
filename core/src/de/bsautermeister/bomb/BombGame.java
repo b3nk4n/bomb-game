@@ -34,12 +34,12 @@ public class BombGame extends GameApp {
 
 		// TODO lazy load this data (after signed in)
 		Array<Integer> topScores = new Array<>();
+		topScores.add(1000);
+		topScores.add(250);
+		topScores.add(200);
+		topScores.add(150);
 		topScores.add(100);
-		topScores.add(25);
-		topScores.add(20);
-		topScores.add(10);
-		topScores.add(5);
-		gameScores.update(topScores, 15);
+		gameScores.update(topScores, 45);
 
 		setScreen(new LoadingScreen(this));
 	}

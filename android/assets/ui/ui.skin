@@ -1,7 +1,13 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
-    "xsmall": {
+    "xxxsmall": {
+      "file": "ui/fonts/MetalLord-12.fnt"
+    },
+    "xxsmall": {
       "file": "ui/fonts/MetalLord-16.fnt"
+    },
+    "xsmall": {
+      "file": "ui/fonts/MetalLord-24.fnt"
     },
     "small": {
       "file": "ui/fonts/MetalLord-32.fnt"
@@ -58,10 +64,26 @@
       "font": "default",
       "fontColor": "white"
     },
+    "xxxsmall": {
+      "font": "xxxsmall",
+      "fontColor": "white"
+    },
+    "xxsmall": {
+      "font": "xxsmall",
+      "fontColor": "white"
+    },
+    "xsmall": {
+      "font": "xsmall",
+      "fontColor": "white"
+    },
+    "small": {
+      "font": "small",
+      "fontColor": "white"
+    },
     "large": {
       "font": "large",
       "fontColor": "white"
-    }
+    },
     "title": {
       "font": "title",
       "fontColor": "white"

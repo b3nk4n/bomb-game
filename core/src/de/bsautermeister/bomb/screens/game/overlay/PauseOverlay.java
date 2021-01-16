@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Styles;
 
 public class PauseOverlay extends Overlay {
@@ -34,6 +35,7 @@ public class PauseOverlay extends Overlay {
 
     private void initialize() {
         titleLabel = new Label("Paused", getSkin(), Styles.Label.TITLE);
+        titleLabel.setColor(Cfg.Colors.DARK_RED);
         titleLabel.addAction(Actions.sequence(
                 Actions.alpha(0f),
                 Actions.delay(0f),
