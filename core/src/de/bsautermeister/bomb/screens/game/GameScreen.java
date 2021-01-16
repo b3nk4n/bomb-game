@@ -6,6 +6,7 @@ import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.screens.menu.MenuScreen;
+import de.bsautermeister.bomb.screens.transition.ScreenTransitions;
 
 public class GameScreen extends ScreenBase {
 
@@ -17,7 +18,7 @@ public class GameScreen extends ScreenBase {
     private final GameScreenCallbacks callbacks = new GameScreenCallbacks() {
         @Override
         public void backToMenu() {
-            setScreen(new MenuScreen(getGame()));
+            setScreen(new MenuScreen(getGame()), ScreenTransitions.SLIDE_UP);
         }
 
         @Override

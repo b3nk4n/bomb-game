@@ -20,6 +20,7 @@ import de.bsautermeister.bomb.core.ScreenBase;
 import de.bsautermeister.bomb.screens.game.GameScreen;
 import de.bsautermeister.bomb.screens.menu.content.AboutContent;
 import de.bsautermeister.bomb.screens.menu.content.MenuContent;
+import de.bsautermeister.bomb.screens.transition.ScreenTransitions;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
@@ -88,12 +89,12 @@ public class MenuScreen extends ScreenBase {
                 new MenuContent.Callbacks() {
                     @Override
                     public void playClicked() {
-                        setScreen(new GameScreen(getGame(), false));
+                        setScreen(new GameScreen(getGame(), false), ScreenTransitions.SLIDE_DOWN);
                     }
 
                     @Override
                     public void continueClicked() {
-                        setScreen(new GameScreen(getGame(), true));
+                        setScreen(new GameScreen(getGame(), true), ScreenTransitions.SLIDE_DOWN);
                     }
 
                     @Override

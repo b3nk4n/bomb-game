@@ -8,17 +8,24 @@ import de.bsautermeister.bomb.core.transition.ScreenTransitionBase;
 import de.bsautermeister.bomb.utils.GdxUtils;
 
 public class SlideScreenTransition extends ScreenTransitionBase {
-    private boolean slideIn;
+
+    public enum SlideType {
+        SLIDE_IN,
+        SLIDE_OUT,
+        SLIDE_PARALLEL
+    }
+
+    private SlideType slideType;
     private Direction direction;
 
-    public SlideScreenTransition(float duration, Interpolation interpolation, boolean slideIn, Direction direction) {
+    public SlideScreenTransition(float duration, Interpolation interpolation, SlideType slideType, Direction direction) {
         super(duration, interpolation);
 
         if (direction == null) {
             throw new IllegalArgumentException("Direction is required");
         }
 
-        this.slideIn = slideIn;
+        this.slideType = slideType;
         this.direction = direction;
     }
 
@@ -26,12 +33,16 @@ public class SlideScreenTransition extends ScreenTransitionBase {
     public void render(SpriteBatch batch, Texture currentScreenTexture, Texture nextScreenTexture, float progress) {
         float percentage = getInterpolatedPercentage(progress);
 
-        float x = 0;
-        float y = 0;
+        float xTop = 0;
+        float yTop = 0;
+        float xBottom = 0;
+        float yBottom = 0;
 
-        // draw oder depends on slide type
-        Texture topTexture = slideIn ? nextScreenTexture : currentScreenTexture;
-        Texture bottomTexture = slideIn ? currentScreenTexture : nextScreenTexture;
+        // draw order depends on slide type
+        Texture topTexture = slideType == SlideType.SLIDE_IN ?
+                nextScreenTexture : currentScreenTexture;
+        Texture bottomTexture = slideType == SlideType.SLIDE_IN ?
+                currentScreenTexture : nextScreenTexture;
 
         int topTextureWidth = topTexture.getWidth();
         int topTextureHeight = topTexture.getHeight();
@@ -42,19 +53,21 @@ public class SlideScreenTransition extends ScreenTransitionBase {
         // calculate position offset
         if (direction.isHorizontal()) {
             float sign = direction.isLeft() ? -1 : 1;
-            x = sign * topTextureWidth * percentage;
+            xTop = sign * topTextureWidth * percentage;
 
-            if (slideIn) {
-                sign = -sign;
-                x += sign * topTextureWidth;
+            if (slideType == SlideType.SLIDE_IN) {
+                xTop -= sign * topTextureWidth;
+            } else if (slideType == SlideType.SLIDE_PARALLEL) {
+                xBottom = xTop - sign * topTextureWidth;
             }
         } else if (direction.isVertical()) {
             float sign = direction.isDown() ? -1 : 1;
-            y = sign * topTextureHeight * percentage;
+            yTop = sign * topTextureHeight * percentage;
 
-            if (slideIn) {
-                sign = -sign;
-                y += sign * topTextureHeight;
+            if (slideType == SlideType.SLIDE_IN) {
+                yTop -= sign * topTextureHeight;
+            } else if (slideType == SlideType.SLIDE_PARALLEL) {
+                yBottom = yTop - sign * topTextureHeight;
             }
         }
 
@@ -63,7 +76,7 @@ public class SlideScreenTransition extends ScreenTransitionBase {
         batch.begin();
 
         batch.draw(bottomTexture,
-                0, 0,
+                xBottom, yBottom,
                 0, 0,
                 bottomTextureWidth, bottomTextureHeight,
                 1, 1,
@@ -73,7 +86,7 @@ public class SlideScreenTransition extends ScreenTransitionBase {
                 false, true);
 
         batch.draw(topTexture,
-                x, y,
+                xTop, yTop,
                 0, 0,
                 bottomTextureWidth, bottomTextureHeight,
                 1, 1,
