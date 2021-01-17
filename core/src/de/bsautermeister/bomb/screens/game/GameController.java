@@ -114,6 +114,8 @@ public class GameController implements Disposable {
 
     private final Array<ScoreMarker> scoreMarkers = new Array<>();
 
+    private boolean canRevive = true;
+
     private final GameScreenCallbacks gameScreenCallbacks;
 
     private final PauseOverlay.Callback pauseCallback = new PauseOverlay.Callback() {
@@ -132,6 +134,19 @@ public class GameController implements Disposable {
         @Override
         public void quit() {
             markBackToMenu = true;
+        }
+
+        @Override
+        public void revive() {
+            player.revive();
+            state.set(GameState.PLAYING);
+            if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
+                game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.GAME_SONG, 85f);
+                game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
+                game.getMusicPlayer().playFromBeginning();
+            }
+            bombEmitTimer = INITIAL_BOMB_EMIT_DELAY;
+            canRevive = false;
         }
 
         @Override
@@ -584,6 +599,7 @@ public class GameController implements Disposable {
             airStrikeManager.write(kryo, output);
             kryo.writeObject(output, airStrikeTargets);
             game.getMusicPlayer().write(kryo, output);
+            output.writeBoolean(canRevive);
             output.close();
         } catch (Exception e) {
             LOG.error("Failed to save game.", e);
@@ -614,6 +630,7 @@ public class GameController implements Disposable {
             airStrikeTargets.clear();
             airStrikeTargets.addAll(kryo.readObject(input, Array.class));
             game.getMusicPlayer().read(kryo, input);
+            canRevive = input.readBoolean();
             input.close();
         } catch (FileNotFoundException e) {
             LOG.error("Failed to load game.", e);
@@ -698,5 +715,9 @@ public class GameController implements Disposable {
 
     public GameScores getGameScores() {
         return game.getGameScores();
+    }
+
+    public boolean canRevive() {
+        return canRevive;
     }
 }

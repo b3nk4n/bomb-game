@@ -27,19 +27,23 @@ public class MenuContent extends Table {
     public interface Callbacks {
         void playClicked();
         void continueClicked();
+        void leaderboardsClicked();
         void achievementsClicked();
         void aboutClicked();
     }
 
     private final boolean canShowAchievements;
+    private final boolean canShowLeaderboards;
     private final boolean canResume;
     private final GameSettings gameSettings;
     private final GameScores gameScores;
     private final Callbacks callbacks;
 
     public MenuContent(AssetManager assetManager, GameSettings gameSettings, GameScores gameScores,
-                       Callbacks callbacks, boolean canResume, boolean canShowAchievements) {
+                       Callbacks callbacks, boolean canResume, boolean canShowLeaderboards,
+                       boolean canShowAchievements) {
         this.canResume = canResume;
+        this.canShowLeaderboards = canShowLeaderboards;
         this.canShowAchievements = canShowAchievements;
         this.gameSettings = gameSettings;
         this.gameScores = gameScores;
@@ -102,21 +106,39 @@ public class MenuContent extends Table {
                     .row();
         }
 
-        if (canShowAchievements) {
-            final Button aboutButton = new TextButton("Achievements", skin);
-            aboutButton.addListener(new ClickListener() {
+        if (canShowLeaderboards) {
+            final Button leaderboardsButton = new TextButton("Leaderboards", skin);
+            leaderboardsButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    callbacks.achievementsClicked();
+                    callbacks.leaderboardsClicked();
                 }
             });
-            aboutButton.addAction(Actions.sequence(
+            leaderboardsButton.addAction(Actions.sequence(
                     Actions.alpha(0f),
                     Actions.delay(delay),
                     Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
-            add(aboutButton)
+            add(leaderboardsButton)
+                    .row();
+        }
+
+        if (canShowAchievements) {
+            final Button achievementsButton = new TextButton("Achievements", skin);
+            achievementsButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    callbacks.achievementsClicked();
+                }
+            });
+            achievementsButton.addAction(Actions.sequence(
+                    Actions.alpha(0f),
+                    Actions.delay(delay),
+                    Actions.alpha(1f, 0.5f)
+            ));
+            delay += DELAY_OFFSET;
+            add(achievementsButton)
                     .row();
         }
 

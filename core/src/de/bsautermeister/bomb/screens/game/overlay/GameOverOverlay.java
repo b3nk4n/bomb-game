@@ -14,24 +14,28 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.objects.Player;
+import de.bsautermeister.bomb.screens.game.GameController;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
 
 public class GameOverOverlay extends Overlay {
     public interface Callback {
         void quit();
+        void revive();
         void restart();
     }
 
     private final Callback callback;
     private final Player player;
     private final GameScores gameScores;
+    private final GameController controller;
 
-    public GameOverOverlay(Skin skin, Callback callback, Player player, GameScores gameScores) {
+    public GameOverOverlay(Skin skin, GameController controller) {
         super(skin);
-        this.callback = callback;
-        this.player = player;
-        this.gameScores = gameScores;
+        this.callback = controller.getGameOverCallback();
+        this.player = controller.getPlayer();
+        this.gameScores = controller.getGameScores();
+        this.controller = controller;
     }
 
     @Override
@@ -105,6 +109,22 @@ public class GameOverOverlay extends Overlay {
             }
         });
         buttonTable.add(restartButton);
+
+
+        if (controller.canRevive()) {
+            Table reviveTable = new Table();
+            Button reviveButton = new TextButton("Revive", getSkin(), Styles.TextButton.LARGE);
+            reviveButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    callback.revive();
+                }
+            });
+            reviveTable.add(reviveButton).padTop(12f).row();
+            Label watchAdsLabel = new Label("(watch ad)", getSkin(), Styles.Label.XXSMALL);
+            reviveTable.add(watchAdsLabel).padTop(-16f);
+            buttonTable.add(reviveTable);
+        }
 
         Button quitButton = new TextButton("Quit", getSkin(), Styles.TextButton.LARGE);
         quitButton.addListener(new ClickListener() {

@@ -44,18 +44,20 @@ public class Player {
     private final static float CAMP_INVALIDATE_DISTANCE = 0.66f;
     public final static float MAX_CAMP_TIME = 15f;
     float previousCampPositionX;
-    float campTime = 0f;
+    float campTime;
 
     public Player(World world, float radius) {
         this.world = world;
         this.radius = radius;
         this.ballBody = createBody(radius);
-        reset();
+        revive();
     }
 
-    public void reset() {
+    public void revive() {
         lifeRatio = 1f;
+        campTime = 0f;
         ballBody.setActive(true);
+        fixedSensorBody.setActive(true);
     }
 
     private Body createBody(float radius) {
@@ -173,6 +175,7 @@ public class Player {
 
             if (isDead()) {
                 ballBody.setActive(false);
+                fixedSensorBody.setActive(false);
             }
         }
         return hasImpact;

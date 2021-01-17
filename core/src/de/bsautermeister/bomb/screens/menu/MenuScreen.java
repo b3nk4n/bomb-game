@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.ServiceKeys;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.core.GameApp;
@@ -99,6 +100,16 @@ public class MenuScreen extends ScreenBase {
                     }
 
                     @Override
+                    public void leaderboardsClicked() {
+                        try {
+                            getGame().getGameServiceClient().showLeaderboards(
+                                    ServiceKeys.Scores.MAX_DEPTH);
+                        } catch (GameServiceException e) {
+                            LOG.error("Showing leaderboards failed", e);
+                        }
+                    }
+
+                    @Override
                     public void achievementsClicked() {
                         try {
                             getGame().getGameServiceClient().showAchievements();
@@ -113,6 +124,8 @@ public class MenuScreen extends ScreenBase {
                     }
                 },
                 ((BombGame) getGame()).getGameFile().exists(),
+                getGame().getGameServiceClient().isFeatureSupported(
+                        IGameServiceClient.GameServiceFeature.ShowLeaderboardUI),
                 getGame().getGameServiceClient().isFeatureSupported(
                         IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
     }

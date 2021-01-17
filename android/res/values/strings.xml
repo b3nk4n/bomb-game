@@ -2,6 +2,6 @@
 <resources>
 
     <string name="app_name">Downfall</string>
-    <string name="app_id">123456789</string>
+    <string name="app_id" translatable="false">742830807080</string>
 
 </resources>

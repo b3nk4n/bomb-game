@@ -2,15 +2,16 @@ package de.bsautermeister.bomb;
 
 public interface ServiceKeys {
     interface Achievements {
-        String FEET_500 = "aaaaa";
-        String FEET_1000 = "bbbbb";
-        String FEET_2500 = "ccccc";
-        String BOMB_KICK_50 = "ddddd";
-        String BOMB_KICK_100 = "eeeee";
-        String BOMB_KICK_250 = "ffffff";
+        String EXPLORER_DEPTH_1000 = "CgkIqLCqoc8VEAIQBQ";
+        String HERO_DEPTH_2500 = "CgkIqLCqoc8VEAIQBg";
+
+        interface Incremental {
+            String SURVIVOR_25_250 = "CgkIqLCqoc8VEAIQAw";
+            String TRUE_SURVIVOR_50_500 = "CgkIqLCqoc8VEAIQBA";
+        }
     }
 
     interface Scores {
-        String DEFAULT = "CgkIj43Q_dIBEAIQBQ";
+        String MAX_DEPTH = "CgkIqLCqoc8VEAIQAg";
     }
 }
