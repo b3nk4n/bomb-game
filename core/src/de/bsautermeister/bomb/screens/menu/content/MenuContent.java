@@ -158,7 +158,7 @@ public class MenuContent extends Table {
         add(aboutButton)
                 .row();
 
-        final int personalHighscore = gameScores.getPersonalBest();
+        final int personalHighscore = gameScores.getPersonalBestScore();
 
         Table footerTable = new Table();
         footerTable.padTop(32f);

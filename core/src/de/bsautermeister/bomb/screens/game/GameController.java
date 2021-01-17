@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.ServiceKeys;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.audio.LoopSound;
 import de.bsautermeister.bomb.audio.MusicPlayer;
@@ -62,7 +63,7 @@ import de.bsautermeister.bomb.objects.TimedBomb;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
-import de.bsautermeister.bomb.screens.game.score.ScoreMarker;
+import de.bsautermeister.bomb.screens.game.score.ScoreEntry;
 import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
@@ -73,8 +74,6 @@ import static com.badlogic.gdx.Input.Keys.SPACE;
 public class GameController implements Disposable {
 
     private static final Logger LOG = new Logger(GameController.class.getSimpleName(), Cfg.LOG_LEVEL);
-
-    private static final String PERSONAL_TOP_STRING = "My Highscore";
 
     private final BombGame game;
     private ShakableCamera2D camera;
@@ -112,9 +111,15 @@ public class GameController implements Disposable {
     private final LoopSound heartbeatSound;
     private final Sound hitSound;
 
-    private final Array<ScoreMarker> scoreMarkers = new Array<>();
+    /**
+     * Copy of the score entries for this game session, that are removed one by one when reached.
+     */
+    private final Array<ScoreEntry> scoreEntries = new Array<>();
 
     private boolean canRevive = true;
+
+    private boolean unlockedExplorer;
+    private boolean unlockedHero;
 
     private final GameScreenCallbacks gameScreenCallbacks;
 
@@ -275,20 +280,34 @@ public class GameController implements Disposable {
                     game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
                     game.getMusicPlayer().playFromBeginning();
                 }
+
+                if (newState == GameState.GAME_OVER) {
+                    int score = ScoreUtils.toScore(player.getMaxDepth());
+                    LOG.debug("Submitting score: " + score);
+                    game.getGameServiceClient().submitToLeaderboard(
+                            ServiceKeys.Scores.MAX_DEPTH, score, null);
+                    game.getGameScores().updatePersonalBest(score);
+
+                    if (score > 250) {
+                        LOG.debug("Increment SURVIVOR achievement");
+                        game.getGameServiceClient().incrementAchievement(
+                                ServiceKeys.Achievements.Incremental.SURVIVOR_25_250,
+                                1, 0f);
+                    }
+
+                    if (score > 500) {
+                        LOG.debug("Increment TRUE SURVIVOR achievement");
+                        game.getGameServiceClient().incrementAchievement(
+                                ServiceKeys.Achievements.Incremental.TRUE_SURVIVOR_50_500,
+                                1, 0f);
+                    }
+                }
             }
         });
 
         GameScores gameScores = game.getGameScores();
-        scoreMarkers.clear();
-        float playerScore = ScoreUtils.toScore(player.getMaxDepth());
-        for (Integer score : gameScores.getTopList()) {
-            if (score > playerScore) {
-                scoreMarkers.add(new ScoreMarker(score, "TBD")); // TODO find way to apply the appropriate label here (e.g. 3rd)
-            }
-        }
-        if (gameScores.getPersonalBest() > playerScore) {
-            scoreMarkers.add(new ScoreMarker(gameScores.getPersonalBest(), PERSONAL_TOP_STRING));
-        }
+        scoreEntries.clear();
+        scoreEntries.addAll(gameScores.getScoreEntries());
     }
 
     private void createWorldBoundsWallBodies(World world) {
@@ -368,6 +387,10 @@ public class GameController implements Disposable {
             state.set(GameState.GAME_OVER);
         }
 
+        if (state.is(GameState.PLAYING)) {
+            updateAchievements();
+        }
+
         updateAirStrikeTargetMarkers(delta);
         updateEnvironment(delta);
         explosionEffect.update(delta);
@@ -375,13 +398,26 @@ public class GameController implements Disposable {
         explosionGlowEffect.update(delta);
     }
 
+    private void updateAchievements() {
+        int score = ScoreUtils.toScore(player.getMaxDepth());
+        if (score >= 2500 && !unlockedHero) {
+            LOG.debug("Unlock HERO achievement");
+            game.getGameServiceClient().unlockAchievement(ServiceKeys.Achievements.HERO_DEPTH_2500);
+            unlockedHero = true;
+        } else if (score >= 1000 && !unlockedExplorer) {
+            LOG.debug("Unlock EXPLORER achievement");
+            game.getGameServiceClient().unlockAchievement(ServiceKeys.Achievements.EXPLORER_DEPTH_1000);
+            unlockedExplorer = true;
+        }
+    }
+
     private void updateScoreMarkers(float delta) {
         int playerScore = ScoreUtils.toScore(player.getMaxDepth());
-        for (int i = scoreMarkers.size - 1; i >= 0; --i) {
-            ScoreMarker scoreMarker = scoreMarkers.get(i);
-            scoreMarker.update(delta, playerScore);
-            if (scoreMarker.isExpired()) {
-                scoreMarkers.removeIndex(i);
+        for (int i = scoreEntries.size - 1; i >= 0; --i) {
+            ScoreEntry scoreEntry = scoreEntries.get(i);
+            scoreEntry.update(delta, playerScore);
+            if (scoreEntry.isExpired()) {
+                scoreEntries.removeIndex(i);
             }
         }
     }
@@ -712,8 +748,8 @@ public class GameController implements Disposable {
         return explosionGlowEffect;
     }
 
-    public Array<ScoreMarker> getScoreMarkers() {
-        return scoreMarkers;
+    public Array<ScoreEntry> getScoreEntries() {
+        return scoreEntries;
     }
 
     public GameScores getGameScores() {

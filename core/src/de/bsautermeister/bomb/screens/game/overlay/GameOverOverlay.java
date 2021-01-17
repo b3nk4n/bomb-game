@@ -62,7 +62,7 @@ public class GameOverOverlay extends Overlay {
         scoresTable.add(scoreTitleLabel).padTop(32f).row();
 
         int newScore = ScoreUtils.toScore(player.getMaxDepth());
-        int personalBest = gameScores.getPersonalBest();
+        int personalBest = gameScores.getPersonalBestScore();
         Table scoreTable = new Table();
         scoreTable.padTop(-24f);
         Label scoreLabel = new Label(String.valueOf(newScore), getSkin(), Styles.Label.TITLE);
@@ -71,8 +71,8 @@ public class GameOverOverlay extends Overlay {
         scoreTable.add(feetLabel).padLeft(4f).padTop(32f);
         scoresTable.add(scoreTable).row();
 
-        if (newScore > personalBest) {
-            Label newHighscoreLabel = new Label("New Highscore!", getSkin(), Styles.Label.XSMALL);
+        if (newScore >= personalBest) {
+            Label newHighscoreLabel = new Label("Personal  Best!", getSkin(), Styles.Label.XSMALL);
             newHighscoreLabel.setColor(Cfg.Colors.DARK_RED);
             scoresTable.add(newHighscoreLabel).row();
         } else {

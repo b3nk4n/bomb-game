@@ -1,7 +1,6 @@
 package de.bsautermeister.bomb;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Array;
 
 import java.io.File;
 
@@ -31,15 +30,6 @@ public class BombGame extends GameApp {
 		gameStats = new GameStats();
 		gameScores = new GameScores();
 		musicPlayer = new MusicPlayer();
-
-		// TODO lazy load this data (after signed in)
-		Array<Integer> topScores = new Array<>();
-		topScores.add(1000);
-		topScores.add(250);
-		topScores.add(200);
-		topScores.add(150);
-		topScores.add(100);
-		gameScores.update(topScores, 45);
 
 		setScreen(new LoadingScreen(this));
 	}

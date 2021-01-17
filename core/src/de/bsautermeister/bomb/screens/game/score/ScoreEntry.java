@@ -1,6 +1,6 @@
 package de.bsautermeister.bomb.screens.game.score;
 
-public class ScoreMarker {
+public class ScoreEntry {
     private static final float TOTAL_EXPIRY_TIME = 0.5f;
 
     private final int score;
@@ -8,7 +8,7 @@ public class ScoreMarker {
     private final String label;
     private float ttl;
 
-    public ScoreMarker(int score, String label) {
+    public ScoreEntry(int score, String label) {
         this.score = score;
         this.label = label;
         this.ttl = TOTAL_EXPIRY_TIME;

@@ -49,7 +49,7 @@ import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
-import de.bsautermeister.bomb.screens.game.score.ScoreMarker;
+import de.bsautermeister.bomb.screens.game.score.ScoreEntry;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.bsautermeister.bomb.utils.PolygonUtils;
 
@@ -191,11 +191,11 @@ public class GameRenderer implements Disposable {
 
         // score line
         Player player = controller.getPlayer();
-        Array<ScoreMarker> scoreMarkers = controller.getScoreMarkers();
-        for (ScoreMarker scoreMarker : scoreMarkers) {
-            float factor = Interpolation.smooth.apply(scoreMarker.inverseProgress());
+        Array<ScoreEntry> scoreMarkers = controller.getScoreEntries();
+        for (ScoreEntry scoreEntry : scoreMarkers) {
+            float factor = Interpolation.smooth.apply(scoreEntry.inverseProgress());
             tmpScoreMarkerColor.a = factor * 0.66f;
-            drawMarkerLine(shapeRenderer, scoreMarker.getDepth(), tmpScoreMarkerColor, factor);
+            drawMarkerLine(shapeRenderer, scoreEntry.getDepth(), tmpScoreMarkerColor, factor);
         }
 
         shapeRenderer.end();
@@ -203,9 +203,9 @@ public class GameRenderer implements Disposable {
 
         batch.setProjectionMatrix(uiCamera.combined);
         batch.begin();
-        for (ScoreMarker scoreMarker : scoreMarkers) {
-            tmpScoreMarkerColor.a = Interpolation.smooth.apply(scoreMarker.inverseProgress()) * 0.66f;
-            drawMarkerText(camera, scoreMarker.getDepth(), scoreMarker.getLabel(), tmpScoreMarkerColor);
+        for (ScoreEntry scoreEntry : scoreMarkers) {
+            tmpScoreMarkerColor.a = Interpolation.smooth.apply(scoreEntry.inverseProgress()) * 0.66f;
+            drawMarkerText(camera, scoreEntry.getDepth(), scoreEntry.getLabel(), tmpScoreMarkerColor);
         }
         batch.end();
 

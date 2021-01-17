@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -25,6 +26,8 @@ import de.bsautermeister.bomb.screens.transition.ScreenTransitions;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.golfgl.gdxgamesvcs.GameServiceException;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
+import de.golfgl.gdxgamesvcs.leaderboard.IFetchLeaderBoardEntriesResponseListener;
+import de.golfgl.gdxgamesvcs.leaderboard.ILeaderBoardEntry;
 
 public class MenuScreen extends ScreenBase {
     private final static Logger LOG = new Logger(MenuScreen.class.getSimpleName(), Cfg.LOG_LEVEL);
@@ -61,6 +64,41 @@ public class MenuScreen extends ScreenBase {
             game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
             game.getMusicPlayer().playFromBeginning();
         }
+
+        fetchData();
+    }
+
+    private void fetchData() {
+        final BombGame bombGame = (BombGame) getGame();
+
+        bombGame.getGameServiceClient().fetchLeaderboardEntries(
+                ServiceKeys.Scores.MAX_DEPTH, 1, true,
+                new IFetchLeaderBoardEntriesResponseListener() {
+                    @Override
+                    public void onLeaderBoardResponse(Array<ILeaderBoardEntry> leaderBoard) {
+                        if (!leaderBoard.isEmpty()) {
+                            ILeaderBoardEntry entry = leaderBoard.get(0);
+                            int scoreValue = (int) entry.getSortValue();
+                            bombGame.getGameScores().updatePersonalBest(scoreValue);
+                        }
+                    }
+                });
+
+        bombGame.getGameServiceClient().fetchLeaderboardEntries(
+                ServiceKeys.Scores.MAX_DEPTH, 10, false,
+                new IFetchLeaderBoardEntriesResponseListener() {
+                    @Override
+                    public void onLeaderBoardResponse(Array<ILeaderBoardEntry> leaderBoard) {
+                        Array<Integer> scores = new Array<>(10);
+                        for (ILeaderBoardEntry entry : leaderBoard) {
+                            if (!entry.isCurrentPlayer()) {
+                                int scoreValue = (int) entry.getSortValue();
+                                scores.add(scoreValue);
+                            }
+                        }
+                        bombGame.getGameScores().updateTopList(scores);
+                    }
+                });
     }
 
     private void setContent(Table newContent) {
