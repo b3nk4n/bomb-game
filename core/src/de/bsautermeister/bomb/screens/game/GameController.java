@@ -247,6 +247,12 @@ public class GameController implements Disposable {
             load();
         }
 
+        // save the file after the game was restore or a new game was started:
+        File file = game.getGameFile();
+        if (file.exists() && file.delete()) {
+            LOG.info("Delete previous saved game");
+        }
+
         if (player == null) {
             player = new Player(world, Cfg.Player.RADIUS_PPM);
             player.setTransform(new Vector2(viewport.getWorldWidth() / 2f, Cfg.Player.START_POSITION_Y), 0f);
@@ -673,11 +679,6 @@ public class GameController implements Disposable {
             input.close();
         } catch (FileNotFoundException e) {
             LOG.error("Failed to load game.", e);
-        }
-
-        // save the file after the game was restored:
-        if (!file.delete()) {
-            LOG.error("Failed to delete saved game.");
         }
     }
 

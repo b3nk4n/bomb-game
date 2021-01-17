@@ -173,14 +173,14 @@ public class MenuContent extends Table {
         footerTable.add(vibrationLabel);
 
         if (personalHighscore > 0) {
-            Label highscoreLabel = new Label("Highscore", skin, Styles.Label.XSMALL);
+            Label highscoreLabel = new Label("Personal  Best", skin, Styles.Label.XSMALL);
             highscoreLabel.setColor(Cfg.Colors.DARK_RED);
             footerTable.add(highscoreLabel);
         } else {
             footerTable.add(new Actor());
         }
 
-        Label musicVolumeLabel = new Label("Music Volume", skin, Styles.Label.XSMALL);
+        Label musicVolumeLabel = new Label("Music  Volume", skin, Styles.Label.XSMALL);
         musicVolumeLabel.setColor(Cfg.Colors.DARK_RED);
         footerTable.add(musicVolumeLabel).row();
 

@@ -50,7 +50,7 @@ public class GameScores {
         scoreEntries.clear();
 
         if (personalBestScore > 0) {
-            scoreEntries.add(new ScoreEntry(personalBestScore, "My Highscore"));
+            scoreEntries.add(new ScoreEntry(personalBestScore, "Personal Best"));
         }
 
         for (int i = 0; i < otherBestScores.size; ++i) {
