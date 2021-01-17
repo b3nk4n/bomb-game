@@ -645,6 +645,8 @@ public class GameController implements Disposable {
             kryo.writeObject(output, airStrikeTargets);
             game.getMusicPlayer().write(kryo, output);
             output.writeBoolean(canRevive);
+            output.writeBoolean(unlockedExplorer);
+            output.writeBoolean(unlockedHero);
             output.close();
         } catch (Exception e) {
             LOG.error("Failed to save game.", e);
@@ -676,6 +678,8 @@ public class GameController implements Disposable {
             airStrikeTargets.addAll(kryo.readObject(input, Array.class));
             game.getMusicPlayer().read(kryo, input);
             canRevive = input.readBoolean();
+            unlockedExplorer = input.readBoolean();
+            unlockedHero = input.readBoolean();
             input.close();
         } catch (FileNotFoundException e) {
             LOG.error("Failed to load game.", e);

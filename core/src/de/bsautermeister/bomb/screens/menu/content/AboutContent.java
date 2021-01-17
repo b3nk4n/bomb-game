@@ -14,7 +14,7 @@ public class AboutContent extends Table {
 
     public static final String TYPE = AboutContent.class.getSimpleName();
 
-    private static final float TEXT_ANIMATION_DURATION = 7.5f;
+    private static final float TEXT_ANIMATION_DURATION = 5f;
 
     private final Skin skin;
     private final Table creditContainer = new Table();
@@ -23,15 +23,15 @@ public class AboutContent extends Table {
 
     private int currentCreditIndex = 0;
 
-
     public AboutContent(AssetManager assetManager) {
         skin = assetManager.get(Assets.Skins.UI);
 
         credits = new CreditEntry[] {
                 new CreditEntry("Developer", "Benjamin Sautermeister"),
-                new CreditEntry("SFX", "Benjamin Sautermeister", "Denis Chardonnet"),
-                new CreditEntry("Effects", "Benjamin Sautermeister", "Existical"),
-                new CreditEntry("Music", "TBD"),
+                new CreditEntry("Visual Effects", "Benjamin Sautermeister", "Existical"),
+                new CreditEntry("Fonts", "Raymond Larabie"),
+                new CreditEntry("Music", "Infraction  x  Aim To Head"),
+                new CreditEntry("Sound Effects", "Benjamin Sautermeister")
         };
 
         initialize();
