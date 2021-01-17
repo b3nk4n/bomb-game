@@ -113,7 +113,11 @@ public class GameRenderer implements Disposable {
         overlays.register(GameState.PAUSED,
                 new PauseOverlay(skin, controller.getPauseCallback()));
         overlays.register(GameState.GAME_OVER,
-                new GameOverOverlay(skin, controller.getGameOverCallback()));
+                new GameOverOverlay(
+                        skin,
+                        controller.getGameOverCallback(),
+                        controller.getPlayer(),
+                        controller.getGameScores()));
         uiCamera = overlays.getStage().getCamera();
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);

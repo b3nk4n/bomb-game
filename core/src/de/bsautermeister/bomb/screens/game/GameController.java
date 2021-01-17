@@ -695,4 +695,8 @@ public class GameController implements Disposable {
     public Array<ScoreMarker> getScoreMarkers() {
         return scoreMarkers;
     }
+
+    public GameScores getGameScores() {
+        return game.getGameScores();
+    }
 }

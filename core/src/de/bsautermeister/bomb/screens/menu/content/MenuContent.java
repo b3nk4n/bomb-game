@@ -16,6 +16,7 @@ import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.GameSettings;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
+import de.bsautermeister.bomb.screens.game.score.GameScores;
 
 public class MenuContent extends Table {
 
@@ -33,13 +34,15 @@ public class MenuContent extends Table {
     private final boolean canShowAchievements;
     private final boolean canResume;
     private final GameSettings gameSettings;
+    private final GameScores gameScores;
     private final Callbacks callbacks;
 
-    public MenuContent(AssetManager assetManager, GameSettings gameSettings, Callbacks callbacks,
-                       boolean canResume, boolean canShowAchievements) {
+    public MenuContent(AssetManager assetManager, GameSettings gameSettings, GameScores gameScores,
+                       Callbacks callbacks, boolean canResume, boolean canShowAchievements) {
         this.canResume = canResume;
         this.canShowAchievements = canShowAchievements;
         this.gameSettings = gameSettings;
+        this.gameScores = gameScores;
         this.callbacks = callbacks;
         initialize(assetManager);
     }
@@ -133,8 +136,7 @@ public class MenuContent extends Table {
         add(aboutButton)
                 .row();
 
-        final int score = 123; // TODO show actual player's highscore
-        boolean hasScore = score > 0;
+        final int personalHighscore = gameScores.getPersonalBest();
 
         Table footerTable = new Table();
         footerTable.padTop(32f);
@@ -148,7 +150,7 @@ public class MenuContent extends Table {
         vibrationLabel.setColor(Cfg.Colors.DARK_RED);
         footerTable.add(vibrationLabel);
 
-        if (hasScore) {
+        if (personalHighscore > 0) {
             Label highscoreLabel = new Label("Highscore", skin, Styles.Label.XSMALL);
             highscoreLabel.setColor(Cfg.Colors.DARK_RED);
             footerTable.add(highscoreLabel);
@@ -175,9 +177,9 @@ public class MenuContent extends Table {
         });
         footerTable.add(toggleVibrateButton).width(256f);
 
-        if (hasScore) {
+        if (personalHighscore > 0) {
             Table scoreTable = new Table();
-            Label scoreLabel = new Label("1234", skin, Styles.Label.DEFAULT);
+            Label scoreLabel = new Label(String.valueOf(personalHighscore), skin, Styles.Label.DEFAULT);
             Label feetLabel = new Label("ft", skin, Styles.Label.XXSMALL);
             scoreTable.add(scoreLabel);
             scoreTable.add(feetLabel).padLeft(4f).padTop(16f);
