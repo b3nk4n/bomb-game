@@ -138,7 +138,7 @@ public class GameController implements Disposable {
 
         @Override
         public void revive() {
-            player.revive();
+            player.revive(0.33f);
             state.set(GameState.PLAYING);
             if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
                 game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.GAME_SONG, 85f);
@@ -332,8 +332,11 @@ public class GameController implements Disposable {
 
         handlePauseInput();
 
-        if (state.is(GameState.PAUSED)) {
+        if (!state.is(GameState.PLAYING)) {
             heartbeatSound.stop();
+        }
+
+        if (state.is(GameState.PAUSED)) {
             return;
         }
 

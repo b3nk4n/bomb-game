@@ -116,3 +116,4 @@ Thumbs.db
 
 ## Game specific
 *.bin
+/android/release/android.aab

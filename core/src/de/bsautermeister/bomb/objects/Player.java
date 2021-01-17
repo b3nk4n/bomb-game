@@ -50,14 +50,18 @@ public class Player {
         this.world = world;
         this.radius = radius;
         this.ballBody = createBody(radius);
-        revive();
+        revive(1f);
     }
 
-    public void revive() {
-        lifeRatio = 1f;
+    public void revive(float lifeRatio) {
+        this.lifeRatio = lifeRatio;
         campTime = 0f;
+        // revive with some velocity so that it looks a bit mire exciting
+        Vector2 initialVelocity = ballBody.getLinearVelocity().scl(0.25f);
         ballBody.setActive(true);
+        ballBody.setLinearVelocity(initialVelocity);
         fixedSensorBody.setActive(true);
+        fixedSensorBody.setLinearVelocity(initialVelocity);
     }
 
     private Body createBody(float radius) {
