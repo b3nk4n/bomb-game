@@ -1,4 +1,4 @@
-package de.bsautermeister.bomb;
+package de.bsautermeister.bomb.service;
 
 public interface ServiceKeys {
     interface Achievements {

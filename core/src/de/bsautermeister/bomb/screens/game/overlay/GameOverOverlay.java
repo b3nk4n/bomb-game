@@ -110,8 +110,7 @@ public class GameOverOverlay extends Overlay {
         });
         buttonTable.add(restartButton);
 
-
-        if (controller.canRevive()) {
+        /*if (controller.canRevive()) {
             Table reviveTable = new Table();
             Button reviveButton = new TextButton("Revive", getSkin(), Styles.TextButton.LARGE);
             reviveButton.addListener(new ClickListener() {
@@ -124,7 +123,7 @@ public class GameOverOverlay extends Overlay {
             Label watchAdsLabel = new Label("(watch ad)", getSkin(), Styles.Label.XXSMALL);
             reviveTable.add(watchAdsLabel).padTop(-16f);
             buttonTable.add(reviveTable);
-        }
+        }*/
 
         Button quitButton = new TextButton("Quit", getSkin(), Styles.TextButton.LARGE);
         quitButton.addListener(new ClickListener() {

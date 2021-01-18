@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
-import de.bsautermeister.bomb.ServiceKeys;
+import de.bsautermeister.bomb.service.ServiceKeys;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.audio.MusicPlayer;
 import de.bsautermeister.bomb.core.GameApp;
@@ -159,6 +159,11 @@ public class MenuScreen extends ScreenBase {
                     @Override
                     public void aboutClicked() {
                         setContent(createAboutContent());
+                    }
+
+                    @Override
+                    public void rateClicked() {
+
                     }
                 },
                 ((BombGame) getGame()).getGameFile().exists(),

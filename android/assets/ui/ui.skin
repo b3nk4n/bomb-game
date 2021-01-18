@@ -88,5 +88,39 @@
       "font": "title",
       "fontColor": "white"
     }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle":{
+    "vibrate": {
+        "up": "vibrate-button",
+        "down": "vibrate-button-down"
+    },
+    "no-vibrate": {
+        "up": "no-vibrate-button",
+        "down": "no-vibrate-button-down"
+    },
+    "star": {
+        "up": "star-button",
+        "down": "star-button-down"
+    },
+    "about": {
+        "up": "about-button",
+        "down": "about-button-down"
+    },
+    "audio0": {
+        "up": "audio0-button",
+        "down": "audio0-button-down"
+    },
+    "audio1": {
+        "up": "audio1-button",
+        "down": "audio1-button-down"
+    },
+    "audio2": {
+        "up": "audio2-button",
+        "down": "audio2-button-down"
+    },
+    "audio3": {
+        "up": "audio3-button",
+        "down": "audio3-button-down"
+    }
   }
 }

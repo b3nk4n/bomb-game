@@ -31,7 +31,7 @@ import java.io.FileOutputStream;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
-import de.bsautermeister.bomb.ServiceKeys;
+import de.bsautermeister.bomb.service.ServiceKeys;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.audio.LoopSound;
 import de.bsautermeister.bomb.audio.MusicPlayer;

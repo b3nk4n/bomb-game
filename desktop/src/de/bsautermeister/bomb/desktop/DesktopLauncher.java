@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
+import de.bsautermeister.bomb.service.NoopRateService;
 import de.golfgl.gdxgamesvcs.NoGameServiceClient;
 
 public class DesktopLauncher {
@@ -14,6 +15,10 @@ public class DesktopLauncher {
 		config.width = Cfg.Window.WIDTH;
 		config.height = Cfg.Window.HEIGHT;
 
-		new LwjglApplication(new BombGame(new NoGameServiceClient()), config);
+		new LwjglApplication(
+				new BombGame(
+						new NoGameServiceClient(),
+						new NoopRateService()),
+				config);
 	}
 }

@@ -9,6 +9,7 @@ import de.bsautermeister.bomb.core.GameApp;
 import de.bsautermeister.bomb.screens.game.GameStats;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.loading.LoadingScreen;
+import de.bsautermeister.bomb.service.RateService;
 import de.golfgl.gdxgamesvcs.IGameServiceClient;
 
 public class BombGame extends GameApp {
@@ -17,9 +18,11 @@ public class BombGame extends GameApp {
 	private GameStats gameStats;
 	private GameScores gameScores;
 	private MusicPlayer musicPlayer;
+	private final RateService rateService;
 
-	public BombGame(IGameServiceClient gameServiceClient) {
+	public BombGame(IGameServiceClient gameServiceClient, RateService rateService) {
 		super(gameServiceClient);
+		this.rateService = rateService;
 	}
 
 	@Override
@@ -79,5 +82,9 @@ public class BombGame extends GameApp {
 
 	public MusicPlayer getMusicPlayer() {
 		return musicPlayer;
+	}
+
+	public RateService getRateService() {
+		return rateService;
 	}
 }

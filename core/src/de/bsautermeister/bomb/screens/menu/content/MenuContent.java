@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,6 +18,15 @@ import de.bsautermeister.bomb.GameSettings;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
+
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.ABOUT;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO0;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO1;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO2;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO3;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.NO_VIBRATE;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.STAR;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.VIBRATE;
 
 public class MenuContent extends Table {
 
@@ -30,6 +40,7 @@ public class MenuContent extends Table {
         void leaderboardsClicked();
         void achievementsClicked();
         void aboutClicked();
+        void rateClicked();
     }
 
     private final boolean canShowAchievements;
@@ -52,13 +63,30 @@ public class MenuContent extends Table {
     }
 
     private void initialize(AssetManager assetManager) {
-        Skin skin = assetManager.get(Assets.Skins.UI);
+        final Skin skin = assetManager.get(Assets.Skins.UI);
 
         center();
         setFillParent(true);
 
         defaults()
-                .pad(16f);
+                .pad(8f);
+
+        Table contentTable = new Table();
+        contentTable.defaults().pad(8f);
+        add(contentTable).colspan(3).expand().row();
+
+        Table leftFooterTable = new Table();
+        leftFooterTable.defaults().pad(16f);
+        add(leftFooterTable).left();
+
+        Table centerFooterTable = new Table();
+        centerFooterTable.defaults().pad(16f);
+        add(centerFooterTable).expandX();
+
+        Table rightFooterTable = new Table();
+        rightFooterTable.defaults().pad(16f);
+        add(rightFooterTable).right();
+
 
         float delay = 0f;
         final Label title = new Label("The Downfall", skin, Styles.Label.TITLE);
@@ -69,7 +97,9 @@ public class MenuContent extends Table {
                 Actions.alpha(1f, 0.5f)
         ));
         delay += DELAY_OFFSET;
-        add(title)
+        contentTable.add(title)
+                .padTop(64f)
+                .padBottom(0f)
                 .row();
 
         final Button playButton = new TextButton("Play", skin, Styles.TextButton.LARGE);
@@ -85,7 +115,7 @@ public class MenuContent extends Table {
                 Actions.alpha(1f, 0.5f)
         ));
         delay += DELAY_OFFSET;
-        add(playButton)
+        contentTable.add(playButton)
                 .row();
 
         if (canResume) {
@@ -102,7 +132,7 @@ public class MenuContent extends Table {
                     Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
-            add(continueButton)
+            contentTable.add(continueButton)
                     .row();
         }
 
@@ -120,7 +150,7 @@ public class MenuContent extends Table {
                     Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
-            add(leaderboardsButton)
+            contentTable.add(leaderboardsButton)
                     .row();
         }
 
@@ -138,108 +168,112 @@ public class MenuContent extends Table {
                     Actions.alpha(1f, 0.5f)
             ));
             delay += DELAY_OFFSET;
-            add(achievementsButton)
+            contentTable.add(achievementsButton)
                     .row();
         }
 
-        final Button aboutButton = new TextButton("About", skin);
+        leftFooterTable.addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.delay(delay),
+                Actions.alpha(1f, 0.5f)
+        ));
+        centerFooterTable.addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.delay(delay),
+                Actions.alpha(1f, 0.5f)
+        ));
+        rightFooterTable.addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.delay(delay),
+                Actions.alpha(1f, 0.5f)
+        ));
+
+        final int personalHighscore = gameScores.getPersonalBestScore();
+
+        if (personalHighscore > 0) {
+            Table scoreTable = new Table();
+            Label bestLabel = new Label("Personal  Best:", skin, Styles.Label.SMALL);
+            bestLabel.setColor(Cfg.Colors.DARK_RED);
+            scoreTable.add(bestLabel);
+            Label bestValueLabel = new Label(String.valueOf(personalHighscore), skin, Styles.Label.SMALL);
+            bestValueLabel.setColor(Cfg.Colors.DARK_RED);
+            scoreTable.add(bestValueLabel)
+                    .padLeft(24f);
+            Label feetLabel = new Label("ft", skin, Styles.Label.XXSMALL);
+            feetLabel.setColor(Cfg.Colors.DARK_RED);
+            scoreTable.add(feetLabel)
+                    .padLeft(4f)
+                    .padTop(8f);
+            centerFooterTable.add(scoreTable).expandX();
+        }
+
+        final ImageButton vibrateButton = new ImageButton(getVibrateStyle(skin, gameSettings.getVibration()));
+        vibrateButton.setColor(Cfg.Colors.DARK_RED);
+        vibrateButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                boolean vibrationEnabled = gameSettings.toggleVibration();
+                vibrateButton.setStyle(getVibrateStyle(skin, vibrationEnabled));
+                if (vibrationEnabled) {
+                    Gdx.input.vibrate(250);
+                }
+            }
+        });
+        leftFooterTable.add(vibrateButton);
+
+        final ImageButton audioButton = new ImageButton(getAudioStyle(skin, gameSettings.getMusicVolumeLevel()));
+        audioButton.setColor(Cfg.Colors.DARK_RED);
+        audioButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                int audioLevel = gameSettings.toggleMusicVolumeLevel();
+                audioButton.setStyle(getAudioStyle(skin, audioLevel));
+            }
+        });
+        leftFooterTable.add(audioButton);
+
+        final ImageButton rateButton = new ImageButton(skin, STAR);
+        rateButton.setColor(Cfg.Colors.DARK_RED);
+        rateButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                callbacks.rateClicked();
+            }
+        });
+        rightFooterTable.add(rateButton);
+
+        final ImageButton aboutButton = new ImageButton(skin, ABOUT);
+        aboutButton.setColor(Cfg.Colors.DARK_RED);
         aboutButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 callbacks.aboutClicked();
             }
         });
-        aboutButton.addAction(Actions.sequence(
-                Actions.alpha(0f),
-                Actions.delay(delay),
-                Actions.alpha(1f, 0.5f)
-        ));
-        delay += DELAY_OFFSET;
-        add(aboutButton)
-                .row();
-
-        final int personalHighscore = gameScores.getPersonalBestScore();
-
-        Table footerTable = new Table();
-        footerTable.padTop(32f);
-        footerTable.addAction(Actions.sequence(
-                Actions.alpha(0f),
-                Actions.delay(delay),
-                Actions.alpha(1f, 0.5f)
-        ));
-
-        Label vibrationLabel = new Label("Vibration", skin, Styles.Label.XSMALL);
-        vibrationLabel.setColor(Cfg.Colors.DARK_RED);
-        footerTable.add(vibrationLabel);
-
-        if (personalHighscore > 0) {
-            Label highscoreLabel = new Label("Personal  Best", skin, Styles.Label.XSMALL);
-            highscoreLabel.setColor(Cfg.Colors.DARK_RED);
-            footerTable.add(highscoreLabel);
-        } else {
-            footerTable.add(new Actor());
-        }
-
-        Label musicVolumeLabel = new Label("Music  Volume", skin, Styles.Label.XSMALL);
-        musicVolumeLabel.setColor(Cfg.Colors.DARK_RED);
-        footerTable.add(musicVolumeLabel).row();
-
-        String vibrationValueText = getVibrationText(gameSettings.getVibration());
-        final TextButton toggleVibrateButton = new TextButton(vibrationValueText, skin, Styles.TextButton.SMALL);
-        toggleVibrateButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                boolean vibrationEnabled = gameSettings.toggleVibration();
-                toggleVibrateButton.setText(getVibrationText(vibrationEnabled));
-
-                if (vibrationEnabled) {
-                    Gdx.input.vibrate(250);
-                }
-            }
-        });
-        footerTable.add(toggleVibrateButton).width(256f);
-
-        if (personalHighscore > 0) {
-            Table scoreTable = new Table();
-            Label scoreLabel = new Label(String.valueOf(personalHighscore), skin, Styles.Label.DEFAULT);
-            Label feetLabel = new Label("ft", skin, Styles.Label.XXSMALL);
-            scoreTable.add(scoreLabel);
-            scoreTable.add(feetLabel).padLeft(4f).padTop(16f);
-            footerTable.add(scoreTable).width(512f);
-        } else {
-            footerTable.add(new Actor()).width(512f);
-        }
-
-        String musicVolumeValueText = getMusicVolumeText(gameSettings.getMusicVolumeLevel());
-        final TextButton toggleMusicVolumeButton = new TextButton(musicVolumeValueText, skin, Styles.TextButton.SMALL);
-        toggleMusicVolumeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                int musicVolumeLevel = gameSettings.toggleMusicVolumeLevel();
-                toggleMusicVolumeButton.setText(getMusicVolumeText(musicVolumeLevel));
-
-            }
-        });
-        footerTable.add(toggleMusicVolumeButton).width(256f).row();
-        add(footerTable);
+        rightFooterTable.add(aboutButton);
 
         pack();
     }
 
-    private String getVibrationText(boolean enabled) {
-        return enabled ? "ON" : "OFF";
+    private static ImageButton.ImageButtonStyle getVibrateStyle(Skin skin, boolean enabled) {
+        return getImgBtnStyle(skin, enabled ? VIBRATE : NO_VIBRATE);
     }
 
-    private String getMusicVolumeText(int level) {
-        switch (level) {
+    private static ImageButton.ImageButtonStyle getAudioStyle(Skin skin, int audioLevel) {
+        switch (audioLevel) {
             case 1:
-                return "LOW";
+                return getImgBtnStyle(skin, AUDIO1);
             case 2:
-                return "MEDIUM";
+                return getImgBtnStyle(skin, AUDIO2);
             case 3:
-                return "HIGH";
+                return getImgBtnStyle(skin, AUDIO3);
+            case 0:
             default:
-                return "OFF";
+                return getImgBtnStyle(skin, AUDIO0);
         }
+    }
+
+    private static ImageButton.ImageButtonStyle getImgBtnStyle(Skin skin, String vibrate) {
+        return skin.get(vibrate, ImageButton.ImageButtonStyle.class);
     }
 }

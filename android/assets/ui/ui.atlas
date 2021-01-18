@@ -1,13 +1,139 @@
 
 ui.png
-size: 16,16
+size: 512,256
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+about-button
+  rotate: false
+  xy: 4, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+about-button-down
+  rotate: false
+  xy: 4, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio0-button
+  rotate: false
+  xy: 72, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio0-button-down
+  rotate: false
+  xy: 4, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio1-button
+  rotate: false
+  xy: 72, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio1-button-down
+  rotate: false
+  xy: 140, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio2-button
+  rotate: false
+  xy: 72, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio2-button-down
+  rotate: false
+  xy: 140, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio3-button
+  rotate: false
+  xy: 208, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+audio3-button-down
+  rotate: false
+  xy: 140, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+button-container
+  rotate: false
+  xy: 208, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
 frame-bg
   rotate: false
   xy: 4, 4
   size: 5, 5
   orig: 5, 5
+  offset: 0, 0
+  index: -1
+no-vibrate-button
+  rotate: false
+  xy: 276, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+no-vibrate-button-down
+  rotate: false
+  xy: 208, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+star-button
+  rotate: false
+  xy: 276, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+star-button-down
+  rotate: false
+  xy: 344, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+template-button
+  rotate: false
+  xy: 276, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+vibrate-button
+  rotate: false
+  xy: 344, 81
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+vibrate-button-down
+  rotate: false
+  xy: 412, 149
+  size: 64, 64
+  orig: 64, 64
   offset: 0, 0
   index: -1

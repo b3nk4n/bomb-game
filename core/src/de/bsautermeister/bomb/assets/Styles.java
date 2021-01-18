@@ -17,6 +17,17 @@ public interface Styles {
         String LARGE = "large";
     }
 
+    interface ImageButton {
+        String VIBRATE = "vibrate";
+        String NO_VIBRATE = "no-vibrate";
+        String STAR = "star";
+        String AUDIO0 = "audio0";
+        String AUDIO1 = "audio1";
+        String AUDIO2 = "audio2";
+        String AUDIO3 = "audio3";
+        String ABOUT = "about";
+    }
+
     interface Fonts {
         String XXXSMALL = "xxxsmall";
         String XXSMALL = "xxsmall";
