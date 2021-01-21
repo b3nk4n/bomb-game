@@ -114,7 +114,7 @@ public class GameController implements Disposable {
     /**
      * Copy of the score entries for this game session, that are removed one by one when reached.
      */
-    private final Array<ScoreEntry> scoreEntries = new Array<>();
+    private final Array<ScoreEntry.InGame> scoreEntries = new Array<>();
 
     private boolean canRevive = true;
 
@@ -313,7 +313,7 @@ public class GameController implements Disposable {
 
         GameScores gameScores = game.getGameScores();
         scoreEntries.clear();
-        scoreEntries.addAll(gameScores.getScoreEntries());
+        scoreEntries.addAll(gameScores.getAllScoreEntries(5));
     }
 
     private void createWorldBoundsWallBodies(World world) {
@@ -420,7 +420,7 @@ public class GameController implements Disposable {
     private void updateScoreMarkers(float delta) {
         int playerScore = ScoreUtils.toScore(player.getMaxDepth());
         for (int i = scoreEntries.size - 1; i >= 0; --i) {
-            ScoreEntry scoreEntry = scoreEntries.get(i);
+            ScoreEntry.InGame scoreEntry = scoreEntries.get(i);
             scoreEntry.update(delta, playerScore);
             if (scoreEntry.isExpired()) {
                 scoreEntries.removeIndex(i);
@@ -753,7 +753,7 @@ public class GameController implements Disposable {
         return explosionGlowEffect;
     }
 
-    public Array<ScoreEntry> getScoreEntries() {
+    public Array<ScoreEntry.InGame> getScoreEntries() {
         return scoreEntries;
     }
 

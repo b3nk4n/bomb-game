@@ -127,7 +127,8 @@ public class GameRenderer implements Disposable {
 
     private final Vector3 tmpProjection = new Vector3();
     private final float[] tmpBlastEntries = new float[64];
-    private final Color tmpScoreMarkerColor = new Color(Color.WHITE);
+    private final Color tmpOtherScoreMarkerColor = new Color(Color.WHITE);
+    private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Cfg.Colors.DARK_RED);
     public void render() {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
@@ -191,11 +192,12 @@ public class GameRenderer implements Disposable {
 
         // score line
         Player player = controller.getPlayer();
-        Array<ScoreEntry> scoreMarkers = controller.getScoreEntries();
-        for (ScoreEntry scoreEntry : scoreMarkers) {
-            float factor = Interpolation.smooth.apply(scoreEntry.inverseProgress());
-            tmpScoreMarkerColor.a = factor * 0.66f;
-            drawMarkerLine(shapeRenderer, scoreEntry.getDepth(), tmpScoreMarkerColor, factor);
+        Array<ScoreEntry.InGame> scoreMarkers = controller.getScoreEntries();
+        for (ScoreEntry.InGame scoreEntry : scoreMarkers) {
+            float factor = Interpolation.smooth.apply(scoreEntry.getInverseProgress());
+            Color color = scoreEntry.isCurrentPlayer() ? tmpCurrentPlayerScoreMarkerColor : tmpOtherScoreMarkerColor;
+            color.a = factor * 0.75f;
+            drawMarkerLine(shapeRenderer, scoreEntry.getDepth(), color, factor);
         }
 
         shapeRenderer.end();
@@ -203,9 +205,11 @@ public class GameRenderer implements Disposable {
 
         batch.setProjectionMatrix(uiCamera.combined);
         batch.begin();
-        for (ScoreEntry scoreEntry : scoreMarkers) {
-            tmpScoreMarkerColor.a = Interpolation.smooth.apply(scoreEntry.inverseProgress()) * 0.66f;
-            drawMarkerText(camera, scoreEntry.getDepth(), scoreEntry.getLabel(), tmpScoreMarkerColor);
+        for (ScoreEntry.InGame scoreEntry : scoreMarkers) {
+            float factor = Interpolation.smooth.apply(scoreEntry.getInverseProgress());
+            Color color = scoreEntry.isCurrentPlayer() ? tmpCurrentPlayerScoreMarkerColor : tmpOtherScoreMarkerColor;
+            color.a = factor * 0.75f;
+            drawMarkerText(camera, scoreEntry.getDepth(), scoreEntry.getLabel(), color);
         }
         batch.end();
 

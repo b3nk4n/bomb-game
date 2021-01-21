@@ -4,74 +4,71 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.Locale;
+
 public class GameScores {
 
     private final Preferences prefs;
 
-    private static final int MIN_BEST_PERSONAL_SCORE_DIFF = 5;
-    private Array<Integer> otherBestScores = new Array<>();
+    private Array<ScoreEntry> otherScores = new Array<>();
+
     private int personalBestScore;
 
     private static final String KEY_PERSONAL_BEST = "maxFeet";
-
-    private static final String[] RANKS = {
-            "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"
-    };
-
-    /**
-     * Single list containing both the local player and other players scores, with proper
-     * rank-labels assigned.
-     */
-    private Array<ScoreEntry> scoreEntries = new Array<>();
 
     public GameScores() {
         prefs = Gdx.app.getPreferences(GameScores.class.getName());
 
         personalBestScore = prefs.getInteger(KEY_PERSONAL_BEST, 0);
-        updateScoreEntries();
     }
 
-    public void updateTopList(Array<Integer> newTopList) {
-        otherBestScores.clear();
-        otherBestScores.addAll(newTopList);
-        updateScoreEntries();
+    public synchronized void clearOtherScores() {
+        otherScores.clear();
     }
 
-    public void updatePersonalBest(int score) {
+    /**
+     * We currently have the assumption that we add other scores in order starting
+     * from the highest score (global 1st).
+     */
+    public synchronized void addOtherScore(int score, String username) {
+        otherScores.add(new ScoreEntry(score, username));
+    }
+
+    public synchronized void updatePersonalBest(int score) {
         if (score > personalBestScore) {
             personalBestScore = score;
             prefs.putInteger(KEY_PERSONAL_BEST, score);
             prefs.flush();
-            updateScoreEntries();
         }
-    }
-
-    private synchronized void updateScoreEntries() {
-        scoreEntries.clear();
-
-        if (personalBestScore > 0) {
-            scoreEntries.add(new ScoreEntry(personalBestScore, "Personal Best"));
-        }
-
-        for (int i = 0; i < otherBestScores.size; ++i) {
-            int currentScore = otherBestScores.get(i);
-            int currentRankIdx = currentScore > personalBestScore ? i : i + 1;
-
-            if (Math.abs(currentScore - personalBestScore) >= MIN_BEST_PERSONAL_SCORE_DIFF) {
-                scoreEntries.add(new ScoreEntry(currentScore, RANKS[currentRankIdx]));
-            }
-        }
-    }
-
-    public Array<Integer> getOtherBestScores() {
-        return otherBestScores;
     }
 
     public int getPersonalBestScore() {
         return personalBestScore;
     }
 
-    public Array<ScoreEntry> getScoreEntries() {
-        return scoreEntries;
+    public synchronized Array<ScoreEntry.InGame> getAllScoreEntries(int minDelta) {
+        Array<ScoreEntry.InGame> results = new Array<>();
+
+        if (personalBestScore > 0) {
+            results.add(new ScoreEntry.InGame(personalBestScore, "Personal Best", true));
+        }
+
+        int previousScore = 0;
+        for (int i = 0; i < otherScores.size; ++i) {
+            ScoreEntry entry = otherScores.get(i);
+            int otherScore = entry.getScore();
+            int currentRank = otherScore > personalBestScore ? i + 1 : i + 2;
+
+            if (Math.abs(otherScore - personalBestScore) >= minDelta
+                    && Math.abs(otherScore - previousScore) >= minDelta) {
+                results.add(new ScoreEntry.InGame(
+                        otherScore,
+                        String.format(Locale.ROOT, "%d. %s", currentRank, entry.getLabel()),
+                        false));
+                previousScore = otherScore;
+            }
+        }
+
+        return results;
     }
 }

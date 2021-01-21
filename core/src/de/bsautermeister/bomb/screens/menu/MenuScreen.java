@@ -89,14 +89,14 @@ public class MenuScreen extends ScreenBase {
                 new IFetchLeaderBoardEntriesResponseListener() {
                     @Override
                     public void onLeaderBoardResponse(Array<ILeaderBoardEntry> leaderBoard) {
-                        Array<Integer> scores = new Array<>(10);
+                        bombGame.getGameScores().clearOtherScores();
                         for (ILeaderBoardEntry entry : leaderBoard) {
                             if (!entry.isCurrentPlayer()) {
                                 int scoreValue = (int) entry.getSortValue();
-                                scores.add(scoreValue);
+                                String name = entry.getUserDisplayName();
+                                bombGame.getGameScores().addOtherScore(scoreValue, name);
                             }
                         }
-                        bombGame.getGameScores().updateTopList(scores);
                     }
                 });
     }
