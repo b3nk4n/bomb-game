@@ -82,27 +82,23 @@ public class GridUtils {
         return tmpCCWInner8;
     }
 
-    private static final GridPoint2 tmpCWOuter16 = new GridPoint2();
-    public static GridPoint2 getNextPosCWOuter16(int i, int j, int centerI, int centerJ) {
+    private static final GridPoint2 tmpCWOuter12 = new GridPoint2();
+    public static GridPoint2 getNextPosCWOuter12(int i, int j, int centerI, int centerJ) {
         int diffI = centerI - i;
         int diffJ = centerJ - j;
-        if (diffI == 0 && diffJ >= 1) tmpCWOuter16.set(centerI - 1, centerJ - 2);
-        if (diffI == 1 && diffJ == 2) tmpCWOuter16.set(centerI - 2, centerJ - 2);
-        if (diffI == 2 && diffJ == 2) tmpCWOuter16.set(centerI - 2, centerJ - 1);
-        if (diffI == 2 && diffJ == 1) tmpCWOuter16.set(centerI - 2, centerJ);
-        if (diffI >= 1 && diffJ == 0) tmpCWOuter16.set(centerI - 2, centerJ + 1);
-        if (diffI == 2 && diffJ == -1) tmpCWOuter16.set(centerI - 2, centerJ + 2);
-        if (diffI == 2 && diffJ == -2) tmpCWOuter16.set(centerI - 1, centerJ + 2);
-        if (diffI == 1 && diffJ == -2) tmpCWOuter16.set(centerI, centerJ + 2);
-        if (diffI == 0 && diffJ <= -1) tmpCWOuter16.set(centerI + 1, centerJ + 2);
-        if (diffI == -1 && diffJ == -2) tmpCWOuter16.set(centerI + 2, centerJ + 2);
-        if (diffI == -2 && diffJ == -2) tmpCWOuter16.set(centerI + 2, centerJ + 1);
-        if (diffI == -2 && diffJ == -1) tmpCWOuter16.set(centerI + 2, centerJ);
-        if (diffI <= -1 && diffJ == 0) tmpCWOuter16.set(centerI + 2, centerJ - 1);
-        if (diffI == -2 && diffJ == 1) tmpCWOuter16.set(centerI + 2, centerJ - 2);
-        if (diffI == -2 && diffJ == 2) tmpCWOuter16.set(centerI + 1, centerJ - 2);
-        if (diffI == -1 && diffJ == 2) tmpCWOuter16.set(centerI, centerJ - 2);
-        return tmpCWOuter16;
+        if (diffI == 0 && diffJ >= 1) tmpCWOuter12.set(centerI - 1, centerJ - 2);
+        if (diffI == 1 && diffJ == 2) tmpCWOuter12.set(centerI - 2, centerJ - 1);
+        if (diffI == 2 && diffJ == 1) tmpCWOuter12.set(centerI - 2, centerJ);
+        if (diffI >= 1 && diffJ == 0) tmpCWOuter12.set(centerI - 2, centerJ + 1);
+        if (diffI == 2 && diffJ == -1) tmpCWOuter12.set(centerI - 1, centerJ + 2);
+        if (diffI == 1 && diffJ == -2) tmpCWOuter12.set(centerI, centerJ + 2);
+        if (diffI == 0 && diffJ <= -1) tmpCWOuter12.set(centerI + 1, centerJ + 2);
+        if (diffI == -1 && diffJ == -2) tmpCWOuter12.set(centerI + 2, centerJ + 1);
+        if (diffI == -2 && diffJ == -1) tmpCWOuter12.set(centerI + 2, centerJ);
+        if (diffI <= -1 && diffJ == 0) tmpCWOuter12.set(centerI + 2, centerJ - 1);
+        if (diffI == -2 && diffJ == 1) tmpCWOuter12.set(centerI + 1, centerJ - 2);
+        if (diffI == -1 && diffJ == 2) tmpCWOuter12.set(centerI, centerJ - 2);
+        return tmpCWOuter12;
     }
 
     /**

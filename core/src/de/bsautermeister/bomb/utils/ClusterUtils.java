@@ -107,12 +107,11 @@ public class ClusterUtils {
                     if (GridUtils.isInBounds(clusterData, shortCutNextI, shortCutNextJ) && clusterData[nextI][nextJ] == clusterIdx) {
                         // use shortcut if we would have hit the same target using the outer circle
 
-                        // skip the first two
-                        next = GridUtils.getNextPosCWOuter16(circleStartI, circleStartJ, currentI, currentJ);
-                        next = GridUtils.getNextPosCWOuter16(next.x, next.y, currentI, currentJ);
+                        // skip the first
+                        next = GridUtils.getNextPosCWOuter12(circleStartI, circleStartJ, currentI, currentJ);
 
-                        for (int k = 2; k < 16 - 1; ++k) {
-                            next = GridUtils.getNextPosCWOuter16(next.x, next.y, currentI, currentJ);
+                        for (int k = 2; k < 12 - 1; ++k) {
+                            next = GridUtils.getNextPosCWOuter12(next.x, next.y, currentI, currentJ);
 
                             if (GridUtils.isInBounds(clusterData, next.x, next.y) && clusterData[next.x][next.y] == clusterIdx) {
                                 if (next.x == shortCutNextI && next.y == shortCutNextJ) {

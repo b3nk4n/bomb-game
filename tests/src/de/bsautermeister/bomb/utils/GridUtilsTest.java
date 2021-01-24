@@ -136,12 +136,12 @@ public class GridUtilsTest {
     }
 
     @Test
-    public void getNextPosCWOuter16Circle() {
+    public void getNextPosCWOuter12Circle() {
         GridPoint2 start = new GridPoint2(0, 2);
         GridPoint2 prev = new GridPoint2(start);
         GridPoint2 center = new GridPoint2();
-        for (int i = 0; i < 16; ++i) {
-            GridPoint2 next = GridUtils.getNextPosCWOuter16(prev.x, prev.y, center.x, center.y);
+        for (int i = 0; i < 12; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCWOuter12(prev.x, prev.y, center.x, center.y);
             prev.set(next);
         }
         assertEquals(start, prev);
