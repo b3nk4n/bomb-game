@@ -43,8 +43,8 @@ public class ClusterUtils {
 
         int outerI = prevI;
         int outerJ = prevJ;
-        for (int k = 0; k < 7; ++k) {
-            GridPoint2 next = GridUtils.getNextPosCW(outerI, outerJ, i, j);
+        for (int k = 0; k < 8 - 1; ++k) {
+            GridPoint2 next = GridUtils.getNextPosCWInner8(outerI, outerJ, i, j);
             outerI = next.x;
             outerJ = next.y;
 
@@ -72,10 +72,14 @@ public class ClusterUtils {
         int nextJ = startPosition.y - 1;
         int lastDiffI = nextI - currentI;
         int lastDiffJ = nextJ - currentJ;
+
         boolean open = true;
         while (open) {
-            for (int i = 0; i < 7; ++i) {
-                GridPoint2 next = GridUtils.getNextPosCW(nextI, nextJ, currentI, currentJ);
+            int circleStartI = nextI;
+            int circleStartJ = nextJ;
+
+            for (int i = 0; i < 8 - 1; ++i) { // TODO does this loop make sense? Or should we BREAK after this loop anyways, otherwise we would try the same thing over and over again!? At least when we reach the end of this loop.
+                GridPoint2 next = GridUtils.getNextPosCWInner8(nextI, nextJ, currentI, currentJ);
                 nextI = next.x;
                 nextJ = next.y;
 
@@ -89,10 +93,52 @@ public class ClusterUtils {
                         result.removeIndex(result.size - 1);
                     }
 
-                    break;
+                    return result;
                 }
 
                 if (GridUtils.isInBounds(clusterData, nextI, nextJ) && clusterData[nextI][nextJ] == clusterIdx) {
+                    // check whether there would have been a 22.5° angle as well
+                    next = GridUtils.getNextPosCCWInner16(nextI, nextJ, currentI, currentJ);
+
+                    int shortCutNextI = next.x;
+                    int shortCutNextJ = next.y;
+                    boolean needToCorrectNext = false;
+
+                    if (GridUtils.isInBounds(clusterData, shortCutNextI, shortCutNextJ) && clusterData[nextI][nextJ] == clusterIdx) {
+                        // use shortcut if we would have hit the same target using the outer circle
+
+                        // skip the first two
+                        next = GridUtils.getNextPosCWOuter16(circleStartI, circleStartJ, currentI, currentJ);
+                        next = GridUtils.getNextPosCWOuter16(next.x, next.y, currentI, currentJ);
+
+                        for (int k = 2; k < 16 - 1; ++k) {
+                            next = GridUtils.getNextPosCWOuter16(next.x, next.y, currentI, currentJ);
+
+                            if (GridUtils.isInBounds(clusterData, next.x, next.y) && clusterData[next.x][next.y] == clusterIdx) {
+                                if (next.x == shortCutNextI && next.y == shortCutNextJ) {
+
+                                    if (shortCutNextI == startPosition.x && shortCutNextJ == startPosition.y) {
+                                        // outline is closed: stop connecting the dots
+                                        open = false;
+
+                                        int diffI = shortCutNextI - currentI;
+                                        int diffJ = shortCutNextJ - currentJ;
+                                        if (diffI == lastDiffI && diffJ == lastDiffJ) {
+                                            result.removeIndex(result.size - 1);
+                                        }
+
+                                        return result;
+                                    }
+
+                                    nextI = shortCutNextI;
+                                    nextJ = shortCutNextJ;
+                                    needToCorrectNext = true;
+                                }
+                                break;
+                            }
+                        }
+                    }
+
                     int diffI = nextI - currentI;
                     int diffJ = nextJ - currentJ;
                     if (diffI == lastDiffI && diffJ == lastDiffJ) {
@@ -108,6 +154,14 @@ public class ClusterUtils {
                     currentJ = nextJ;
                     nextI = tmpI;
                     nextJ = tmpJ;
+
+                    if (needToCorrectNext) {
+                        // we did one step on inner-16, which we need to repeat to be on a inner-8 position again
+                        next = GridUtils.getNextPosCCWInner16(nextI, nextJ, currentI, currentJ);
+                        nextI = next.x;
+                        nextJ = next.y;
+                    }
+
                     break;
                 }
             }

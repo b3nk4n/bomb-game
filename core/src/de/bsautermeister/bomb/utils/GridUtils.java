@@ -6,45 +6,114 @@ public class GridUtils {
 
     private GridUtils() {}
 
-    private static final GridPoint2 tmpNextPostCw = new GridPoint2();
-    public static GridPoint2 getNextPosCW(int i, int j, int centerI, int centerJ) {
+    private static final GridPoint2 tmpCWInner16 = new GridPoint2();
+    public static GridPoint2 getNextPosCWInner16(int i, int j, int centerI, int centerJ) {
         int diffI = centerI - i;
         int diffJ = centerJ - j;
-        if (diffI == 0 && diffJ == 1) tmpNextPostCw.set(centerI - 1, centerJ - 1);
-        if (diffI == 1 && diffJ == 1) tmpNextPostCw.set(centerI - 1, centerJ);
-        if (diffI == 1 && diffJ == 0) tmpNextPostCw.set(centerI - 1, centerJ + 1);
-        if (diffI == 1 && diffJ == -1) tmpNextPostCw.set(centerI, centerJ + 1);
-        if (diffI == 0 && diffJ == -1) tmpNextPostCw.set(centerI + 1, centerJ + 1);
-        if (diffI == -1 && diffJ == -1) tmpNextPostCw.set(centerI + 1, centerJ);
-        if (diffI == -1 && diffJ == 0) tmpNextPostCw.set(centerI + 1, centerJ - 1);
-        if (diffI == -1 && diffJ == 1) tmpNextPostCw.set(centerI, centerJ - 1);
-        return tmpNextPostCw;
+        if (diffI == 0 && diffJ == 1) tmpCWInner16.set(centerI - 1, centerJ - 2);
+        if (diffI == 1 && diffJ == 2) tmpCWInner16.set(centerI - 1, centerJ - 1);
+        if (diffI == 1 && diffJ == 1) tmpCWInner16.set(centerI - 2, centerJ - 1);
+        if (diffI == 2 && diffJ == 1) tmpCWInner16.set(centerI - 1, centerJ);
+        if (diffI == 1 && diffJ == 0) tmpCWInner16.set(centerI - 2, centerJ + 1);
+        if (diffI == 2 && diffJ == -1) tmpCWInner16.set(centerI - 1, centerJ + 1);
+        if (diffI == 1 && diffJ == -1) tmpCWInner16.set(centerI - 1, centerJ + 2);
+        if (diffI == 1 && diffJ == -2) tmpCWInner16.set(centerI, centerJ + 1);
+        if (diffI == 0 && diffJ == -1) tmpCWInner16.set(centerI + 1, centerJ + 2);
+        if (diffI == -1 && diffJ == -2) tmpCWInner16.set(centerI + 1, centerJ + 1);
+        if (diffI == -1 && diffJ == -1) tmpCWInner16.set(centerI + 2, centerJ + 1);
+        if (diffI == -2 && diffJ == -1) tmpCWInner16.set(centerI + 1, centerJ);
+        if (diffI == -1 && diffJ == 0) tmpCWInner16.set(centerI + 2, centerJ - 1);
+        if (diffI == -2 && diffJ == 1) tmpCWInner16.set(centerI + 1, centerJ - 1);
+        if (diffI == -1 && diffJ == 1) tmpCWInner16.set(centerI + 1, centerJ - 2);
+        if (diffI == -1 && diffJ == 2) tmpCWInner16.set(centerI, centerJ - 1);
+        return tmpCWInner16;
     }
 
-    private static final GridPoint2 tmpNextPostCcw = new GridPoint2();
-    public static GridPoint2 getNextPosCCW(int i, int j, int centerI, int centerJ) {
+    private static final GridPoint2 tmpCCWInner16 = new GridPoint2();
+    public static GridPoint2 getNextPosCCWInner16(int i, int j, int centerI, int centerJ) {
         int diffI = centerI - i;
         int diffJ = centerJ - j;
-        if (diffI == 0 && diffJ == 1) tmpNextPostCcw.set(centerI + 1, centerJ - 1);
-        if (diffI == 1 && diffJ == 1) tmpNextPostCcw.set(centerI, centerJ - 1);
-        if (diffI == 1 && diffJ == 0) tmpNextPostCcw.set(centerI - 1, centerJ - 1);
-        if (diffI == 1 && diffJ == -1) tmpNextPostCcw.set(centerI - 1, centerJ);
-        if (diffI == 0 && diffJ == -1) tmpNextPostCcw.set(centerI - 1, centerJ + 1);
-        if (diffI == -1 && diffJ == -1) tmpNextPostCcw.set(centerI, centerJ + 1);
-        if (diffI == -1 && diffJ == 0) tmpNextPostCcw.set(centerI + 1, centerJ + 1);
-        if (diffI == -1 && diffJ == 1) tmpNextPostCcw.set(centerI + 1, centerJ);
-        return tmpNextPostCcw;
+        if (diffI == 0 && diffJ == 1) tmpCCWInner16.set(centerI + 1, centerJ - 2);
+        if (diffI == -1 && diffJ == 2) tmpCCWInner16.set(centerI + 1, centerJ - 1);
+        if (diffI == -1 && diffJ == 1) tmpCCWInner16.set(centerI + 2, centerJ - 1);
+        if (diffI == -2 && diffJ == 1) tmpCCWInner16.set(centerI + 1, centerJ);
+        if (diffI == -1 && diffJ == 0) tmpCCWInner16.set(centerI + 2, centerJ + 1);
+        if (diffI == -2 && diffJ == -1) tmpCCWInner16.set(centerI + 1, centerJ + 1);
+        if (diffI == -1 && diffJ == -1) tmpCCWInner16.set(centerI + 1, centerJ + 2);
+        if (diffI == -1 && diffJ == -2) tmpCCWInner16.set(centerI, centerJ + 1);
+        if (diffI == 0 && diffJ == -1) tmpCCWInner16.set(centerI - 1, centerJ + 2);
+        if (diffI == 1 && diffJ == -2) tmpCCWInner16.set(centerI - 1, centerJ + 1);
+        if (diffI == 1 && diffJ == -1) tmpCCWInner16.set(centerI - 2, centerJ + 1);
+        if (diffI == 2 && diffJ == -1) tmpCCWInner16.set(centerI - 1, centerJ);
+        if (diffI == 1 && diffJ == 0) tmpCCWInner16.set(centerI - 2, centerJ - 1);
+        if (diffI == 2 && diffJ == 1) tmpCCWInner16.set(centerI - 1, centerJ - 1);
+        if (diffI == 1 && diffJ == 1) tmpCCWInner16.set(centerI - 1, centerJ - 2);
+        if (diffI == 1 && diffJ == 2) tmpCCWInner16.set(centerI, centerJ - 1);
+        return tmpCCWInner16;
+    }
+
+    private static final GridPoint2 tmpCWInner8 = new GridPoint2();
+    public static GridPoint2 getNextPosCWInner8(int i, int j, int centerI, int centerJ) {
+        int diffI = centerI - i;
+        int diffJ = centerJ - j;
+        if (diffI == 0 && diffJ == 1) tmpCWInner8.set(centerI - 1, centerJ - 1);
+        if (diffI == 1 && diffJ == 1) tmpCWInner8.set(centerI - 1, centerJ);
+        if (diffI == 1 && diffJ == 0) tmpCWInner8.set(centerI - 1, centerJ + 1);
+        if (diffI == 1 && diffJ == -1) tmpCWInner8.set(centerI, centerJ + 1);
+        if (diffI == 0 && diffJ == -1) tmpCWInner8.set(centerI + 1, centerJ + 1);
+        if (diffI == -1 && diffJ == -1) tmpCWInner8.set(centerI + 1, centerJ);
+        if (diffI == -1 && diffJ == 0) tmpCWInner8.set(centerI + 1, centerJ - 1);
+        if (diffI == -1 && diffJ == 1) tmpCWInner8.set(centerI, centerJ - 1);
+        return tmpCWInner8;
+    }
+
+    private static final GridPoint2 tmpCCWInner8 = new GridPoint2();
+    public static GridPoint2 getNextPosCCWInner8(int i, int j, int centerI, int centerJ) {
+        int diffI = centerI - i;
+        int diffJ = centerJ - j;
+        if (diffI == 0 && diffJ == 1) tmpCCWInner8.set(centerI + 1, centerJ - 1);
+        if (diffI == 1 && diffJ == 1) tmpCCWInner8.set(centerI, centerJ - 1);
+        if (diffI == 1 && diffJ == 0) tmpCCWInner8.set(centerI - 1, centerJ - 1);
+        if (diffI == 1 && diffJ == -1) tmpCCWInner8.set(centerI - 1, centerJ);
+        if (diffI == 0 && diffJ == -1) tmpCCWInner8.set(centerI - 1, centerJ + 1);
+        if (diffI == -1 && diffJ == -1) tmpCCWInner8.set(centerI, centerJ + 1);
+        if (diffI == -1 && diffJ == 0) tmpCCWInner8.set(centerI + 1, centerJ + 1);
+        if (diffI == -1 && diffJ == 1) tmpCCWInner8.set(centerI + 1, centerJ);
+        return tmpCCWInner8;
+    }
+
+    private static final GridPoint2 tmpCWOuter16 = new GridPoint2();
+    public static GridPoint2 getNextPosCWOuter16(int i, int j, int centerI, int centerJ) {
+        int diffI = centerI - i;
+        int diffJ = centerJ - j;
+        if (diffI == 0 && diffJ >= 1) tmpCWOuter16.set(centerI - 1, centerJ - 2);
+        if (diffI == 1 && diffJ == 2) tmpCWOuter16.set(centerI - 2, centerJ - 2);
+        if (diffI == 2 && diffJ == 2) tmpCWOuter16.set(centerI - 2, centerJ - 1);
+        if (diffI == 2 && diffJ == 1) tmpCWOuter16.set(centerI - 2, centerJ);
+        if (diffI >= 1 && diffJ == 0) tmpCWOuter16.set(centerI - 2, centerJ + 1);
+        if (diffI == 2 && diffJ == -1) tmpCWOuter16.set(centerI - 2, centerJ + 2);
+        if (diffI == 2 && diffJ == -2) tmpCWOuter16.set(centerI - 1, centerJ + 2);
+        if (diffI == 1 && diffJ == -2) tmpCWOuter16.set(centerI, centerJ + 2);
+        if (diffI == 0 && diffJ <= -1) tmpCWOuter16.set(centerI + 1, centerJ + 2);
+        if (diffI == -1 && diffJ == -2) tmpCWOuter16.set(centerI + 2, centerJ + 2);
+        if (diffI == -2 && diffJ == -2) tmpCWOuter16.set(centerI + 2, centerJ + 1);
+        if (diffI == -2 && diffJ == -1) tmpCWOuter16.set(centerI + 2, centerJ);
+        if (diffI <= -1 && diffJ == 0) tmpCWOuter16.set(centerI + 2, centerJ - 1);
+        if (diffI == -2 && diffJ == 1) tmpCWOuter16.set(centerI + 2, centerJ - 2);
+        if (diffI == -2 && diffJ == 2) tmpCWOuter16.set(centerI + 1, centerJ - 2);
+        if (diffI == -1 && diffJ == 2) tmpCWOuter16.set(centerI, centerJ - 2);
+        return tmpCWOuter16;
     }
 
     /**
      * Checks whether the node on i,j from prevI, prevJ would be connectable to any other neighbor.
      */
     public static boolean hasConnectibleNeighborsLeftOrRight(int[][] data, int i, int j, int prevI, int prevJ, int emptyValue) {
-        GridPoint2 leftPos = getNextPosCCW(i, j, prevI, prevJ);
+        GridPoint2 leftPos = getNextPosCCWInner8(i, j, prevI, prevJ);
         if (isInBounds(data, leftPos) &&  data[leftPos.x][leftPos.y] != emptyValue) {
             return true;
         }
-        GridPoint2 rightPos = getNextPosCW(i, j, prevI, prevJ);
+        GridPoint2 rightPos = getNextPosCWInner8(i, j, prevI, prevJ);
         if (isInBounds(data, rightPos) && data[rightPos.x][rightPos.y] != emptyValue) {
             return true;
         }
@@ -52,11 +121,11 @@ public class GridUtils {
         int diffJ = j - prevJ;
         if (diffI == 0 || diffJ == 0) {
             // for horizontal/vertical steps there are 2 neighbors each side that can be connected
-            leftPos = getNextPosCCW(leftPos.x, leftPos.y, prevI, prevJ);
+            leftPos = getNextPosCCWInner8(leftPos.x, leftPos.y, prevI, prevJ);
             if (isInBounds(data, leftPos) &&  data[leftPos.x][leftPos.y] != emptyValue) {
                 return true;
             }
-            rightPos = getNextPosCW(rightPos.x, rightPos.y, prevI, prevJ);
+            rightPos = getNextPosCWInner8(rightPos.x, rightPos.y, prevI, prevJ);
             if (isInBounds(data, rightPos) && data[rightPos.x][rightPos.y] != emptyValue) {
                 return true;
             }

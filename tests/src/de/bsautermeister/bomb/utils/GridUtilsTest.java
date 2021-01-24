@@ -64,27 +64,87 @@ public class GridUtilsTest {
     }
 
     @Test
-    public void getNextPosCW() {
-        assertEquals(new GridPoint2(1, -1), GridUtils.getNextPosCW(1, 0, 0, 0));
-        assertEquals(new GridPoint2(0, -1), GridUtils.getNextPosCW(1, -1, 0, 0));
-        assertEquals(new GridPoint2(-1, -1), GridUtils.getNextPosCW(0, -1, 0, 0));
-        assertEquals(new GridPoint2(-1, 0), GridUtils.getNextPosCW(-1, -1, 0, 0));
-        assertEquals(new GridPoint2(-1, 1), GridUtils.getNextPosCW(-1, 0, 0, 0));
-        assertEquals(new GridPoint2(0, 1), GridUtils.getNextPosCW(-1, 1, 0, 0));
-        assertEquals(new GridPoint2(1, 1), GridUtils.getNextPosCW(0, 1, 0, 0));
-        assertEquals(new GridPoint2(1, 0), GridUtils.getNextPosCW(1, 1, 0, 0));
+    public void getNextPosCW8() {
+        assertEquals(new GridPoint2(1, -1), GridUtils.getNextPosCWInner8(1, 0, 0, 0));
+        assertEquals(new GridPoint2(0, -1), GridUtils.getNextPosCWInner8(1, -1, 0, 0));
+        assertEquals(new GridPoint2(-1, -1), GridUtils.getNextPosCWInner8(0, -1, 0, 0));
+        assertEquals(new GridPoint2(-1, 0), GridUtils.getNextPosCWInner8(-1, -1, 0, 0));
+        assertEquals(new GridPoint2(-1, 1), GridUtils.getNextPosCWInner8(-1, 0, 0, 0));
+        assertEquals(new GridPoint2(0, 1), GridUtils.getNextPosCWInner8(-1, 1, 0, 0));
+        assertEquals(new GridPoint2(1, 1), GridUtils.getNextPosCWInner8(0, 1, 0, 0));
+        assertEquals(new GridPoint2(1, 0), GridUtils.getNextPosCWInner8(1, 1, 0, 0));
     }
 
     @Test
-    public void getNextPosCCW() {
-        assertEquals(new GridPoint2(1, 1), GridUtils.getNextPosCCW(1, 0, 0, 0));
-        assertEquals(new GridPoint2(1, 0), GridUtils.getNextPosCCW(1, -1, 0, 0));
-        assertEquals(new GridPoint2(1, -1), GridUtils.getNextPosCCW(0, -1, 0, 0));
-        assertEquals(new GridPoint2(0, -1), GridUtils.getNextPosCCW(-1, -1, 0, 0));
-        assertEquals(new GridPoint2(-1, -1), GridUtils.getNextPosCCW(-1, 0, 0, 0));
-        assertEquals(new GridPoint2(-1, 0), GridUtils.getNextPosCCW(-1, 1, 0, 0));
-        assertEquals(new GridPoint2(-1, 1), GridUtils.getNextPosCCW(0, 1, 0, 0));
-        assertEquals(new GridPoint2(0, 1), GridUtils.getNextPosCCW(1, 1, 0, 0));
+    public void getNextPosCCW8() {
+        assertEquals(new GridPoint2(1, 1), GridUtils.getNextPosCCWInner8(1, 0, 0, 0));
+        assertEquals(new GridPoint2(1, 0), GridUtils.getNextPosCCWInner8(1, -1, 0, 0));
+        assertEquals(new GridPoint2(1, -1), GridUtils.getNextPosCCWInner8(0, -1, 0, 0));
+        assertEquals(new GridPoint2(0, -1), GridUtils.getNextPosCCWInner8(-1, -1, 0, 0));
+        assertEquals(new GridPoint2(-1, -1), GridUtils.getNextPosCCWInner8(-1, 0, 0, 0));
+        assertEquals(new GridPoint2(-1, 0), GridUtils.getNextPosCCWInner8(-1, 1, 0, 0));
+        assertEquals(new GridPoint2(-1, 1), GridUtils.getNextPosCCWInner8(0, 1, 0, 0));
+        assertEquals(new GridPoint2(0, 1), GridUtils.getNextPosCCWInner8(1, 1, 0, 0));
+    }
+
+    @Test
+    public void getNextPosCW8Circle() {
+        GridPoint2 start = new GridPoint2(0, 1);
+        GridPoint2 prev = new GridPoint2(start);
+        GridPoint2 center = new GridPoint2();
+        for (int i = 0; i < 8; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCWInner8(prev.x, prev.y, center.x, center.y);
+            prev.set(next);
+        }
+        assertEquals(start, prev);
+    }
+
+    @Test
+    public void getNextPosCCW8Circle() {
+        GridPoint2 start = new GridPoint2(0, 1);
+        GridPoint2 prev = new GridPoint2(start);
+        GridPoint2 center = new GridPoint2();
+        for (int i = 0; i < 8; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCCWInner8(prev.x, prev.y, center.x, center.y);
+            prev.set(next);
+        }
+        assertEquals(start, prev);
+    }
+
+    @Test
+    public void getNextPosCW16Circle() {
+        GridPoint2 start = new GridPoint2(0, 1);
+        GridPoint2 prev = new GridPoint2(start);
+        GridPoint2 center = new GridPoint2();
+        for (int i = 0; i < 16; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCWInner16(prev.x, prev.y, center.x, center.y);
+            prev.set(next);
+        }
+        assertEquals(start, prev);
+    }
+
+    @Test
+    public void getNextPosCCW16Circle() {
+        GridPoint2 start = new GridPoint2(0, 1);
+        GridPoint2 prev = new GridPoint2(start);
+        GridPoint2 center = new GridPoint2();
+        for (int i = 0; i < 16; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCCWInner16(prev.x, prev.y, center.x, center.y);
+            prev.set(next);
+        }
+        assertEquals(start, prev);
+    }
+
+    @Test
+    public void getNextPosCWOuter16Circle() {
+        GridPoint2 start = new GridPoint2(0, 2);
+        GridPoint2 prev = new GridPoint2(start);
+        GridPoint2 center = new GridPoint2();
+        for (int i = 0; i < 16; ++i) {
+            GridPoint2 next = GridUtils.getNextPosCWOuter16(prev.x, prev.y, center.x, center.y);
+            prev.set(next);
+        }
+        assertEquals(start, prev);
     }
 
     @Test

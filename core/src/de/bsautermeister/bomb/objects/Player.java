@@ -114,19 +114,19 @@ public class Player {
     public void control(boolean up, boolean left, boolean right) {
         if (right) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(-3f, true);
+                ballBody.applyTorque(-4f, true);
             }
-            ballBody.applyForceToCenter(12.5f, 0, true);
+            ballBody.applyForceToCenter(13f, 0, true);
         }
         if (left) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(3f, true);
+                ballBody.applyTorque(4f, true);
             }
-            ballBody.applyForceToCenter(-12.5f, 0, true);
+            ballBody.applyForceToCenter(-13f, 0, true);
         }
         if (up && hasGroundContact() && !blockJumpUntilRelease) {
             blockJumpUntilRelease = true;
-            ballBody.applyLinearImpulse(0f, 12.5f, ballBody.getWorldCenter().x, ballBody.getWorldCenter().y, true);
+            ballBody.applyLinearImpulse(0f, 13f, ballBody.getWorldCenter().x, ballBody.getWorldCenter().y, true);
         }
         if (!up) {
             blockJumpUntilRelease = false;
