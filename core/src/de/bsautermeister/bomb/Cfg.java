@@ -7,6 +7,7 @@ public interface Cfg {
 
     int LOG_LEVEL = Logger.DEBUG;
     boolean DEBUG_MODE = false;
+    boolean DEBUG_ADS = true;
     String SAVE_GAME_FILE = "save.bin";
     float GAME_OVER_DELAY = 3f;
     float DEPTH_TO_SCORE_FACTOR = 10f;

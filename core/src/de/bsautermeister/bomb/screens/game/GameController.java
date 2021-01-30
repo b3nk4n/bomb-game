@@ -31,7 +31,6 @@ import java.io.FileOutputStream;
 
 import de.bsautermeister.bomb.BombGame;
 import de.bsautermeister.bomb.Cfg;
-import de.bsautermeister.bomb.service.ServiceKeys;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.audio.LoopSound;
 import de.bsautermeister.bomb.audio.MusicPlayer;
@@ -68,6 +67,8 @@ import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 import de.bsautermeister.bomb.serializers.Vector3Serializer;
+import de.bsautermeister.bomb.service.AdService;
+import de.bsautermeister.bomb.service.ServiceKeys;
 
 import static com.badlogic.gdx.Input.Keys.SPACE;
 
@@ -94,6 +95,7 @@ public class GameController implements Disposable {
 
     private boolean markBackToMenu;
     private boolean markRestartGame;
+    private boolean markRevived;
 
     private static final float BOMB_START_Y = 32f / Cfg.World.PPM;
     private static final float INITIAL_BOMB_EMIT_DELAY = 3f;
@@ -143,14 +145,7 @@ public class GameController implements Disposable {
 
         @Override
         public void revive() {
-            player.revive(0.33f);
-            state.set(GameState.PLAYING);
-            if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
-                game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.GAME_SONG, 85f);
-                game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, true);
-                game.getMusicPlayer().playFromBeginning();
-            }
-            bombEmitTimer = INITIAL_BOMB_EMIT_DELAY;
+            markRevived = true;
             canRevive = false;
         }
 
@@ -340,9 +335,8 @@ public class GameController implements Disposable {
         shape.dispose();
     }
 
+    private float timeFactor = 1f;
     public void update(float delta) {
-        state.update(delta);
-
         if (markBackToMenu) {
             markBackToMenu = false;
             gameScreenCallbacks.backToMenu();
@@ -354,6 +348,26 @@ public class GameController implements Disposable {
             gameScreenCallbacks.restartGame();
             return;
         }
+
+        if (markRevived) {
+            markRevived = false;
+            player.revive(0.33f);
+            state.set(GameState.PLAYING);
+            if (!game.getMusicPlayer().isSelected(Assets.Music.GAME_SONG)) {
+                game.getMusicPlayer().selectSmoothLoopedMusic(Assets.Music.GAME_SONG, 85f);
+                game.getMusicPlayer().setVolume(MusicPlayer.MAX_VOLUME, false);
+                game.getMusicPlayer().playFromBeginning();
+            }
+            bombEmitTimer = INITIAL_BOMB_EMIT_DELAY;
+            timeFactor = 0f;
+        }
+
+        if (timeFactor < 1f) {
+            timeFactor = Math.min(timeFactor + delta * 0.5f, 1f);
+            delta *= timeFactor;
+        }
+
+        state.update(delta);
 
         handlePauseInput();
 
@@ -765,5 +779,9 @@ public class GameController implements Disposable {
 
     public boolean canRevive() {
         return canRevive;
+    }
+
+    public AdService getAdService() {
+        return game.getAdService();
     }
 }

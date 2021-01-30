@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Timer;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.assets.Styles;
@@ -17,6 +18,7 @@ import de.bsautermeister.bomb.objects.Player;
 import de.bsautermeister.bomb.screens.game.GameController;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
+import de.bsautermeister.bomb.service.AdService;
 
 public class GameOverOverlay extends Overlay {
     public interface Callback {
@@ -41,7 +43,7 @@ public class GameOverOverlay extends Overlay {
     @Override
     public void show() {
         clear();
-        Label titleLabel = new Label("Game Over", getSkin(), Styles.Label.TITLE);
+        final Label titleLabel = new Label("Game Over", getSkin(), Styles.Label.TITLE);
         titleLabel.setColor(Cfg.Colors.DARK_RED);
         add(titleLabel)
                 .pad(8f)
@@ -110,20 +112,43 @@ public class GameOverOverlay extends Overlay {
         });
         buttonTable.add(restartButton);
 
-        /*if (controller.canRevive()) {
+        final AdService adService = controller.getAdService();
+        if (controller.canRevive() && adService.isSupported() && adService.isReady()) {
             Table reviveTable = new Table();
             Button reviveButton = new TextButton("Revive", getSkin(), Styles.TextButton.LARGE);
             reviveButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    callback.revive();
+                    clear();
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            boolean adShown = adService.show(new AdService.RewardCallback() {
+                                @Override
+                                public void rewarded(String type, int amount) {
+                                    callback.revive();
+                                }
+
+                                @Override
+                                public void canceled() {
+                                    callback.quit();
+                                }
+                            });
+
+                            if (!adShown) {
+                                // We have shown the "revive" button, but failed to show the ad.
+                                // This is not the users fault, so reward him anyways.
+                                callback.revive();
+                            }
+                        }
+                    }, 0.1f);
                 }
             });
             reviveTable.add(reviveButton).padTop(12f).row();
             Label watchAdsLabel = new Label("(watch ad)", getSkin(), Styles.Label.XXSMALL);
             reviveTable.add(watchAdsLabel).padTop(-16f);
             buttonTable.add(reviveTable);
-        }*/
+        }
 
         Button quitButton = new TextButton("Quit", getSkin(), Styles.TextButton.LARGE);
         quitButton.addListener(new ClickListener() {

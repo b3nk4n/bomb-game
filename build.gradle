@@ -10,7 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.4.3'
         
 
     }
@@ -74,7 +74,8 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
         api "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:1.0.2"
-        
+        implementation "com.google.android.gms:play-services-ads:19.7.0"
+        implementation "com.android.support:multidex:1.0.3"
     }
 }
 

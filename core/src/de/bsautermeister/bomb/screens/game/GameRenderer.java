@@ -109,7 +109,7 @@ public class GameRenderer implements Disposable {
         Skin skin = assetManager.get(Assets.Skins.UI);
         font = skin.getFont(Styles.Fonts.XXSMALL);
 
-        overlays = new Overlays<>(uiViewport, batch, 0x000000BB);
+        overlays = new Overlays<>(uiViewport, batch, 0x00000099);
         overlays.register(GameState.PAUSED,
                 new PauseOverlay(skin, controller.getPauseCallback()));
         overlays.register(GameState.GAME_OVER,

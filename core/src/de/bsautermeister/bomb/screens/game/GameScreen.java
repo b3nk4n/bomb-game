@@ -36,10 +36,14 @@ public class GameScreen extends ScreenBase {
     public void show() {
         super.show();
 
-        controller = new GameController((BombGame) getGame(), callbacks, getAssetManager());
+        BombGame game = (BombGame) getGame();
+
+        controller = new GameController(game, callbacks, getAssetManager());
         controller.initialize(resume);
         renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
                 getGame().getFrameBufferManager());
+
+        game.getAdService().load();
     }
 
     @Override
