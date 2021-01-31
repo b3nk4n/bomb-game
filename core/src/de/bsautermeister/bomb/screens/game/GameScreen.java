@@ -56,7 +56,7 @@ public class GameScreen extends ScreenBase {
     public void render(float delta) {
         super.render(delta);
         controller.update(delta);
-        renderer.render();
+        renderer.render(delta);
     }
 
     @Override

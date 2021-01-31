@@ -39,7 +39,7 @@ public class Overlays<T extends Enum> {
     }
 
     public void update(T state) {
-        if (overlayStage.getActors().isEmpty()) {
+        if (!isVisible()) {
             Overlay overlay = overlays.get(state);
             if (overlay != null) {
                 overlayStage.addActor(overlay);
@@ -52,7 +52,7 @@ public class Overlays<T extends Enum> {
     }
 
     public void render(SpriteBatch batch) {
-        if (!overlayStage.getActors().isEmpty()) {
+        if (isVisible()) {
             if (skipNextOverlayAct) {
                 skipNextOverlayAct = false;
                 return;
@@ -65,11 +65,11 @@ public class Overlays<T extends Enum> {
         }
     }
 
-    public InputProcessor getInputProcessor() {
-        return overlayStage;
+    public boolean isVisible() {
+        return !overlayStage.getActors().isEmpty();
     }
 
-    public Stage getStage() {
+    public InputProcessor getInputProcessor() {
         return overlayStage;
     }
 }

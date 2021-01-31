@@ -3,7 +3,6 @@ package de.bsautermeister.bomb.screens.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -50,6 +49,7 @@ import de.bsautermeister.bomb.screens.game.overlay.GameOverOverlay;
 import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.screens.game.score.ScoreEntry;
+import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.bsautermeister.bomb.utils.PolygonUtils;
 
@@ -76,7 +76,7 @@ public class GameRenderer implements Disposable {
     private final ShapeRenderer shapeRenderer;
 
     private final Viewport uiViewport;
-    private final Camera uiCamera;
+    private final GameHud hud;
     private final Overlays<GameState> overlays;
 
     private final BitmapFont font;
@@ -109,6 +109,7 @@ public class GameRenderer implements Disposable {
         Skin skin = assetManager.get(Assets.Skins.UI);
         font = skin.getFont(Styles.Fonts.XXSMALL);
 
+        hud = new GameHud(assetManager, uiViewport, batch);
         overlays = new Overlays<>(uiViewport, batch, 0x00000099);
         overlays.register(GameState.PAUSED,
                 new PauseOverlay(skin, controller.getPauseCallback()));
@@ -116,7 +117,6 @@ public class GameRenderer implements Disposable {
                 new GameOverOverlay(
                         skin,
                         controller));
-        uiCamera = overlays.getStage().getCamera();
 
         blastShader = assetManager.get(Assets.ShaderPrograms.BLAST);
         blurShader = assetManager.get(Assets.ShaderPrograms.BLUR);
@@ -129,7 +129,7 @@ public class GameRenderer implements Disposable {
     private final float[] tmpBlastEntries = new float[64];
     private final Color tmpOtherScoreMarkerColor = new Color(Color.WHITE);
     private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Cfg.Colors.DARK_RED);
-    public void render() {
+    public void render(float delta) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
@@ -203,7 +203,7 @@ public class GameRenderer implements Disposable {
         shapeRenderer.end();
         GdxUtils.disableAlpha();
 
-        batch.setProjectionMatrix(uiCamera.combined);
+        batch.setProjectionMatrix(hud.getCamera().combined);
         batch.begin();
         for (ScoreEntry.InGame scoreEntry : scoreMarkers) {
             float factor = Interpolation.smooth.apply(scoreEntry.getInverseProgress());
@@ -278,9 +278,20 @@ public class GameRenderer implements Disposable {
         }
 
         uiViewport.apply();
-        batch.setProjectionMatrix(uiCamera.combined);
+        batch.setProjectionMatrix(hud.getCamera().combined);
+        renderHud(delta);
         overlays.update(controller.getState());
         overlays.render(batch);
+    }
+
+    private void renderHud(float delta) {
+        if (overlays.isVisible()) {
+            return;
+        }
+
+        Player player = controller.getPlayer();
+        hud.updateScore(ScoreUtils.toScore(player.getMaxDepth()));
+        hud.render(delta);
     }
 
     private void drawMarkerText(Camera2D camera, float depth, String text, Color color) {
