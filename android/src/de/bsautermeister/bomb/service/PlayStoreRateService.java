@@ -31,6 +31,6 @@ public class PlayStoreRateService implements RateService {
 
     @Override
     public boolean canRate() {
-        return false;
+        return true;
     }
 }

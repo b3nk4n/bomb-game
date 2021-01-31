@@ -163,7 +163,7 @@ public class MenuScreen extends ScreenBase {
 
                     @Override
                     public void rateClicked() {
-
+                        ((BombGame) getGame()).getRateService().rateGame();
                     }
                 },
                 ((BombGame) getGame()).getGameFile().exists(),

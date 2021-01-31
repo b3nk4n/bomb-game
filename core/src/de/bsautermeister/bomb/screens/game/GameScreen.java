@@ -18,7 +18,9 @@ public class GameScreen extends ScreenBase {
     private final GameScreenCallbacks callbacks = new GameScreenCallbacks() {
         @Override
         public void backToMenu() {
-            setScreen(new MenuScreen(getGame()), ScreenTransitions.SLIDE_UP);
+            // actually wanted to do a SLIDE transition here, but somehow the transition was not
+            // really noticeable when going back to main menu
+            setScreen(new MenuScreen(getGame()), ScreenTransitions.FADE);
         }
 
         @Override
