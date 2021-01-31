@@ -44,8 +44,8 @@ public class ClusterBomb extends Bomb {
         for (int i = 0; i < bombs.length; ++i) {
             Vector2 position = getPosition();
             position.add(RELEASE_CLUSTER_OFFSETS[i]);
-            float theta = MathUtils.random(0.5f, MathUtils.PI - 0.5f);
-            Vector2 velocity = new Vector2(MathUtils.cos(theta), MathUtils.sin(theta)).scl(MathUtils.random(7.5f, 12f));
+            float theta = MathUtils.random(0.66f, MathUtils.PI - 0.66f);
+            Vector2 velocity = new Vector2(MathUtils.cos(theta), MathUtils.sin(theta)).scl(MathUtils.random(5f, 10f));
             Bomb clusterFragment = new ClusterFragmentBomb(getWorld(), getBodyRadius() / 2f, getDetonationRadius() / 2);
             clusterFragment.setTransform(position, 0f);
             clusterFragment.setLinearVelocity(velocity);

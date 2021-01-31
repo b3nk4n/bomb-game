@@ -38,7 +38,7 @@ public abstract class Bomb implements Disposable {
     private Body createBody() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.linearDamping = 0.25f;
+        bodyDef.linearDamping = 0.5f;
         bodyDef.angularDamping = 0.9f;
         defineBody(bodyDef);
 
@@ -69,7 +69,7 @@ public abstract class Bomb implements Disposable {
 
     protected void defineFilter(Filter filter) {
         filter.categoryBits = Bits.BOMB;
-        filter.maskBits = Bits.ENVIRONMENT | Bits.BALL;
+        filter.maskBits = Bits.ENVIRONMENT | Bits.OBJECTS;
     }
 
     public abstract void update(float delta);
