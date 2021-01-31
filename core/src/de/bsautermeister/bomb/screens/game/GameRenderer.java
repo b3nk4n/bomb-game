@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -50,6 +51,7 @@ import de.bsautermeister.bomb.screens.game.overlay.Overlays;
 import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.screens.game.score.ScoreEntry;
 import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
+import de.bsautermeister.bomb.screens.game.tutorial.TutorialRenderer;
 import de.bsautermeister.bomb.utils.GdxUtils;
 import de.bsautermeister.bomb.utils.PolygonUtils;
 
@@ -79,7 +81,9 @@ public class GameRenderer implements Disposable {
     private final GameHud hud;
     private final Overlays<GameState> overlays;
 
-    private final BitmapFont font;
+    private final BitmapFont markerFont;
+
+    private final TutorialRenderer tutorialRenderer;
 
     public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
                         FrameBufferManager frameBufferManager) {
@@ -107,7 +111,7 @@ public class GameRenderer implements Disposable {
         uiViewport = new StretchViewport(Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
 
         Skin skin = assetManager.get(Assets.Skins.UI);
-        font = skin.getFont(Styles.Fonts.XXSMALL);
+        markerFont = skin.getFont(Styles.Fonts.XXSMALL);
 
         hud = new GameHud(assetManager, uiViewport, batch);
         overlays = new Overlays<>(uiViewport, batch, 0x00000099);
@@ -123,6 +127,8 @@ public class GameRenderer implements Disposable {
         vignettingShader = assetManager.get(Assets.ShaderPrograms.VIGNETTING);
 
         shapeRenderer = new ExtendedShapeRenderer();
+
+        tutorialRenderer = new TutorialRenderer(controller.getTutorialController(), assetManager, uiViewport);
     }
 
     private final Vector3 tmpProjection = new Vector3();
@@ -280,6 +286,10 @@ public class GameRenderer implements Disposable {
         uiViewport.apply();
         batch.setProjectionMatrix(hud.getCamera().combined);
         renderHud(delta);
+        if (!overlays.isVisible()) {
+            shapeRenderer.setProjectionMatrix(hud.getCamera().combined);
+            tutorialRenderer.render(shapeRenderer, batch);
+        }
         overlays.update(controller.getState());
         overlays.render(batch);
     }
@@ -298,8 +308,8 @@ public class GameRenderer implements Disposable {
         tmpProjection.set(0f, -depth, 0f);
         camera.getGdxCamera().project(
                 tmpProjection, 0f, 0f, Cfg.Ui.WIDTH, Cfg.Ui.HEIGHT);
-        font.setColor(color);
-        font.draw(batch, text, 0f, tmpProjection.y, Cfg.Ui.WIDTH, Align.center, false);
+        markerFont.setColor(color);
+        markerFont.draw(batch, text, 0f, tmpProjection.y, Cfg.Ui.WIDTH, Align.center, false);
     }
 
     private static void drawMarkerLine(ShapeRenderer shapeRenderer, float depth, Color color, float widthFactor) {

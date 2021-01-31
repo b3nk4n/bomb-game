@@ -24,7 +24,7 @@ import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.utils.PhysicsUtils;
 
-public class Player {
+public class Player implements Controllable {
     private final static Logger LOG = new Logger(Player.class.getSimpleName(), Cfg.LOG_LEVEL);
 
     public static final float CRITICAL_HEALTH_THRESHOLD = 0.5f;
@@ -111,6 +111,7 @@ public class Player {
         return body;
     }
 
+    @Override
     public void control(boolean up, boolean left, boolean right) {
         if (right) {
             if (hasGroundContact()) {

@@ -50,7 +50,7 @@ public abstract class Bomb implements Disposable {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.8f;
         fixtureDef.density = 10.0f;
-        fixtureDef.restitution = 0.8f;
+        fixtureDef.restitution = 0.66f;
         defineFilter(fixtureDef.filter);
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);

@@ -64,6 +64,7 @@ import de.bsautermeister.bomb.screens.game.overlay.PauseOverlay;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
 import de.bsautermeister.bomb.screens.game.score.ScoreEntry;
 import de.bsautermeister.bomb.screens.game.score.ScoreUtils;
+import de.bsautermeister.bomb.screens.game.tutorial.TutorialController;
 import de.bsautermeister.bomb.serializers.ArraySerializer;
 import de.bsautermeister.bomb.serializers.Vector2Serializer;
 import de.bsautermeister.bomb.serializers.Vector3Serializer;
@@ -122,6 +123,8 @@ public class GameController implements Disposable {
 
     private boolean unlockedExplorer;
     private boolean unlockedHero;
+
+    private final TutorialController tutorialController;
 
     private final GameScreenCallbacks gameScreenCallbacks;
 
@@ -203,6 +206,11 @@ public class GameController implements Disposable {
         hitSound = assetManager.get(Assets.Sounds.HIT);
 
         airStrikeManager = new AirStrikeManager(world);
+
+        tutorialController = new TutorialController();
+        if (game.getGameStats().hasTutorialCompleted()) {
+            tutorialController.skip();
+        }
 
         kryo = new Kryo();
         kryo.setRegistrationRequired(false);
@@ -386,9 +394,17 @@ public class GameController implements Disposable {
             handleInput();
             player.update(delta);
             updateScoreMarkers(delta);
-            updateAirStrike(delta);
             updateCamera(delta);
-            updateBombEmitter(delta);
+
+            tutorialController.update(delta);
+            if (tutorialController.isFinished()) {
+                updateAirStrike(delta);
+                updateBombEmitter(delta);
+            }
+            if (tutorialController.justCompleted()) {
+                LOG.info("Tutorial marked as completed");
+                game.getGameStats().setTutorialCompleted();
+            }
 
             float criticalHealthRatio = player.getCriticalHealthRatio();
             float musicVolume;
@@ -421,11 +437,11 @@ public class GameController implements Disposable {
     private void updateAchievements() {
         int score = ScoreUtils.toScore(player.getMaxDepth());
         if (score >= 2500 && !unlockedHero) {
-            LOG.debug("Unlock HERO achievement");
+            LOG.info("Unlock HERO achievement");
             game.getGameServiceClient().unlockAchievement(ServiceKeys.Achievements.HERO_DEPTH_2500);
             unlockedHero = true;
         } else if (score >= 1000 && !unlockedExplorer) {
-            LOG.debug("Unlock EXPLORER achievement");
+            LOG.info("Unlock EXPLORER achievement");
             game.getGameServiceClient().unlockAchievement(ServiceKeys.Achievements.EXPLORER_DEPTH_1000);
             unlockedExplorer = true;
         }
@@ -610,10 +626,10 @@ public class GameController implements Disposable {
             x = x / Gdx.graphics.getWidth();
             y = y / Gdx.graphics.getHeight();
 
-            if (y < 0.5) {
+            if (y < 0.66f) {
                 upPressed = true;
             } else {
-                if (x <= 0.5) {
+                if (x <= 0.5f) {
                     leftPressed = true;
                 } else {
                     rightPressed = true;
@@ -631,6 +647,7 @@ public class GameController implements Disposable {
         }
 
         player.control(upPressed, leftPressed, rightPressed);
+        tutorialController.control(upPressed, leftPressed, rightPressed);
     }
 
     public void pause() {
@@ -783,5 +800,9 @@ public class GameController implements Disposable {
 
     public AdService getAdService() {
         return game.getAdService();
+    }
+
+    public TutorialController getTutorialController() {
+        return tutorialController;
     }
 }
