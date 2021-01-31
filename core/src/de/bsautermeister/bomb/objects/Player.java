@@ -114,15 +114,15 @@ public class Player {
     public void control(boolean up, boolean left, boolean right) {
         if (right) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(-4f, true);
+                ballBody.applyTorque(-5f, true);
             }
-            ballBody.applyForceToCenter(13f, 0, true);
+            ballBody.applyForceToCenter(12f, 0, true);
         }
         if (left) {
             if (hasGroundContact()) {
-                ballBody.applyTorque(4f, true);
+                ballBody.applyTorque(5f, true);
             }
-            ballBody.applyForceToCenter(-13f, 0, true);
+            ballBody.applyForceToCenter(-12f, 0, true);
         }
         if (up && hasGroundContact() && !blockJumpUntilRelease) {
             blockJumpUntilRelease = true;
