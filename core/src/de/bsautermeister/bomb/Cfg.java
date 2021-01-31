@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Logger;
 
 public interface Cfg {
 
-    int LOG_LEVEL = Logger.DEBUG;
+    int LOG_LEVEL = Logger.INFO;
     boolean DEBUG_MODE = false;
     boolean DEBUG_ADS = true;
 
