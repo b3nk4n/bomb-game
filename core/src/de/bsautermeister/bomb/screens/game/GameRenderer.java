@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -134,7 +133,7 @@ public class GameRenderer implements Disposable {
     private final Vector3 tmpProjection = new Vector3();
     private final float[] tmpBlastEntries = new float[64];
     private final Color tmpOtherScoreMarkerColor = new Color(Color.WHITE);
-    private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Cfg.Colors.DARK_RED);
+    private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Color.RED);
     public void render(float delta) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();

@@ -183,7 +183,9 @@ public class GameController implements Disposable {
                 Vector2 bombPosition = bomb.getPosition();
                 float volume = camera.isInView(bombPosition)
                         ? strength * 0.5f : strength * 0.1f;
-                hitSound.play(volume);
+                if (!Cfg.RECORD_MODE) {
+                    hitSound.play(volume);
+                }
             }
         });
 

@@ -14,7 +14,7 @@ public class TimedBomb extends Bomb {
     private float tickingTimer;
 
     public TimedBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, 8, detonationRadius, 1f);
+        super(world, bodyRadius, 8, detonationRadius, 0.5f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
     }

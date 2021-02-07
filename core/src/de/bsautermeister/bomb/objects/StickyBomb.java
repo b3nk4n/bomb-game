@@ -21,7 +21,7 @@ public class StickyBomb extends Bomb {
     private Joint stickyJoint;
 
     public StickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, 5, detonationRadius, 1f);
+        super(world, bodyRadius, 5, detonationRadius, 0.5f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
     }

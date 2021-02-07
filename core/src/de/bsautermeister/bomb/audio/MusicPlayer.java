@@ -78,7 +78,7 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
     }
 
     public void playFromBeginning() {
-        if (music == null) {
+        if (music == null || Cfg.RECORD_MODE) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class MusicPlayer implements KryoExternalSerializer, Disposable {
     }
 
     public void resumeOrPlay() {
-        if (music == null) {
+        if (music == null || Cfg.RECORD_MODE) {
             return;
         }
 

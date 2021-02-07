@@ -22,6 +22,8 @@ public class AirStrikeBomb extends Bomb {
     @Override
     protected void defineBody(BodyDef bodyDef) {
         bodyDef.gravityScale = 0f;
+        // no linear damping, otherwise it would get slower and slower
+        bodyDef.linearDamping = 0f;
     }
 
     @Override

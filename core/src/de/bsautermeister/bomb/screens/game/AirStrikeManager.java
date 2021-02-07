@@ -13,8 +13,8 @@ import de.bsautermeister.bomb.contact.Bits;
 import de.bsautermeister.bomb.serializers.KryoExternalSerializer;
 
 public class AirStrikeManager implements KryoExternalSerializer {
-    private final static Vector2 VELOCITY_RIGHT = new Vector2(3f, -9f);
-    private final static Vector2 VELOCITY_LEFT = new Vector2(-3f, -9f);
+    private final static Vector2 VELOCITY_RIGHT = new Vector2(2f, -6f);
+    private final static Vector2 VELOCITY_LEFT = new Vector2(-2f, -6f);
     private final static float START_OFFSET_FACTOR = 2.5f;
 
     private final World world;

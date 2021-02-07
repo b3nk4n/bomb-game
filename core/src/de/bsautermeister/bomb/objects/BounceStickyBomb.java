@@ -25,7 +25,7 @@ public class BounceStickyBomb extends Bomb {
     private Joint stickyJoint;
 
     public BounceStickyBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, 6, detonationRadius, 1f);
+        super(world, bodyRadius, 6, detonationRadius, 0.5f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
         stickyTimer = INITIAL_STICKY_DELAY;

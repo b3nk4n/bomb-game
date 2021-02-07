@@ -20,7 +20,7 @@ android {
         applicationId "de.bsautermeister.bomb"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 3
+        versionCode 4
         versionName "1.0"
         multiDexEnabled true
     }

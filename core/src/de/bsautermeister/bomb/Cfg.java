@@ -7,7 +7,14 @@ public interface Cfg {
 
     int LOG_LEVEL = Logger.INFO;
     boolean DEBUG_MODE = false;
-    boolean DEBUG_ADS = true;
+    boolean DEBUG_ADS = false;
+
+    /**
+     * When recording a video via Android 11, the music is still playing even though the volume
+     * is muted. Therefore this flag prevents the Music from playing. Furthermore, sound effects
+     * are played with the full volume.
+     */
+    boolean RECORD_MODE = false;
 
     String SAVE_GAME_FILE = "save.bin";
     float GAME_OVER_DELAY = 3f;

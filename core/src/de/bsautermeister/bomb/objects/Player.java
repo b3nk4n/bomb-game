@@ -41,8 +41,8 @@ public class Player implements Controllable {
     private boolean blockJumpUntilRelease;
     private int groundContacts;
 
-    private final static float CAMP_INVALIDATE_DISTANCE = 0.66f;
-    public final static float MAX_CAMP_TIME = 15f;
+    private final static float CAMP_INVALIDATE_DISTANCE = 1.0f;
+    public final static float MAX_CAMP_TIME = 10.f;
     float previousCampPositionX;
     float campTime;
 

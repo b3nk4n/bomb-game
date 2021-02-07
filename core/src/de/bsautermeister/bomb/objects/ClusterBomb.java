@@ -21,7 +21,7 @@ public class ClusterBomb extends Bomb {
     private float tickingTimer;
 
     public ClusterBomb(World world, float tickingTime, float bodyRadius, float detonationRadius) {
-        super(world, bodyRadius, 4, detonationRadius, 1f);
+        super(world, bodyRadius, 4, detonationRadius, 0.5f);
         this.initialTickingTime = tickingTime;
         this.tickingTimer = initialTickingTime;
     }
@@ -46,7 +46,7 @@ public class ClusterBomb extends Bomb {
             position.add(RELEASE_CLUSTER_OFFSETS[i]);
             float theta = MathUtils.random(0.66f, MathUtils.PI - 0.66f);
             Vector2 velocity = new Vector2(MathUtils.cos(theta), MathUtils.sin(theta)).scl(MathUtils.random(5f, 10f));
-            Bomb clusterFragment = new ClusterFragmentBomb(getWorld(), getBodyRadius() / 2f, getDetonationRadius() / 2);
+            Bomb clusterFragment = new ClusterFragmentBomb(getWorld(), getBodyRadius() * 0.66f, getDetonationRadius() * 0.5f);
             clusterFragment.setTransform(position, 0f);
             clusterFragment.setLinearVelocity(velocity);
             bombs[i] = clusterFragment;

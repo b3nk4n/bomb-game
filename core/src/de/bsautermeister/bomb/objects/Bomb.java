@@ -38,7 +38,7 @@ public abstract class Bomb implements Disposable {
     private Body createBody() {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.linearDamping = 0.5f;
+        bodyDef.linearDamping = 0.66f;
         bodyDef.angularDamping = 0.9f;
         defineBody(bodyDef);
 
@@ -50,7 +50,7 @@ public abstract class Bomb implements Disposable {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.friction = 0.8f;
         fixtureDef.density = 10.0f;
-        fixtureDef.restitution = 0.66f;
+        fixtureDef.restitution = 0.55f;
         defineFilter(fixtureDef.filter);
         fixtureDef.shape = shape;
         Fixture fixture = body.createFixture(fixtureDef);
