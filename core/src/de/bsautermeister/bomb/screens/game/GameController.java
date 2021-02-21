@@ -558,7 +558,12 @@ public class GameController implements Disposable {
 
                 bombs.addAll(bomb.releaseBombs());
 
-                activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 1f));
+                if (bombPosition.dst(player.getPosition()) < 18f) {
+                    // only add a blast effect when actually close to the player / in view,
+                    // otherwise there is a clearly visible pixel artifacts for everything
+                    // rendered by ShapeRenderer
+                    activeBlastEffects.add(new BlastInstance(bombPosition, bomb.getDetonationRadius(), 1f));
+                }
                 explosionGlowEffect.emit(bombPosition, 0.0066f * bomb.getDetonationRadius());
 
                 float explosionVolume = camera.isInView(bombPosition)
@@ -618,6 +623,9 @@ public class GameController implements Disposable {
         boolean leftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
         boolean rightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
+        boolean debugDropBomb = false;
+        boolean debugEmitExplosion = false;
+
         for (int pointer = 0; pointer < Gdx.input.getMaxPointers(); ++pointer) {
             if (!Gdx.input.isTouched(pointer)) {
                 continue;
@@ -629,7 +637,15 @@ public class GameController implements Disposable {
             y = y / Gdx.graphics.getHeight();
 
             if (y < 0.66f) {
-                upPressed = true;
+                if (Cfg.DEBUG_MODE && y < 0.2f) {
+                    if (x > 0.5f) {
+                        debugEmitExplosion = true;
+                    } else {
+                        debugDropBomb = true;
+                    }
+                } else {
+                    upPressed = true;
+                }
             } else {
                 if (x <= 0.5f) {
                     leftPressed = true;
@@ -641,11 +657,18 @@ public class GameController implements Disposable {
 
         if (Cfg.DEBUG_MODE) {
             if (Gdx.input.isKeyJustPressed(SPACE)) {
-                emitBomb(player.getPosition().x);
+                debugDropBomb = true;
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                ground.impact(outRemovedVertices, player.getPosition(), player.getRadius() * 3f);
+                debugEmitExplosion = true;
             }
+        }
+
+        if (debugDropBomb) {
+            emitBomb(player.getPosition().x);
+        }
+        if (debugEmitExplosion) {
+            ground.impact(outRemovedVertices, player.getPosition(), player.getRadius() * 3f);
         }
 
         player.control(upPressed, leftPressed, rightPressed);
