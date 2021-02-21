@@ -41,7 +41,10 @@ public class MenuContent extends Table {
         void achievementsClicked();
         void aboutClicked();
         void rateClicked();
+        void signOut();
     }
+
+    private int hiddenSignOutClickCounter;
 
     private final boolean canShowAchievements;
     private final boolean canShowLeaderboards;
@@ -96,6 +99,16 @@ public class MenuContent extends Table {
                 Actions.delay(delay),
                 Actions.alpha(1f, 0.5f)
         ));
+        title.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                hiddenSignOutClickCounter++;
+                if (hiddenSignOutClickCounter == 10) {
+                    hiddenSignOutClickCounter = 0;
+                    callbacks.signOut();
+                }
+            }
+        });
         delay += DELAY_OFFSET;
         contentTable.add(title)
                 .padTop(64f)

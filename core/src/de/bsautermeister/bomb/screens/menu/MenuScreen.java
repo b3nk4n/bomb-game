@@ -142,6 +142,9 @@ public class MenuScreen extends ScreenBase {
                         try {
                             getGame().getGameServiceClient().showLeaderboards(
                                     ServiceKeys.Scores.MAX_DEPTH);
+                        } catch (GameServiceException.NoSessionException nse) {
+                            LOG.info("Signing in");
+                            getGame().getGameServiceClient().logIn();
                         } catch (GameServiceException e) {
                             LOG.error("Showing leaderboards failed", e);
                         }
@@ -151,6 +154,9 @@ public class MenuScreen extends ScreenBase {
                     public void achievementsClicked() {
                         try {
                             getGame().getGameServiceClient().showAchievements();
+                        } catch (GameServiceException.NoSessionException nse) {
+                            LOG.info("Signing in");
+                            getGame().getGameServiceClient().logIn();
                         } catch (GameServiceException e) {
                             LOG.error("Showing achievements failed", e);
                         }
@@ -164,6 +170,12 @@ public class MenuScreen extends ScreenBase {
                     @Override
                     public void rateClicked() {
                         ((BombGame) getGame()).getRateService().rateGame();
+                    }
+
+                    @Override
+                    public void signOut() {
+                        LOG.info("Signing out");
+                        getGame().getGameServiceClient().logOff();
                     }
                 },
                 ((BombGame) getGame()).getGameFile().exists(),
