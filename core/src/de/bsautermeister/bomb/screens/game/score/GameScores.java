@@ -8,13 +8,20 @@ import java.util.Locale;
 
 public class GameScores {
 
+    private static final String KEY_PERSONAL_BEST = "maxFeet";
+
+    /**
+     * We ignore other scores lower than this, because it looks odd in the start-animation, when
+     * there are already player score-markers listed.
+     * The only exception is the player's own high score.
+     */
+    private static final int MIN_SCORE_SHOWN = 50;
+
     private final Preferences prefs;
 
     private Array<ScoreEntry> otherScores = new Array<>();
 
     private int personalBestScore;
-
-    private static final String KEY_PERSONAL_BEST = "maxFeet";
 
     public GameScores() {
         prefs = Gdx.app.getPreferences(GameScores.class.getName());
@@ -31,6 +38,10 @@ public class GameScores {
      * from the highest score (global 1st).
      */
     public synchronized void addOtherScore(int score, String username) {
+        if (score < MIN_SCORE_SHOWN) {
+            return;
+        }
+
         otherScores.add(new ScoreEntry(score, username));
     }
 

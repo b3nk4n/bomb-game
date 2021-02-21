@@ -196,12 +196,14 @@ public class GameRenderer implements Disposable {
         }
 
         // score line
+        boolean isOverlayVisible = overlays.isVisible();
+        float maxScoreAlpha = isOverlayVisible ? 0.25f : 0.75f;
         Player player = controller.getPlayer();
         Array<ScoreEntry.InGame> scoreMarkers = controller.getScoreEntries();
         for (ScoreEntry.InGame scoreEntry : scoreMarkers) {
             float factor = Interpolation.smooth.apply(scoreEntry.getInverseProgress());
             Color color = scoreEntry.isCurrentPlayer() ? tmpCurrentPlayerScoreMarkerColor : tmpOtherScoreMarkerColor;
-            color.a = factor * 0.75f;
+            color.a = factor * maxScoreAlpha;
             drawMarkerLine(shapeRenderer, scoreEntry.getDepth(), color, factor);
         }
 
@@ -213,7 +215,7 @@ public class GameRenderer implements Disposable {
         for (ScoreEntry.InGame scoreEntry : scoreMarkers) {
             float factor = Interpolation.smooth.apply(scoreEntry.getInverseProgress());
             Color color = scoreEntry.isCurrentPlayer() ? tmpCurrentPlayerScoreMarkerColor : tmpOtherScoreMarkerColor;
-            color.a = factor * 0.75f;
+            color.a = factor * maxScoreAlpha;
             drawMarkerText(camera, scoreEntry.getDepth(), scoreEntry.getLabel(), color);
         }
         batch.end();
