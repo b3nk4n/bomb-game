@@ -336,13 +336,13 @@ public class GameRenderer implements Disposable {
         boolean fix = cameraPosition.y < -0.5f * BUILDING_BASE_HEIGHT;
 
         renderer.setColor(CITY_BACK_COLOR);
-        renderCityLayer(renderer,  cameraPosition.x * 0.6f - 10f, fix ? cameraPosition.y : cameraPosition.y * 0.9f);
+        renderCityLayer(renderer,  cameraPosition.x * 0.6f - 10f, fix ? cameraPosition.y + 10f : cameraPosition.y * 0.9f);
 
         renderer.setColor(CITY_MID_COLOR);
-        renderCityLayer(renderer, cameraPosition.x * 0.5f, 0.5f + (fix ? cameraPosition.y : cameraPosition.y * 0.8f) + 0.1f);
+        renderCityLayer(renderer, cameraPosition.x * 0.5f, 0.5f + (fix ? cameraPosition.y + 10f : cameraPosition.y * 0.8f) + 0.1f);
 
         renderer.setColor(CITY_FRONT_COLOR);
-        renderCityLayer(renderer, cameraPosition.x * 0.4f - 5f, 1f + (fix ? cameraPosition.y : cameraPosition.y * 0.7f) + 0.2f);
+        renderCityLayer(renderer, cameraPosition.x * 0.4f - 5f, 1f + (fix ? cameraPosition.y + 10f : cameraPosition.y * 0.7f) + 0.2f);
     }
 
     private final static float BUILDING_BASE_HEIGHT = 100f;

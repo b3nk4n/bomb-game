@@ -644,7 +644,7 @@ public class GameController implements Disposable {
                 emitBomb(player.getPosition().x);
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                ground.impact(outRemovedVertices, player.getPosition(), player.getRadius() * 1.25f);
+                ground.impact(outRemovedVertices, player.getPosition(), player.getRadius() * 3f);
             }
         }
 
