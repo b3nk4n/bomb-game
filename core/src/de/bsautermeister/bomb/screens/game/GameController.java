@@ -727,6 +727,10 @@ public class GameController implements Disposable {
     }
 
     private void handlePauseInput() {
+        if (!state.is(GameState.PLAYING)) {
+            return;
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             state.set(GameState.PAUSED);
         }
