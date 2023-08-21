@@ -1,6 +1,6 @@
 android {
     buildToolsVersion "29.0.3"
-    compileSdkVersion 30
+    compileSdkVersion 33
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -18,10 +18,10 @@ android {
     }
     defaultConfig {
         applicationId "de.bsautermeister.bomb"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 5
-        versionName "1.1"
+        minSdkVersion 26
+        targetSdkVersion 33
+        versionCode 6
+        versionName "1.1.1"
         multiDexEnabled true
     }
     buildTypes {

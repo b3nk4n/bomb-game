@@ -27,11 +27,11 @@ public class AboutContent extends Table {
         skin = assetManager.get(Assets.Skins.UI);
 
         credits = new CreditEntry[] {
-                new CreditEntry("Developer", "Benjamin Sautermeister"),
-                new CreditEntry("Visual Effects", "Benjamin Sautermeister", "Existical"),
+                new CreditEntry("Developer", "Benjamin Kan"),
+                new CreditEntry("Visual Effects", "Benjamin Kan", "Existical"),
                 new CreditEntry("Fonts", "Raymond Larabie"),
                 new CreditEntry("Music", "Infraction  x  Aim To Head"),
-                new CreditEntry("Sound Effects", "Benjamin Sautermeister")
+                new CreditEntry("Sound Effects", "Benjamin Kan")
         };
 
         initialize();
