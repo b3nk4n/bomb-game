@@ -12,11 +12,6 @@ public class ParticleEffectBox2DPool extends Pool<ParticleEffectBox2DPool.Pooled
         this.effect = effect;
     }
 
-    public ParticleEffectBox2DPool (ParticleEffectBox2D effect, int initialCapacity, int max, boolean preFill) {
-        super(initialCapacity, max, preFill);
-        this.effect = effect;
-    }
-
     protected PooledBox2DEffect newObject () {
         PooledBox2DEffect pooledEffect = new PooledBox2DEffect(effect);
         pooledEffect.start();

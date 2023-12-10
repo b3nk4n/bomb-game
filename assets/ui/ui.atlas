@@ -1,8 +1,8 @@
 
 ui.png
-size: 512,256
+size: 512, 256
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 about-button
   rotate: false

@@ -1,8 +1,8 @@
 
 game.png
-size: 128,64
+size: 128, 64
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest, Nearest
 repeat: none
 block_ground
   rotate: false
