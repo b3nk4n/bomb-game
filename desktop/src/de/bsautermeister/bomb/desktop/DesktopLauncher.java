@@ -18,6 +18,7 @@ public class DesktopLauncher {
 
         new Lwjgl3Application(
                 new BombGame(
+                        () -> "Desktop version",
                         new NoGameServiceClient(),
                         new NoopRateService(),
                         new NoopAdService()),

@@ -23,7 +23,10 @@ public class AboutContent extends Table {
 
     private int currentCreditIndex = 0;
 
-    public AboutContent(AssetManager assetManager) {
+    private final String versionText;
+
+    public AboutContent(AssetManager assetManager, String version) {
+        versionText = version;
         skin = assetManager.get(Assets.Skins.UI);
 
         credits = new CreditEntry[] {
@@ -47,6 +50,17 @@ public class AboutContent extends Table {
                 .padBottom(32f)
                 .setFillParent(true);
         updateLabels(credits[currentCreditIndex]);
+
+        final Label versionLabel = new Label(versionText, skin, Styles.Label.XXSMALL);
+        add(versionLabel)
+                .center()
+                .bottom()
+                .padBottom(16f)
+                .padRight(16f)
+                .expand();
+        addAction(Actions.sequence(
+                Actions.alpha(0f),
+                Actions.alpha(1f, 0.5f)));
     }
 
     private void updateLabels(CreditEntry entry) {

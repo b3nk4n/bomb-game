@@ -22,8 +22,8 @@ public class BombGame extends GameApp {
 	private final RateService rateService;
 	private final AdService adService;
 
-	public BombGame(IGameServiceClient gameServiceClient, RateService rateService, AdService adService) {
-		super(gameServiceClient);
+	public BombGame(GameEnv gameEnv, IGameServiceClient gameServiceClient, RateService rateService, AdService adService) {
+		super(gameEnv, gameServiceClient);
 		this.rateService = rateService;
 		this.adService = adService;
 	}

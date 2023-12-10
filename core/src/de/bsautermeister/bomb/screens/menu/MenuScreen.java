@@ -186,7 +186,8 @@ public class MenuScreen extends ScreenBase {
     }
 
     private Table createAboutContent() {
-        return new AboutContent(getAssetManager());
+        final String version = getGame().getEnv().getVersion();
+        return new AboutContent(getAssetManager(), version);
     }
 
     @Override

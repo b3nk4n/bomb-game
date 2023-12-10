@@ -27,6 +27,7 @@ public class AndroidLauncher extends AndroidApplication {
 		AdService adService = new AdMobService(this, adUnitId);
 
 		initialize(new BombGame(
+				new AndroidGameEnv(),
 				gpgsClient,
 				new PlayStoreRateService(this),
 				adService
