@@ -101,7 +101,8 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "de.golfgl.gdxgamesvcs:gdx-gamesvcs-core:$gdxgamesvcsVersion"
 
-        implementation "com.esotericsoftware:kryo:$kryoVersion"
+        // Note: implementation worked well for Android/Desktop, but iOS requires this to be api
+        api "com.esotericsoftware:kryo:$kryoVersion"
     }
 }
 

@@ -15,8 +15,8 @@ public class SlideScreenTransition extends ScreenTransitionBase {
         SLIDE_PARALLEL
     }
 
-    private SlideType slideType;
-    private Direction direction;
+    private final SlideType slideType;
+    private final Direction direction;
 
     public SlideScreenTransition(float duration, Interpolation interpolation, SlideType slideType, Direction direction) {
         super(duration, interpolation);
@@ -88,11 +88,11 @@ public class SlideScreenTransition extends ScreenTransitionBase {
         batch.draw(topTexture,
                 xTop, yTop,
                 0, 0,
-                bottomTextureWidth, bottomTextureHeight,
+                topTextureWidth, topTextureHeight,
                 1, 1,
                 0,
                 0, 0,
-                bottomTextureWidth, bottomTextureHeight,
+                topTextureWidth, topTextureHeight,
                 false, true);
 
         batch.end();

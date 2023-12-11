@@ -37,7 +37,7 @@ import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
-import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
+import de.bsautermeister.bomb.core.graphics.FrameBufferSupport;
 import de.bsautermeister.bomb.objects.AirStrikeBomb;
 import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
@@ -62,7 +62,7 @@ public class GameRenderer implements Disposable {
 
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch();
     private final SpriteBatch batch;
-    private final FrameBufferManager frameBufferManager;
+    private final FrameBufferSupport frameBufferSupport;
     private final FrameBuffer[] frameBuffers;
     private final GameController controller;
     private final Box2DDebugRenderer box2DRenderer;
@@ -84,11 +84,10 @@ public class GameRenderer implements Disposable {
 
     private final TutorialRenderer tutorialRenderer;
 
-    public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
-                        FrameBufferManager frameBufferManager) {
+    public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller) {
         this.batch = batch;
         this.controller = controller;
-        this.frameBufferManager = frameBufferManager;
+        this.frameBufferSupport = new FrameBufferSupport();
 
         frameBuffers = new FrameBuffer[2];
         for (int i = 0; i < frameBuffers.length; ++i) {
@@ -134,13 +133,14 @@ public class GameRenderer implements Disposable {
     private final float[] tmpBlastEntries = new float[64];
     private final Color tmpOtherScoreMarkerColor = new Color(Color.WHITE);
     private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Color.RED);
+
     public void render(float delta) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
         viewport.apply();
         int fbIdx = 0;
-        frameBufferManager.begin(frameBuffers[fbIdx]);
+        frameBufferSupport.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
         GdxUtils.clearScreen(Cfg.Colors.DARK_RED);
 
@@ -152,9 +152,9 @@ public class GameRenderer implements Disposable {
         renderBackground(shapeRenderer, controller.getCamera());
         shapeRenderer.end();
 
-        frameBufferManager.end();
+        frameBufferSupport.end();
 
-        frameBufferManager.begin(frameBuffers[fbIdx]);
+        frameBufferSupport.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
 
         batch.begin();
@@ -220,7 +220,7 @@ public class GameRenderer implements Disposable {
         }
         batch.end();
 
-        frameBufferManager.end();
+        frameBufferSupport.end();
 
         viewport.apply();
         batch.setProjectionMatrix(camera.getGdxCamera().combined);
@@ -239,7 +239,7 @@ public class GameRenderer implements Disposable {
                 tmpBlastEntries[4 * i + 3] = blast.getRadius() / 6f;
             }
 
-            frameBufferManager.begin(frameBuffers[fbIdx]);
+            frameBufferSupport.begin(frameBuffers[fbIdx]);
             fbIdx = ++fbIdx % frameBuffers.length;
 
             batch.begin();
@@ -250,7 +250,7 @@ public class GameRenderer implements Disposable {
             batch.end();
             batch.setShader(null);
 
-            frameBufferManager.end();
+            frameBufferSupport.end();
         }
 
         batch.begin();

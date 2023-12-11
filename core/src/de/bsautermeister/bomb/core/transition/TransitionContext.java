@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
+import de.bsautermeister.bomb.core.graphics.FrameBufferSupport;
 import de.bsautermeister.bomb.core.ScreenBase;
 
 public class TransitionContext {
@@ -17,22 +17,22 @@ public class TransitionContext {
     private ScreenTransition transition;
     private boolean renderedToTexture;
     private boolean transitionInProgress;
-    private Viewport transitionViewport;
+    private final Viewport transitionViewport;
     private ScreenBase currentScreen;
     private ScreenBase nextScreen;
-    private final FrameBufferManager frameBufferManager;
+    private final FrameBufferSupport frameBufferSupport;
     private FrameBuffer currentFrameBuffer;
     private FrameBuffer nextFrameBuffer;
 
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
 
-    public TransitionContext(SpriteBatch batch, FrameBufferManager frameBufferManager) {
+    public TransitionContext(SpriteBatch batch) {
         transitionViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.batch = batch;
-        this.frameBufferManager = frameBufferManager;
+        frameBufferSupport = new FrameBufferSupport();
     }
 
-    public void setScreen(ScreenBase screen, ScreenTransition transtion) {
+    public void setScreen(ScreenBase screen, ScreenTransition transition) {
         if (transitionInProgress) {
             return;
         }
@@ -41,7 +41,7 @@ public class TransitionContext {
             return;
         }
 
-        this.transition = transtion;
+        this.transition = transition;
 
         // screen size
         int width = Gdx.graphics.getWidth();
@@ -95,15 +95,15 @@ public class TransitionContext {
     private void renderScreensToTexture(float delta) {
         // render current screen to buffer
         if (currentScreen != null) {
-            frameBufferManager.begin(currentFrameBuffer);
+            frameBufferSupport.begin(currentFrameBuffer);
             currentScreen.render(0f);
-            frameBufferManager.end();
+            frameBufferSupport.end();
         }
 
         // render next screen to buffer
-        frameBufferManager.begin(nextFrameBuffer);
+        frameBufferSupport.begin(nextFrameBuffer);
         nextScreen.render(delta);
-        frameBufferManager.end();
+        frameBufferSupport.end();
     }
 
     private void updateTransition() {
@@ -136,6 +136,7 @@ public class TransitionContext {
         Texture nextScreenTexture = nextFrameBuffer.getColorBufferTexture();
 
         // render transition to screen
+        transitionViewport.apply();
         batch.setProjectionMatrix(transitionViewport.getCamera().combined);
         transition.render(batch, currentScreenTexture, nextScreenTexture, progress);
     }

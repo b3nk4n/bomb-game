@@ -42,8 +42,7 @@ public class GameScreen extends ScreenBase {
 
         controller = new GameController(game, callbacks, getAssetManager());
         controller.initialize(resume);
-        renderer = new GameRenderer(getBatch(), getAssetManager(), controller,
-                getGame().getFrameBufferManager());
+        renderer = new GameRenderer(getBatch(), getAssetManager(), controller);
 
         game.getAdService().load();
     }

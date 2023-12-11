@@ -48,7 +48,7 @@ not actually use that Gradle task. Instead, simply create this run configuration
 While this might only be strictly necessary for MacOS, it does not harm to do that for any platform,
 to ensure the proper Gradle task to run the desktop project is used.
 
-### iOS run configuration
+### iOS simulator run configuration
 
 1. Install the **MobiVM** plugin into Android Studio
 2. Install Xcode
@@ -58,6 +58,28 @@ to ensure the proper Gradle task to run the desktop project is used.
     3. Select the project's _Module_
     4. Select _Simulator_ toggle (which does not need a provisioning profile)
 4. Launch the run configuration
+
+### Running on a physical iOS device
+
+1. Run Xcode
+2. Create an empty iOS app, using the bundle identifier as specified in `robovm.properties`
+   as `app.id`
+3. Under _Settings > Accounts_, sign in with your Apple ID
+4. Connect your device (iPhone) using a cable
+5. In Xcode, select your device in the top toolbar as destination target
+6. In your app projects **Signing & Capabilities**, use the following settings:
+   - Enable **Automatically manage signing**
+   - Select your Apple ID (Personal Team) as **Team**
+   - As **Bundle Identifier**, ensure it is correct as described in step 2
+   - Xcode should indicate the **Provisioning Profile** and **Signing Certificate** below
+7. Create a run configuration similar to described above. But use **Attached Device** and select
+   the created **Signing Identity** (equal to the Xcode _Signing Certificate_ from step 6)
+
+### Changes in the logo or icon are not reflected in the installed iOS app during development
+
+At least when changes in the Logo (`Logo.imageset`) are made, these are not directly reflected after
+reinstalling or even deleting the app. These might be cached by the phone internally.
+Simply rebooting the iPhone resolves this and makes these changes visible.
 
 ## License
 
