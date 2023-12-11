@@ -1,0 +1,1 @@
+Assets generated via https://www.appicon.co/

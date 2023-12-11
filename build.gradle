@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.20'
     }
 }
 
@@ -74,6 +75,20 @@ project(":android") {
         api "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gdxgamesvcsVersion"
         implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
         implementation "com.android.support:multidex:$multidexVersion"
+    }
+}
+
+project(":ios") {
+    apply plugin: "java-library"
+    apply plugin: "robovm"
+
+    dependencies {
+        implementation project(":core")
+        api "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
+        api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
+        api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
+        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios"
+        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios"
     }
 }
 

@@ -31,7 +31,7 @@ Thanks to Infraction for allowing us to use this his song in this non-commercial
 
 Use Java 11 to build and run the project.
 
-### Troubleshooting
+## IntelliJ
 
 ### Desktop run configuration
 
@@ -43,9 +43,21 @@ not actually use that Gradle task. Instead, simply create this run configuration
 1. Select _Edit configurations..._
 2. Add a new _Gradle_ configuration
 3. Use `desktop:run` as the command to _Run_
+4. Launch the created run configuration
 
 While this might only be strictly necessary for MacOS, it does not harm to do that for any platform,
 to ensure the proper Gradle task to run the desktop project is used.
+
+### iOS run configuration
+
+1. Install the **MobiVM** plugin into Android Studio
+2. Install Xcode
+3. Create a run configuration
+    1. Select _Edit configurations..._
+    2. Add a new _RoboVM iOS_ configuration
+    3. Select the project's _Module_
+    4. Select _Simulator_ toggle (which does not need a provisioning profile)
+4. Launch the run configuration
 
 ## License
 
