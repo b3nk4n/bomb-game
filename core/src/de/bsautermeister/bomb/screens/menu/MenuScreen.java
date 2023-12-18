@@ -192,12 +192,20 @@ public class MenuScreen extends ScreenBase {
 
     @Override
     public void render(float delta) {
+        render(delta, false);
+    }
+
+    @Override
+    public void render(float delta, boolean usedInFbo) {
         GdxUtils.clearScreen(Color.BLACK);
 
         // ensure background tint color is not affected by actor actions
         getBatch().setColor(Color.WHITE);
 
         stage.act();
+        if (!usedInFbo) {
+            stage.getViewport().apply();
+        }
         stage.draw();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.BACK) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)

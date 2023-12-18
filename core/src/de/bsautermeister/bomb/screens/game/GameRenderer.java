@@ -37,7 +37,7 @@ import de.bsautermeister.bomb.assets.RegionNames;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.core.graphics.Camera2D;
 import de.bsautermeister.bomb.core.graphics.ExtendedShapeRenderer;
-import de.bsautermeister.bomb.core.graphics.FrameBufferSupport;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.objects.AirStrikeBomb;
 import de.bsautermeister.bomb.objects.AirStrikeTargetMarker;
 import de.bsautermeister.bomb.objects.BlastInstance;
@@ -62,7 +62,7 @@ public class GameRenderer implements Disposable {
 
     private final PolygonSpriteBatch polygonBatch = new PolygonSpriteBatch();
     private final SpriteBatch batch;
-    private final FrameBufferSupport frameBufferSupport;
+    private final FrameBufferManager frameBufferManager;
     private final FrameBuffer[] frameBuffers;
     private final GameController controller;
     private final Box2DDebugRenderer box2DRenderer;
@@ -84,10 +84,11 @@ public class GameRenderer implements Disposable {
 
     private final TutorialRenderer tutorialRenderer;
 
-    public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller) {
+    public GameRenderer(SpriteBatch batch, AssetManager assetManager, GameController controller,
+                        FrameBufferManager frameBufferManager) {
         this.batch = batch;
         this.controller = controller;
-        this.frameBufferSupport = new FrameBufferSupport();
+        this.frameBufferManager = frameBufferManager;
 
         frameBuffers = new FrameBuffer[2];
         for (int i = 0; i < frameBuffers.length; ++i) {
@@ -134,17 +135,20 @@ public class GameRenderer implements Disposable {
     private final Color tmpOtherScoreMarkerColor = new Color(Color.WHITE);
     private final Color tmpCurrentPlayerScoreMarkerColor = new Color(Color.RED);
 
-    public void render(float delta) {
+    public void render(float delta, boolean usedInFbo) {
         Camera2D camera = controller.getCamera();
         Viewport viewport = controller.getViewport();
 
-        viewport.apply();
+        if (!usedInFbo) {
+            viewport.apply();
+        }
+
         int fbIdx = 0;
-        frameBufferSupport.begin(frameBuffers[fbIdx]);
+        frameBufferManager.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
         GdxUtils.clearScreen(Cfg.Colors.DARK_RED);
 
-        shapeRenderer.setProjectionMatrix(controller.getCamera().getGdxCamera().combined);
+        shapeRenderer.setProjectionMatrix(camera.getGdxCamera().combined);
         polygonBatch.setProjectionMatrix(camera.getGdxCamera().combined);
         batch.setProjectionMatrix(camera.getGdxCamera().combined);
 
@@ -152,9 +156,9 @@ public class GameRenderer implements Disposable {
         renderBackground(shapeRenderer, controller.getCamera());
         shapeRenderer.end();
 
-        frameBufferSupport.end();
+        frameBufferManager.end();
 
-        frameBufferSupport.begin(frameBuffers[fbIdx]);
+        frameBufferManager.begin(frameBuffers[fbIdx]);
         fbIdx = ++fbIdx % frameBuffers.length;
 
         batch.begin();
@@ -220,9 +224,11 @@ public class GameRenderer implements Disposable {
         }
         batch.end();
 
-        frameBufferSupport.end();
+        frameBufferManager.end();
 
-        viewport.apply();
+        if (!usedInFbo) {
+            viewport.apply();
+        }
         batch.setProjectionMatrix(camera.getGdxCamera().combined);
 
         Array<BlastInstance> blasts = controller.getActiveBlastEffects();
@@ -239,7 +245,7 @@ public class GameRenderer implements Disposable {
                 tmpBlastEntries[4 * i + 3] = blast.getRadius() / 6f;
             }
 
-            frameBufferSupport.begin(frameBuffers[fbIdx]);
+            frameBufferManager.begin(frameBuffers[fbIdx]);
             fbIdx = ++fbIdx % frameBuffers.length;
 
             batch.begin();
@@ -250,7 +256,7 @@ public class GameRenderer implements Disposable {
             batch.end();
             batch.setShader(null);
 
-            frameBufferSupport.end();
+            frameBufferManager.end();
         }
 
         batch.begin();
@@ -284,7 +290,9 @@ public class GameRenderer implements Disposable {
             box2DRenderer.render(controller.getWorld(), camera.getGdxCamera().combined);
         }
 
-        uiViewport.apply();
+        if (!usedInFbo) {
+            uiViewport.apply();
+        }
         batch.setProjectionMatrix(hud.getCamera().combined);
         renderHud(delta);
         if (!overlays.isVisible()) {
@@ -412,8 +420,8 @@ public class GameRenderer implements Disposable {
         }
     }
 
-    private static Vector2 tmpVertex = new Vector2();
-    private static float[] tmpVerticesArray = new float[6];
+    private static final Vector2 tmpVertex = new Vector2();
+    private static final float[] tmpVerticesArray = new float[6];
     private void renderGround(PolygonSpriteBatch polygonBatch) {
         Ground ground = controller.getGround();
 

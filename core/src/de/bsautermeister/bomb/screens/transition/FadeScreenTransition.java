@@ -54,6 +54,8 @@ public class FadeScreenTransition extends ScreenTransitionBase {
                 nextScreenWidth, nextScreenHeight,
                 false, true);
 
+        batch.setColor(oldColor);
+
         batch.end();
     }
 }

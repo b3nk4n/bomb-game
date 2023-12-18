@@ -42,7 +42,8 @@ public class GameScreen extends ScreenBase {
 
         controller = new GameController(game, callbacks, getAssetManager());
         controller.initialize(resume);
-        renderer = new GameRenderer(getBatch(), getAssetManager(), controller);
+        renderer = new GameRenderer(
+                getBatch(), getAssetManager(), controller, getGame().getFrameBufferManager());
 
         game.getAdService().load();
     }
@@ -55,9 +56,14 @@ public class GameScreen extends ScreenBase {
 
     @Override
     public void render(float delta) {
+        render(delta, false);
+    }
+
+    @Override
+    public void render(float delta, boolean usedInFbo) {
         super.render(delta);
         controller.update(delta);
-        renderer.render(delta);
+        renderer.render(delta, usedInFbo);
     }
 
     @Override

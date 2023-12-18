@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Logger;
 
 import de.bsautermeister.bomb.Cfg;
 import de.bsautermeister.bomb.GameEnv;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 import de.bsautermeister.bomb.core.transition.ScreenTransition;
 import de.bsautermeister.bomb.core.transition.TransitionContext;
 import de.bsautermeister.bomb.effects.ParticleEffectBox2D;
@@ -21,6 +22,8 @@ public abstract class GameApp implements ApplicationListener {
     private AssetManager assetManager;
     private SpriteBatch batch;
 
+    private final FrameBufferManager frameBufferManager;
+
     private final GameEnv gameEnv;
 
     private TransitionContext transitionContext;
@@ -30,6 +33,7 @@ public abstract class GameApp implements ApplicationListener {
     public GameApp(GameEnv gameEnv, IGameServiceClient gameServiceClient) {
         this.gameEnv = gameEnv;
         this.gameServiceClient = gameServiceClient;
+        this.frameBufferManager = new FrameBufferManager();
     }
 
     @Override
@@ -39,7 +43,7 @@ public abstract class GameApp implements ApplicationListener {
 
         batch = new SpriteBatch();
 
-        transitionContext = new TransitionContext(batch);
+        transitionContext = new TransitionContext(batch, frameBufferManager);
 
         gameServiceClient.setListener(new IGameServiceListener() {
             @Override
@@ -105,6 +109,10 @@ public abstract class GameApp implements ApplicationListener {
 
     public SpriteBatch getBatch() {
         return batch;
+    }
+
+    public FrameBufferManager getFrameBufferManager() {
+        return frameBufferManager;
     }
 
     public IGameServiceClient getGameServiceClient() {

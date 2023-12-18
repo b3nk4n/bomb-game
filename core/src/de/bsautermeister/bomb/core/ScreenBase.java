@@ -39,6 +39,14 @@ public abstract class ScreenBase extends ScreenAdapter {
         return game.getAssetManager();
     }
 
+    /**
+     * Not applying the internal viewports of the screen or changing camera projection of the batch
+     * can be required when rendering the screen to a frame buffer as render target.
+     */
+    public void render(float delta, boolean usedInFbo) {
+        this.render(delta);
+    }
+
     @Override
     public void hide() {
         dispose();

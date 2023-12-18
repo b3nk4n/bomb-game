@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import de.bsautermeister.bomb.core.graphics.FrameBufferSupport;
 import de.bsautermeister.bomb.core.ScreenBase;
+import de.bsautermeister.bomb.core.graphics.FrameBufferManager;
 
 public class TransitionContext {
 
@@ -20,16 +20,16 @@ public class TransitionContext {
     private final Viewport transitionViewport;
     private ScreenBase currentScreen;
     private ScreenBase nextScreen;
-    private final FrameBufferSupport frameBufferSupport;
+    private final FrameBufferManager frameBufferManager;
     private FrameBuffer currentFrameBuffer;
     private FrameBuffer nextFrameBuffer;
 
     private final SpriteBatch batch;
 
-    public TransitionContext(SpriteBatch batch) {
+    public TransitionContext(SpriteBatch batch, FrameBufferManager frameBufferManager) {
         transitionViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.batch = batch;
-        frameBufferSupport = new FrameBufferSupport();
+        this.frameBufferManager = frameBufferManager;
     }
 
     public void setScreen(ScreenBase screen, ScreenTransition transition) {
@@ -95,15 +95,15 @@ public class TransitionContext {
     private void renderScreensToTexture(float delta) {
         // render current screen to buffer
         if (currentScreen != null) {
-            frameBufferSupport.begin(currentFrameBuffer);
-            currentScreen.render(0f);
-            frameBufferSupport.end();
+            frameBufferManager.begin(currentFrameBuffer);
+            currentScreen.render(0f, true);
+            frameBufferManager.end();
         }
 
         // render next screen to buffer
-        frameBufferSupport.begin(nextFrameBuffer);
-        nextScreen.render(delta);
-        frameBufferSupport.end();
+        frameBufferManager.begin(nextFrameBuffer);
+        nextScreen.render(delta, true);
+        frameBufferManager.end();
     }
 
     private void updateTransition() {
