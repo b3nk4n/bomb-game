@@ -24,7 +24,6 @@ allprojects {
         ashleyVersion = '1.7.4'
         aiVersion = '1.8.2'
         gdxControllersVersion = '2.2.1'
-        gmsLibraryVersion = '7.8.0' // https://mvnrepository.com/artifact/com.google.android.gms/play-services-games
         gdxgamesvcsVersion = '1.1.0'
         kryoVersion = '4.0.2'
         playServicesAdsVersion = '22.6.0'
