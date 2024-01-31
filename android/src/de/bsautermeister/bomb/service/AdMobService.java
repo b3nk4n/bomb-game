@@ -206,7 +206,18 @@ public class AdMobService implements AdService {
                     @Override
                     public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                         LOG.error("Failed to show fullscreen content: " + adError.getMessage());
+                        rewardedAd = null;
                         rewardCallback.canceled();
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        LOG.debug("Ad was clicked");
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        LOG.debug("Ad recorded an impression");
                     }
                 });
                 rewardedAd.show(
