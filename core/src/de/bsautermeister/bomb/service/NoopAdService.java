@@ -12,10 +12,28 @@ public class NoopAdService implements AdService {
     }
 
     @Override
+    public void initialize() { }
+
+    @Override
     public void load() { }
 
     @Override
     public boolean show(RewardCallback callback) {
         return false;
+    }
+
+    @Override
+    public boolean isPrivacyOptionsRequired() {
+        return false;
+    }
+
+    @Override
+    public void showPrivacyConsentForm() {
+
+    }
+
+    @Override
+    public void resetConsentForTesting() {
+
     }
 }

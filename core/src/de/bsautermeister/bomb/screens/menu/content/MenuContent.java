@@ -18,6 +18,7 @@ import de.bsautermeister.bomb.GameSettings;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
+import de.bsautermeister.bomb.service.AdService;
 
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.ABOUT;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO0;
@@ -25,6 +26,7 @@ import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO1;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO2;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO3;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.NO_VIBRATE;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.PRIVACY;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.STAR;
 import static de.bsautermeister.bomb.assets.Styles.ImageButton.VIBRATE;
 
@@ -40,6 +42,7 @@ public class MenuContent extends Table {
         void leaderboardsClicked();
         void achievementsClicked();
         void aboutClicked();
+        void privacyClicked();
         void rateClicked();
         void signOut();
     }
@@ -53,15 +56,18 @@ public class MenuContent extends Table {
     private final GameScores gameScores;
     private final Callbacks callbacks;
 
+    private final boolean privacyOptionRequired;
+
     public MenuContent(AssetManager assetManager, GameSettings gameSettings, GameScores gameScores,
                        Callbacks callbacks, boolean canResume, boolean canShowLeaderboards,
-                       boolean canShowAchievements) {
+                       boolean canShowAchievements, boolean privacyOptionRequired) {
         this.canResume = canResume;
         this.canShowLeaderboards = canShowLeaderboards;
         this.canShowAchievements = canShowAchievements;
         this.gameSettings = gameSettings;
         this.gameScores = gameScores;
         this.callbacks = callbacks;
+        this.privacyOptionRequired = privacyOptionRequired;
         initialize(assetManager);
     }
 
@@ -255,7 +261,19 @@ public class MenuContent extends Table {
         });
         rightFooterTable.add(rateButton);
 
-        final ImageButton aboutButton = new ImageButton(skin, ABOUT);
+        if (privacyOptionRequired) {
+            ImageButton privacyOptionButton = new ImageButton(skin, PRIVACY);
+            privacyOptionButton.setColor(Cfg.Colors.DARK_RED);
+            privacyOptionButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    callbacks.privacyClicked();
+                }
+            });
+            rightFooterTable.add(privacyOptionButton);
+        }
+
+        ImageButton aboutButton = new ImageButton(skin, ABOUT);
         aboutButton.setColor(Cfg.Colors.DARK_RED);
         aboutButton.addListener(new ClickListener() {
             @Override

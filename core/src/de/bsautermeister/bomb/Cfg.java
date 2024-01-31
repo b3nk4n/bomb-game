@@ -10,6 +10,13 @@ public interface Cfg {
     boolean DEBUG_ADS = false;
 
     /**
+     * Enable consent form debugging using a local device.
+     * To get the hased ID, start the app with {@link Cfg#DEBUG_ADS} enabled and check for the log:
+     * Use new ConsentDebugSettings.Builder().addTestDeviceHashedId("XXXXXX") to set this as a debug device.
+     */
+    String DEBUG_ADS_TEST_DEVICE_HASHED_ID = "6AF04AC20756A978832ACC7053531D1B"; // Pixel 4
+
+    /**
      * When recording a video via Android 11, the music is still playing even though the volume
      * is muted. Therefore this flag prevents the Music from playing. Furthermore, sound effects
      * are played with the full volume.

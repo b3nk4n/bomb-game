@@ -106,6 +106,10 @@
         "up": "about-button",
         "down": "about-button-down"
     },
+    "privacy": {
+        "up": "privacy-button",
+        "down": "privacy-button-down"
+    },
     "audio0": {
         "up": "audio0-button",
         "down": "audio0-button-down"

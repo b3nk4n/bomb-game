@@ -168,6 +168,11 @@ public class MenuScreen extends ScreenBase {
                     }
 
                     @Override
+                    public void privacyClicked() {
+                        ((BombGame) getGame()).getAdService().showPrivacyConsentForm();
+                    }
+
+                    @Override
                     public void rateClicked() {
                         ((BombGame) getGame()).getRateService().rateGame();
                     }
@@ -182,7 +187,8 @@ public class MenuScreen extends ScreenBase {
                 getGame().getGameServiceClient().isFeatureSupported(
                         IGameServiceClient.GameServiceFeature.ShowLeaderboardUI),
                 getGame().getGameServiceClient().isFeatureSupported(
-                        IGameServiceClient.GameServiceFeature.ShowAchievementsUI));
+                        IGameServiceClient.GameServiceFeature.ShowAchievementsUI),
+                ((BombGame) getGame()).getAdService().isPrivacyOptionsRequired());
     }
 
     private Table createAboutContent() {

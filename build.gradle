@@ -27,6 +27,7 @@ allprojects {
         gdxgamesvcsVersion = '1.1.0'
         kryoVersion = '4.0.2'
         playServicesAdsVersion = '22.6.0'
+        adMobUmpVersion = '2.2.0'
         multidexVersion = '1.0.3'
     }
 
@@ -72,6 +73,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
         implementation "de.golfgl.gdxgamesvcs:gdx-gamesvcs-android-gpgs:$gdxgamesvcsVersion"
         implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
+        implementation "com.google.android.ump:user-messaging-platform:$adMobUmpVersion"
         implementation "com.android.support:multidex:$multidexVersion"
     }
 }

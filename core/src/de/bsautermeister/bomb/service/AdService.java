@@ -17,6 +17,13 @@ public interface AdService {
 
     boolean isSupported();
     boolean isReady();
+    void initialize();
     void load();
     boolean show(RewardCallback callback);
+
+    boolean isPrivacyOptionsRequired();
+
+    void showPrivacyConsentForm();
+
+    void resetConsentForTesting();
 }

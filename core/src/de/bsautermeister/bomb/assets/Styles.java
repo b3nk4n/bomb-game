@@ -26,6 +26,7 @@ public interface Styles {
         String AUDIO2 = "audio2";
         String AUDIO3 = "audio3";
         String ABOUT = "about";
+        String PRIVACY = "privacy";
     }
 
     interface Fonts {

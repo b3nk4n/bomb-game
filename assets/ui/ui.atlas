@@ -102,37 +102,51 @@ no-vibrate-button-down
   orig: 64, 64
   offset: 0, 0
   index: -1
-star-button
+privacy-button
   rotate: false
   xy: 276, 81
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-star-button-down
+privacy-button-down
   rotate: false
   xy: 344, 149
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-template-button
+star-button
   rotate: false
   xy: 276, 13
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-vibrate-button
+star-button-down
   rotate: false
   xy: 344, 81
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
-vibrate-button-down
+template-button
   rotate: false
   xy: 412, 149
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+vibrate-button
+  rotate: false
+  xy: 344, 13
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+vibrate-button-down
+  rotate: false
+  xy: 412, 81
   size: 64, 64
   orig: 64, 64
   offset: 0, 0

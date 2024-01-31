@@ -25,10 +25,10 @@ public class AndroidLauncher extends AndroidApplication {
 				.setGpgsAchievementIdMapper(new GpgsAchievementMapper())
 				.initialize(this, false);
 
-		String adUnitId = Cfg.DEBUG_ADS
-				? Ads.TEST_REWARDED_VIDEO_AD_UNIT_ID
-				: Ads.REWARDED_EXTRA_LIFE_AD_UNIT_ID;
-		AdService adService = new AdMobService(this, adUnitId);
+		AdService adService = new AdMobService(
+				this, Ads.REWARDED_EXTRA_LIFE_AD_UNIT_ID,
+				Cfg.DEBUG_ADS, Cfg.DEBUG_ADS_TEST_DEVICE_HASHED_ID);
+		adService.initialize();
 
 		initialize(new BombGame(
 				new AndroidGameEnv(),
