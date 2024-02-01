@@ -5,7 +5,6 @@ import static com.google.android.ump.ConsentInformation.PrivacyOptionsRequiremen
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 

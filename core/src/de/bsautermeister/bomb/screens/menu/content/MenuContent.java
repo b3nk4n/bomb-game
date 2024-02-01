@@ -1,8 +1,17 @@
 package de.bsautermeister.bomb.screens.menu.content;
 
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.ABOUT;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO0;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO1;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO2;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO3;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.NO_VIBRATE;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.PRIVACY;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.STAR;
+import static de.bsautermeister.bomb.assets.Styles.ImageButton.VIBRATE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -18,17 +27,6 @@ import de.bsautermeister.bomb.GameSettings;
 import de.bsautermeister.bomb.assets.Assets;
 import de.bsautermeister.bomb.assets.Styles;
 import de.bsautermeister.bomb.screens.game.score.GameScores;
-import de.bsautermeister.bomb.service.AdService;
-
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.ABOUT;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO0;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO1;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO2;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.AUDIO3;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.NO_VIBRATE;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.PRIVACY;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.STAR;
-import static de.bsautermeister.bomb.assets.Styles.ImageButton.VIBRATE;
 
 public class MenuContent extends Table {
 
